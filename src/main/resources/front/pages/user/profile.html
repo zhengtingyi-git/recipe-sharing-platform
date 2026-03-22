@@ -1,0 +1,226 @@
+<!-- 用户主页：查看某用户的昵称、头像、粉丝数及发布的中式/外国美食 -->
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<title>用户主页</title>
+		<link rel="stylesheet" href="../../layui/css/layui.css">
+		<link rel="stylesheet" href="../../css/style.css" />
+		<link rel="stylesheet" href="../../css/theme.css" />
+		<link rel="stylesheet" href="../../css/common.css" />
+	</head>
+	<style>
+		#swiper { overflow: hidden; }
+		.index-title { text-align: center; box-sizing: border-box; width: 980px; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+		.index-title span { padding: 0 10px; line-height: 1.4; }
+		.profile-container { max-width: 900px; margin: 0 auto 20px; padding: 0 15px; }
+		.profile-card { padding: 24px; box-shadow: 0 0 6px rgba(255,0,0,.2); border-radius: 8px; background: #fff; margin-bottom: 20px; display: flex; align-items: center; flex-wrap: wrap; }
+		.profile-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-right: 20px; border: 2px solid #eee; }
+		.profile-info { flex: 1; min-width: 0; }
+		.profile-name { font-size: 20px; color: #333; margin-bottom: 8px; }
+		.profile-fans { font-size: 14px; color: #666; }
+		.profile-section { padding: 16px 0; border-top: 1px solid #f0f0f0; }
+		.profile-section:first-of-type { border-top: none; }
+		.profile-section h3 { font-size: 16px; color: #333; margin-bottom: 12px; padding: 0 4px; }
+		.profile-list { display: flex; flex-wrap: wrap; gap: 12px; }
+		.profile-list .item { flex: 0 0 calc(25% - 10px); min-width: 140px; box-shadow: 0 0 6px rgba(0,0,0,.08); border-radius: 8px; overflow: hidden; background: #fff; cursor: pointer; }
+		.profile-list .item img { width: 100%; height: 140px; object-fit: cover; display: block; }
+		.profile-list .item .name { padding: 8px 10px; font-size: 14px; color: #333; text-align: center; }
+		.profile-empty { text-align: center; padding: 24px; color: #999; font-size: 14px; }
+		.profile-btn-follow { margin-left: auto; padding: 6px 16px; font-size: 14px; color: red; border: 1px solid red; border-radius: 6px; background: #fff; cursor: pointer; }
+		.profile-btn-follow.followed { color: #999; border-color: #ccc; }
+	</style>
+	<body>
+		<div id="app">
+			<div class="layui-carousel" id="swiper" :style='{"boxShadow":"0 0 8px rgba(255, 69, 0, 1)","margin":"0","borderColor":"rgba(0, 0, 0, 0.75)","borderRadius":"20px","borderWidth":"5px 0 0 0","width":"100%","borderStyle":"solid"}'>
+				<div carousel-item>
+					<div v-for="(item,index) in swiperList" :key="index">
+						<img style="width: 100%;height: 100%;object-fit:cover;" :src="item.img" />
+					</div>
+				</div>
+			</div>
+
+			<div class="index-title" :style='{"padding":"10px","boxShadow":"0 0 5px rgba(255,0,0,.8)","margin":"10px auto","borderColor":"rgba(255, 255, 255, 1)","backgroundColor":"rgba(255, 255, 255, 1)","color":"rgba(255, 0, 0, 1)","borderRadius":"50% 50px","borderWidth":"2px","fontSize":"20px","borderStyle":"solid","height":"auto"}'>
+				<span>用户主页</span>
+			</div>
+
+			<div class="profile-container">
+				<div class="profile-card" v-if="user.id">
+					<img class="profile-avatar" :src="user.touxiang ? (baseurl + user.touxiang) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'" alt="头像" />
+					<div class="profile-info">
+						<div class="profile-name">{{ user.yonghuxingming || '—' }}</div>
+						<div class="profile-fans">粉丝数：{{ fansCount }}</div>
+					</div>
+					<a v-if="!isSelf" @click.prevent="followClick()" href="javascript:void(0)" class="profile-btn-follow" :class="{ followed: followFlag }">{{ followFlag ? '已关注' : '+ 关注' }}</a>
+				</div>
+				<div class="profile-card" v-else-if="loaded">
+					<div class="profile-empty">用户不存在</div>
+				</div>
+
+				<div class="profile-card" v-if="user.id">
+					<div class="profile-section" style="width:100%;">
+						<h3>TA 发布的中式美食</h3>
+						<div class="profile-list" v-if="listZhong.length">
+							<div class="item" v-for="(item,index) in listZhong" :key="'z'+index" @click="jump('../zhongshimeishi/detail.html?id=' + item.id)">
+								<img :src="item.tupian ? (baseurl + item.tupian.split(',')[0]) : '../../img/default.png'" @error="$event.target.src='../../img/default.png'" />
+								<div class="name">{{ item.caipinmingcheng }}</div>
+							</div>
+						</div>
+						<div class="profile-empty" v-else>暂无发布</div>
+					</div>
+					<div class="profile-section" style="width:100%;">
+						<h3>TA 发布的外国美食</h3>
+						<div class="profile-list" v-if="listWai.length">
+							<div class="item" v-for="(item,index) in listWai" :key="'w'+index" @click="jump('../waiguomeishi/detail.html?id=' + item.id)">
+								<img :src="item.tupian ? (baseurl + item.tupian.split(',')[0]) : '../../img/default.png'" @error="$event.target.src='../../img/default.png'" />
+								<div class="name">{{ item.caipinmingcheng }}</div>
+							</div>
+						</div>
+						<div class="profile-empty" v-else>暂无发布</div>
+					</div>
+					<div class="profile-section" style="width:100%;">
+						<h3>TA 发布的美食论坛</h3>
+						<div class="profile-list" v-if="listNews.length">
+							<div class="item" v-for="(item,index) in listNews" :key="'n'+index" @click="jump('../news/detail.html?id=' + item.id)">
+								<img :src="item.picture ? (baseurl + item.picture.split(',')[0]) : '../../img/default.png'" @error="$event.target.src='../../img/default.png'" />
+								<div class="name">{{ item.title }}</div>
+							</div>
+						</div>
+						<div class="profile-empty" v-else>暂无发布</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="../../layui/layui.js"></script>
+		<script src="../../js/vue.js"></script>
+		<script src="../../js/config.js"></script>
+		<script src="../../modules/config.js"></script>
+		<script src="../../js/utils.js"></script>
+		<script>
+			var vue = new Vue({
+				el: '#app',
+				data: {
+					swiperList: [{ img: '../../img/banner.jpg' }],
+					baseurl: '',
+					user: {},
+					fansCount: 0,
+					listZhong: [],
+					listWai: [],
+					// TA 发布的美食论坛
+					listNews: [],
+					loaded: false,
+					followFlag: 0
+				},
+				computed: {
+					isSelf() {
+						var uid = localStorage.getItem('userid');
+						if (!uid) return true;
+						return this.user && (this.user.id == uid || this.user.id == Number(uid));
+					}
+				},
+				methods: {
+					jump(url) { jump(url); },
+					followClick() {
+						var uid = localStorage.getItem('userid');
+						if (!uid) {
+							layui.layer.msg('请先登录', { icon: 5 });
+							return;
+						}
+						if (!this.user || !this.user.id) return;
+						var followedId = this.user.id;
+						var api = this.followFlag ? 'guanzhu/unfollow' : 'guanzhu/follow';
+						var _this = this;
+						layui.http.request(api, 'get', { followedId: followedId }, function(res) {
+							if (res.code === 0) {
+								_this.followFlag = _this.followFlag ? 0 : 1;
+								layui.layer.msg(res.msg || (_this.followFlag ? '关注成功' : '已取消关注'), { icon: 6 });
+								// 关注/取关成功后从服务器重新拉取粉丝数，保证显示正确
+								layui.http.request('guanzhu/fansCount', 'get', { userId: followedId }, function(r) {
+									if (r.fansCount != null) _this.fansCount = r.fansCount;
+								});
+							} else {
+								layui.layer.msg(res.msg || '操作失败', { icon: 5 });
+							}
+						});
+					}
+				}
+			});
+
+			layui.use(['layer', 'carousel', 'http', 'jquery'], function() {
+				var layer = layui.layer;
+				var carousel = layui.carousel;
+				var http = layui.http;
+				var jquery = layui.jquery;
+
+				vue.baseurl = http.baseurl;
+
+				var id = http.getParam('id');
+				if (!id) {
+					layer.msg('缺少用户ID', { icon: 5 });
+					vue.loaded = true;
+					return;
+				}
+
+				// 轮播图
+				http.request('config/list', 'get', { page: 1, limit: 5 }, function(res) {
+					if (res.data && res.data.list && res.data.list.length > 0) {
+						var arr = [];
+						for (var i = 0; i < res.data.list.length; i++) {
+							var item = res.data.list[i];
+							if (item.name && item.name.indexOf('picture') >= 0 && item.value) {
+								arr.push({ img: http.baseurl + item.value });
+							}
+						}
+						if (arr.length) vue.swiperList = arr;
+						vue.$nextTick(function() {
+							carousel.render({
+								elem: '#swiper',
+								width: '100%',
+								height: '300px',
+								arrow: 'hover',
+								anim: 'default',
+								autoplay: true,
+								interval: 3000,
+								indicator: 'inside'
+							});
+						});
+					}
+				});
+
+				// 用户信息
+				http.request('user/detail/' + id, 'get', {}, function(res) {
+					vue.loaded = true;
+					if (res.code === 0 && res.data) {
+						vue.user = res.data;
+						// 粉丝数（接口返回在根级 fansCount）
+						http.request('guanzhu/fansCount', 'get', { userId: id }, function(r) {
+							vue.fansCount = (r.fansCount != null) ? r.fansCount : 0;
+						});
+						// 关注状态（当前用户已登录且不是自己时）
+						if (localStorage.getItem('userid') && vue.user.id != localStorage.getItem('userid') && vue.user.id != Number(localStorage.getItem('userid'))) {
+							http.request('guanzhu/status', 'get', { followedId: id }, function(r) {
+								vue.followFlag = (r.data && r.data.followed) ? 1 : 0;
+							});
+						}
+						// 该用户发布的中式美食
+						http.request('zhongshimeishi/list', 'get', { page: 1, limit: 100, userid: id, sfsh: '是' }, function(r) {
+							vue.listZhong = (r.data && r.data.list) ? r.data.list : [];
+						});
+						// 该用户发布的外国美食
+						http.request('waiguomeishi/list', 'get', { page: 1, limit: 100, userid: id, sfsh: '是' }, function(r) {
+							vue.listWai = (r.data && r.data.list) ? r.data.list : [];
+						});
+						// 该用户发布的美食论坛
+						http.request('news/list', 'get', { page: 1, limit: 100, userid: id }, function(r) {
+							vue.listNews = (r.data && r.data.list) ? r.data.list : [];
+						});
+					} else {
+						vue.user = {};
+					}
+				});
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,145 @@
+<!-- 我发布的中式美食 -->
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<title>我发布的中式美食</title>
+		<link rel="stylesheet" href="../../layui/css/layui.css">
+		<link rel="stylesheet" href="../../css/style.css" />
+		<link rel="stylesheet" href="../../css/theme.css" />
+		<link rel="stylesheet" href="../../css/common.css" />
+	</head>
+	<body>
+		<div id="app">
+			<div class="layui-carousel" id="swiper" :style='{"boxShadow":"0 0 8px rgba(255, 69, 0, 1)","margin":"0px 0 0 0","borderColor":"rgba(0, 0, 0, 0.75)","borderRadius":"20px","borderWidth":"5px 0 0 0","width":"100%","borderStyle":"solid"}'>
+			  <div carousel-item id="swiper-item">
+				<div v-for="(item,index) in swiperList" :key="index">
+					<img style="width: 100%;height: 100%;object-fit:cover;" :src="item.img" />
+				</div>
+			  </div>
+			</div>
+
+			<div class="index-title" :style='{"padding":"10px","boxShadow":"0 0 5px rgba(255,0,0,.8)","margin":"10px auto","borderColor":"rgba(255, 255, 255, 1)","backgroundColor":"rgba(255, 255, 255, 1)","color":"rgba(255, 0, 0, 1)","borderRadius":"50% 50px","borderWidth":"2px","fontSize":"20px","borderStyle":"solid","height":"auto","width":"980px","display":"flex","justifyContent":"center","alignItems":"center","flexDirection":"column"}'>
+			  <span>ZHONGSHI FOOD</span><span>我发布的中式美食</span>
+			</div>
+
+			<div class="forum-container">
+				<table class="layui-table" lay-skin="nob">
+					<thead>
+						<tr>
+							<th>菜品名称</th>
+							<th>菜系</th>
+							<th>时间</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="(item,index) in dataList" v-bind:key="index">
+							<td @click="jump('../zhongshimeishi/detail.html?id='+item.id);" style="text-align:left">{{item.caipinmingcheng}}</td>
+							<td style="text-align:left">{{item.caixi}}</td>
+							<td style="text-align:left">{{item.shijian}}</td>
+							<td style="text-align:left">
+								<button @click="jump('../zhongshimeishi/detail.html?id='+item.id);" type="button" class="layui-btn layui-btn-radius btn-theme">
+									查看
+								</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="pager" id="pager" :style="{textAlign:2==1?'left':2==2?'center':'right'}"></div>
+			</div>
+		</div>
+
+		<script src="../../layui/layui.js"></script>
+		<script src="../../js/vue.js"></script>
+		<script src="../../js/config.js"></script>
+		<script src="../../modules/config.js"></script>
+		<script src="../../js/utils.js"></script>
+		<script>
+			var vue = new Vue({
+				el: '#app',
+				data: {
+					swiperList: [{
+						img: '../../img/banner.jpg'
+					}],
+					dataList: []
+				},
+				methods: {
+					jump(url) {
+						jump(url)
+					}
+				}
+			})
+
+			layui.use(['layer', 'element', 'carousel', 'laypage', 'http', 'jquery'], function() {
+				var layer = layui.layer;
+				var element = layui.element;
+				var carousel = layui.carousel;
+				var laypage = layui.laypage;
+				var http = layui.http;
+				var jquery = layui.jquery;
+
+				var limit = 10;
+
+				http.request('config/list', 'get', {
+					page: 1,
+					limit: 5
+				}, function(res) {
+					if (res.data.list.length > 0) {
+						var swiperItemHtml = '';
+						for (let item of res.data.list) {
+							if (item.name.indexOf('picture') >= 0 && item.value && item.value != "" && item.value != null) {
+								swiperItemHtml +=
+									'<div>' +
+									'<img class="swiper-item" style="width: 100%;height: 100%;object-fit:cover;" src="' + http.baseurl+item.value + '">' +
+									'</div>';
+							}
+						}
+						jquery('#swiper-item').html(swiperItemHtml);
+						vue.$nextTick(() => {
+						  carousel.render({
+						  	elem: '#swiper',
+							width: '100%',
+						  	height: '300px',
+						  	arrow: 'hover',
+						  	anim: 'default',
+						  	autoplay: 'true',
+						  	interval: '3000',
+						  	indicator: 'inside'
+						  });
+						})
+					}
+				});
+
+				// 我发布的中式美食列表，只查当前登录用户
+				http.request('zhongshimeishi/page?sort=addtime&order=desc', 'get', {
+					page: 1,
+					limit: limit
+				}, function(res) {
+					vue.dataList = res.data.list
+					laypage.render({
+						elem: 'pager',
+						count: res.data.total,
+						limit: limit,
+						groups: 3,
+						layout: ["prev","page","next"],
+						theme: '#000000',
+						jump: function(obj, first) {
+							if (!first) {
+								http.request('zhongshimeishi/page?sort=addtime&order=desc', 'get', {
+									page: obj.curr,
+									limit: obj.limit
+								}, function(res) {
+									vue.dataList = res.data.list
+								})
+							}
+						}
+					});
+				})
+
+			});
+		</script>
+	</body>
+</html>
+

@@ -1,0 +1,298 @@
+<!-- 我的发布 -->
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<title>我的发布</title>
+		<link rel="stylesheet" href="../../layui/css/layui.css">
+		<link rel="stylesheet" href="../../css/style.css" />
+		<link rel="stylesheet" href="../../css/theme.css" />
+		<link rel="stylesheet" href="../../css/common.css" />
+	</head>
+	<body>
+		<div id="app">
+			<div class="layui-carousel" id="swiper" :style='{"boxShadow":"0 0 8px rgba(255, 69, 0, 1)","margin":"0px 0 0 0","borderColor":"rgba(0, 0, 0, 0.75)","borderRadius":"20px","borderWidth":"5px 0 0 0","width":"100%","borderStyle":"solid"}'>
+			  <div carousel-item id="swiper-item">
+				<div v-for="(item,index) in swiperList" :key="index">
+					<img style="width: 100%;height: 100%;object-fit:cover;" :src="item.img" />
+				</div>
+			  </div>
+			</div>
+
+			<div class="index-title" :style='{"padding":"10px","boxShadow":"0 0 5px rgba(255,0,0,.8)","margin":"10px auto","borderColor":"rgba(255, 255, 255, 1)","backgroundColor":"rgba(255, 255, 255, 1)","color":"rgba(255, 0, 0, 1)","borderRadius":"50% 50px","borderWidth":"2px","fontSize":"20px","borderStyle":"solid","height":"auto","width":"980px","display":"flex","justifyContent":"center","alignItems":"center","flexDirection":"column"}'>
+			  <span>MY PUBLISH</span><span>我的发布</span>
+			</div>
+
+			<div class="forum-container" style="width: 980px; margin: 0 auto; padding: 20px;">
+				<div class="sort-tabs" style="display:flex;align-items:center;gap:16px;margin-bottom:15px;">
+					<span class="sort-tab" :class="{ current: currentType === 'all' }" style="cursor:pointer;font-size:14px;padding:6px 14px;border-radius:16px;border:1px solid #ddd;" @click="switchType('all')">全部</span>
+					<span class="sort-tab" :class="{ current: currentType === '美食论坛' }" style="cursor:pointer;font-size:14px;padding:6px 14px;border-radius:16px;border:1px solid #ddd;" @click="switchType('美食论坛')">美食论坛</span>
+					<span class="sort-tab" :class="{ current: currentType === '中式美食' }" style="cursor:pointer;font-size:14px;padding:6px 14px;border-radius:16px;border:1px solid #ddd;" @click="switchType('中式美食')">中式美食</span>
+					<span class="sort-tab" :class="{ current: currentType === '外国美食' }" style="cursor:pointer;font-size:14px;padding:6px 14px;border-radius:16px;border:1px solid #ddd;" @click="switchType('外国美食')">外国美食</span>
+				</div>
+				<table class="layui-table" lay-skin="nob">
+					<thead>
+						<tr>
+							<th>发布内容</th>
+							<th>类型</th>
+							<th>时间</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="(item,index) in dataList" v-bind:key="index">
+							<td @click="jumpToDetail(item)" style="text-align:left;cursor:pointer;">{{item.caipinmingcheng || item.biaoti}}</td>
+							<td style="text-align:left">{{item.type}}</td>
+							<td style="text-align:left">{{item.shijian || item.addtime}}</td>
+							<td style="text-align:left">
+								<button @click="jumpToDetail(item)" type="button" class="layui-btn layui-btn-radius btn-theme" style="margin-right:5px;">
+									查看
+								</button>
+								<button @click="deleteItem(item, index)" type="button" class="layui-btn layui-btn-radius layui-btn-danger">
+									删除
+								</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="pager" id="pager" style="text-align: center; margin-top: 20px;"></div>
+			</div>
+		</div>
+
+		<script src="../../layui/layui.js"></script>
+		<script src="../../js/vue.js"></script>
+		<script src="../../js/config.js"></script>
+		<script src="../../modules/config.js"></script>
+		<script src="../../js/utils.js"></script>
+		<script>
+			var vue = new Vue({
+				el: '#app',
+				data: {
+					swiperList: [{
+						img: '../../img/banner.jpg'
+					}],
+					dataList: [],
+					allData: [],
+					currentType: 'all'
+				},
+				methods: {
+					jump(url) {
+						jump(url)
+					},
+					switchType(type) {
+						this.currentType = type;
+						currentPage = 1;
+						loadData();
+					},
+					jumpToDetail(item) {
+						if (item.type === '外国美食') {
+							jump('../waiguomeishi/detail.html?id=' + item.id);
+						} else if (item.type === '中式美食') {
+							jump('../zhongshimeishi/detail.html?id=' + item.id);
+						} else if (item.type === '美食论坛') {
+							jump('../news/detail.html?id=' + item.id);
+						}
+					},
+					deleteItem(item, index) {
+						var layer = layui.layer;
+						var http = layui.http;
+						var self = this;
+						
+						layer.confirm('确定要删除这条记录吗？', {
+							icon: 3,
+							title: '提示'
+						}, function(index2) {
+							var deleteUrl = '';
+							if (item.type === '外国美食') {
+								deleteUrl = 'waiguomeishi/delete';
+							} else if (item.type === '中式美食') {
+								deleteUrl = 'zhongshimeishi/delete';
+							} else if (item.type === '美食论坛') {
+								deleteUrl = 'news/delete';
+							}
+							
+							http.requestJson(deleteUrl, 'post', [item.id], function(res) {
+								if (res.code == 0) {
+									layer.msg('删除成功', {
+										icon: 1,
+										time: 1500
+									}, function() {
+										// 重新加载数据
+										loadData();
+									});
+								} else {
+									layer.msg(res.msg || '删除失败', {
+										icon: 2
+									});
+								}
+							});
+							layer.close(index2);
+						});
+					}
+				}
+			})
+
+			var currentPage = 1;
+			var limit = 10;
+
+			function filterByType(type, list) {
+				if (!type || type === 'all') return list || [];
+				return (list || []).filter(function(item) {
+					return item.type === type;
+				});
+			}
+			
+			function loadData() {
+				var laypage = layui.laypage;
+				var http = layui.http;
+
+				// 加载外国美食
+				http.request('waiguomeishi/page?sort=addtime&order=desc', 'get', {
+					page: 1,
+					limit: 1000
+				}, function(res1) {
+					var waiguoList = [];
+					if (res1.data && res1.data.list) {
+						waiguoList = res1.data.list.map(function(item) {
+							return {
+								id: item.id,
+								caipinmingcheng: item.caipinmingcheng,
+								caixi: item.caixi,
+								shijian: item.shijian,
+								type: '外国美食',
+								tableName: 'waiguomeishi'
+							};
+						});
+					}
+
+					// 加载中式美食
+					http.request('zhongshimeishi/page?sort=addtime&order=desc', 'get', {
+						page: 1,
+						limit: 1000
+					}, function(res2) {
+						var zhongshiList = [];
+						if (res2.data && res2.data.list) {
+							zhongshiList = res2.data.list.map(function(item) {
+								return {
+									id: item.id,
+									caipinmingcheng: item.caipinmingcheng,
+									caixi: item.caixi,
+									shijian: item.shijian,
+									type: '中式美食',
+									tableName: 'zhongshimeishi'
+								};
+							});
+						}
+
+						// 加载美食论坛（新闻）
+						http.request('news/page?sort=addtime&order=desc', 'get', {
+							page: 1,
+							limit: 1000
+						}, function(res3) {
+							var newsList = [];
+							if (res3.data && res3.data.list) {
+								newsList = res3.data.list.map(function(item) {
+									return {
+										id: item.id,
+										caipinmingcheng: item.title,
+										caixi: '-',
+										shijian: item.addtime,
+										type: '美食论坛',
+										tableName: 'news'
+									};
+								});
+							}
+
+							// 合并所有数据并按时间排序
+							var allData = waiguoList.concat(zhongshiList).concat(newsList);
+							allData.sort(function(a, b) {
+								var timeA = new Date(a.shijian || 0).getTime();
+								var timeB = new Date(b.shijian || 0).getTime();
+								return timeB - timeA;
+							});
+
+							vue.allData = allData;
+							
+							// 根据当前类型过滤数据
+							var displayData = filterByType(vue.currentType, vue.allData);
+							
+							// 分页显示
+							var total = displayData.length;
+							var start = (currentPage - 1) * limit;
+							var end = start + limit;
+							vue.dataList = displayData.slice(start, end);
+
+							laypage.render({
+								elem: 'pager',
+								count: total,
+								limit: limit,
+								groups: 3,
+								layout: ["prev","page","next"],
+								theme: '#000000',
+								curr: currentPage,
+								jump: function(obj, first) {
+									if (!first) {
+										currentPage = obj.curr;
+										var displayData = filterByType(vue.currentType, vue.allData);
+										var start = (obj.curr - 1) * obj.limit;
+										var end = start + obj.limit;
+										vue.dataList = displayData.slice(start, end);
+									} else {
+										// 首次加载时设置当前页数据
+										var displayDataInit = filterByType(vue.currentType, vue.allData);
+										var start = (currentPage - 1) * limit;
+										var end = start + limit;
+										vue.dataList = displayDataInit.slice(start, end);
+									}
+								}
+							});
+						});
+					});
+				});
+			}
+
+			layui.use(['layer', 'element', 'carousel', 'laypage', 'http', 'jquery'], function() {
+				var layer = layui.layer;
+				var element = layui.element;
+				var carousel = layui.carousel;
+				var laypage = layui.laypage;
+				var http = layui.http;
+				var jquery = layui.jquery;
+
+				http.request('config/list', 'get', {
+					page: 1,
+					limit: 5
+				}, function(res) {
+					if (res.data.list.length > 0) {
+						var swiperItemHtml = '';
+						for (let item of res.data.list) {
+							if (item.name.indexOf('picture') >= 0 && item.value && item.value != "" && item.value != null) {
+								swiperItemHtml +=
+									'<div>' +
+									'<img class="swiper-item" style="width: 100%;height: 100%;object-fit:cover;" src="' + http.baseurl+item.value + '">' +
+									'</div>';
+							}
+						}
+						jquery('#swiper-item').html(swiperItemHtml);
+						vue.$nextTick(() => {
+						  carousel.render({
+						  	elem: '#swiper',
+							width: '100%',
+						  	height: '300px',
+						  	arrow: 'hover',
+						  	anim: 'default',
+						  	autoplay: 'true',
+						  	interval: '3000',
+						  	indicator: 'inside'
+						  });
+						})
+					}
+				});
+
+				// 加载数据
+				loadData();
+			});
+		</script>
+	</body>
+</html>

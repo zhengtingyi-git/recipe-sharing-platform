@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<title>发布美食论坛</title>
+		<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+		<link rel="stylesheet" href="../../layui/css/layui.css">
+		<link rel="stylesheet" href="../../css/style.css" />
+		<link rel="stylesheet" href="../../css/theme.css" />
+		<link rel="stylesheet" href="../../css/common.css" />
+	</head>
+	<body style="background: #EEEEEE;">
+		<div id="app">
+			<div class="layui-carousel" id="swiper" :style='{"boxShadow":"0 0 8px rgba(255, 69, 0, 1)","margin":"0px 0 0 0","borderColor":"rgba(0, 0, 0, 0.75)","borderRadius":"20px","borderWidth":"5px 0 0 0","width":"100%","borderStyle":"solid"}'>
+			  <div carousel-item id="swiper-item">
+				<div v-for="(item,index) in swiperList" :key="index">
+					<img style="width: 100%;height: 100%;object-fit:cover;" :src="item.img" />
+				</div>
+			  </div>
+			</div>
+
+			<div class="data-add-container" :style='{"padding":"20px","boxShadow":"1px 1px 6px rgba(255,0,0,.8)","margin":"30px auto","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"10px","borderWidth":"0","borderStyle":"solid","maxWidth":"980px"}'>
+				<form class="layui-form layui-form-pane add" lay-filter="myForm">
+                    <div :style='{"padding":"0 0 10px 0","boxShadow":"0 0 0 rgba(0,0,0,0)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,0)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid","display":"flex","justifyContent":"space-between","alignItems":"center"}' class="layui-form-item" pane>
+						<div style="font-size:16px;color:#333;font-weight:bold;">发布美食论坛</div>
+						<button type="button"
+								@click="jump('../news/list.html')"
+								:style='{"padding":"0 14px","boxShadow":"0 0 6px rgba(255,0,0,.3)","borderColor":"rgba(255,0,0,.4)","backgroundColor":"#fff","color":"red","borderRadius":"16px","borderWidth":"1px","width":"auto","fontSize":"12px","borderStyle":"solid","height":"32px","cursor":"pointer"}'
+								class="layui-btn layui-btn-sm layui-btn-primary">
+							× 关闭
+						</button>
+					</div>
+                    <div :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="layui-form-item" pane>
+						<label :style='{"width":"94px","padding":"0 12px 0 0","fontSize":"14px","color":"#333","textAlign":"right"}' class="layui-form-label">标题：</label>
+						<div class="layui-input-block">
+							<input :style='{"padding":"0 12px","boxShadow":"0 0 6px rgba(255,0,0,.8)","borderColor":"#DCDFE6","backgroundColor":"#fff","color":"#333","borderRadius":"4px","textAlign":"left","borderWidth":"1px","fontSize":"14px","borderStyle":"solid","height":"40px"}' v-model="detail.title" type="text" name="title" id="title" autocomplete="off" class="layui-input" lay-verify="required">
+						</div>
+					</div>
+                    <div :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="layui-form-item" pane>
+						<label :style='{"width":"94px","padding":"0 12px 0 0","fontSize":"14px","color":"#333","textAlign":"right"}' class="layui-form-label">封面：</label>
+						<div class="layui-input-block">
+							<div v-if="detail.picture" style="display:inline-block;margin-right:10px;">
+								<img id="pictureImg" style="width: 100px;height: 100px;border-radius: 8px;border: 2px solid #EEEEEE;" :src="baseurl+detail.picture.split(',')[0]">
+								<input type="hidden" :value="detail.picture" id="picture" name="picture" />
+							</div>
+							<button :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,.5)","margin":"0 10px 0 0","borderColor":"#ccc","backgroundColor":"red","color":"#fff","borderRadius":"8px","borderWidth":"0","width":"auto","fontSize":"14px","borderStyle":"solid","height":"44px"}' type="button" class="layui-btn btn-theme" id="pictureUpload">
+								<i class="layui-icon" :style='{"color":"#fff","fontSize":"14px"}'>&#xe67c;</i>上传封面
+							</button>
+						</div>
+					</div>
+                    <div :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="layui-form-item" pane>
+						<label :style='{"width":"94px","padding":"0 12px 0 0","fontSize":"14px","color":"#333","textAlign":"right"}' class="layui-form-label">简介：</label>
+						<div class="layui-input-block">
+							<textarea :style='{"padding":"8px 12px","boxShadow":"0 0 6px rgba(255,0,0,.8)","borderColor":"#DCDFE6","backgroundColor":"#fff","color":"#333","borderRadius":"4px","textAlign":"left","borderWidth":"1px","fontSize":"14px","borderStyle":"solid","minHeight":"80px"}' v-model="detail.introduction" name="introduction" id="introduction" placeholder="简单介绍一下这条分享..." class="layui-textarea"></textarea>
+						</div>
+					</div>
+                    <div :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="layui-form-item" pane>
+						<label :style='{"width":"94px","padding":"0 12px 0 0","fontSize":"14px","color":"#333","textAlign":"right"}' class="layui-form-label">内容：</label>
+						<div class="layui-input-block">
+							<textarea name="content" id="content">请输入分享内容</textarea>
+						</div>
+					</div>
+					<div :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="layui-form-item">
+						<div class="layui-input-block" style="text-align: right;">
+							<button :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,.5)","margin":"0 10px","borderColor":"#ccc","backgroundColor":"red","color":"#fff","borderRadius":"8px","borderWidth":"0","width":"25%","fontSize":"14px","borderStyle":"solid","height":"44px"}' class="layui-btn btn-submit" lay-submit lay-filter="*">提交</button>
+							<button :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,.5)","margin":"0 10px","borderColor":"#ccc","backgroundColor":"#fff","color":"red","borderRadius":"8px","borderWidth":"0","width":"25%","fontSize":"14px","borderStyle":"solid","height":"44px"}' type="reset" class="layui-btn layui-btn-primary">重置</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<script src="../../layui/layui.js"></script>
+		<script src="../../js/vue.js"></script>
+		<script src="../../js/config.js"></script>
+		<script src="../../modules/config.js"></script>
+		<script src="../../js/utils.js"></script>
+		<script src="../../js/validate.js"></script>
+		<script src="../../js/jquery.js"></script>
+		<script src="../../js/bootstrap.min.js"></script>
+		<script>
+			var jquery = $;
+			var vue = new Vue({
+				el: '#app',
+				data: {
+					swiperList: [{
+						img: '../../img/banner.jpg'
+					}],
+					baseurl: '',
+					detail: {
+						title: '',
+						introduction: '',
+						picture: '',
+						content: ''
+					}
+				},
+				methods: {
+					jump(url) {
+						jump(url)
+					}
+				}
+			})
+
+			layui.use(['layer', 'element', 'carousel', 'http', 'jquery', 'form', 'upload', 'tinymce'], function() {
+				var layer = layui.layer;
+				var element = layui.element;
+				var carousel = layui.carousel;
+				var http = layui.http;
+				var jquery = layui.jquery;
+				var form = layui.form;
+				var upload = layui.upload;
+				var tinymce = layui.tinymce;
+				vue.baseurl = http.baseurl;
+
+				// 轮播图
+				http.request('config/list', 'get', {
+					page: 1,
+					limit: 5
+				}, function(res) {
+					if (res.data.list.length > 0) {
+						var swiperItemHtml = '';
+						for (let item of res.data.list) {
+							if (item.name.indexOf('picture') >= 0 && item.value && item.value != "" && item.value != null) {
+								swiperItemHtml +=
+									'<div>' +
+									'<img style="width: 100%;height: 100%;object-fit:cover;" class="swiper-item" src="' + http.baseurl+item.value + '">' +
+									'</div>';
+							}
+						}
+						jquery('#swiper-item').html(swiperItemHtml);
+						vue.$nextTick(() => {
+						  carousel.render({
+						  	elem: '#swiper',
+							width: '100%',
+						  	height: '300px',
+						  	arrow: 'hover',
+						  	anim: 'default',
+						  	autoplay: 'true',
+						  	interval: '3000',
+						  	indicator: 'inside'
+						  });
+						})
+					}
+				});
+
+				// 上传封面
+				upload.render({
+					elem: '#pictureUpload',
+					url: http.baseurl + 'file/upload',
+					headers: {
+						Token: localStorage.getItem('Token')
+					},
+					accept: 'images',
+					before: function() {
+						layer.load(1, {
+							shade: [0.1, '#fff']
+						});
+					},
+					done: function(res) {
+						layer.closeAll();
+						if (res.code == 0) {
+							layer.msg("上传成功", {
+								time: 2000,
+								icon: 6
+							});
+							var url = 'upload/' + res.file;
+							jquery('#picture').val(url);
+							vue.detail.picture = url;
+							jquery('#pictureImg').attr('src', http.baseurl + url);
+						} else {
+							layer.msg(res.msg || '上传失败', {
+								time: 2000,
+								icon: 5
+							});
+						}
+					},
+					error: function() {
+						layer.closeAll();
+						layer.msg("请求接口异常", {
+							time: 2000,
+							icon: 5
+						});
+					}
+				});
+
+				// 富文本
+                var editor = tinymce.render({
+                    elem: "#content",
+                    height: 600,
+                    images_upload_handler: function(blobInfo, succFun, failFun) {
+                        var xhr, formData;
+                        var file = blobInfo.blob();
+                        xhr = new XMLHttpRequest();
+                        xhr.withCredentials = false;
+                        xhr.open('POST', http.baseurl + 'file/upload');
+                        xhr.setRequestHeader("Token", localStorage.getItem('Token'));
+                        xhr.onload = function() {
+                            var json;
+                            if (xhr.status != 200) {
+                                failFun('HTTP Error: ' + xhr.status);
+                                return;
+                            }
+                            json = JSON.parse(xhr.responseText);
+                            if (!json || typeof json.file != 'string') {
+                                failFun('Invalid JSON: ' + xhr.responseText);
+                                return;
+                            }
+                            succFun(http.baseurl + 'upload/' + json.file);
+                        };
+                        formData = new FormData();
+                        formData.append('file', file, file.name);
+                        xhr.send(formData);
+                    }
+                }, function() {});
+
+				// 提交
+				form.on('submit(*)', function(data) {
+					data = data.field;
+					var content = tinymce.get('#content').getContent();
+					data.content = content;
+					if (!data.title || !data.title.trim()) {
+						layer.msg('标题不能为空', { time: 2000, icon: 5 });
+						return false;
+					}
+					if (!data.picture) {
+						layer.msg('请先上传封面', { time: 2000, icon: 5 });
+						return false;
+					}
+					http.requestJson('news/add', 'post', data, function(res) {
+						if (res.code === 0) {
+							layer.msg('发布成功', {
+								time: 2000,
+								icon: 6
+							}, function() {
+								back();
+							});
+						} else {
+							layer.msg(res.msg || '发布失败', {
+								time: 2000,
+								icon: 5
+							});
+						}
+					});
+					return false;
+				});
+			});
+		</script>
+	</body>
+</html>
+
