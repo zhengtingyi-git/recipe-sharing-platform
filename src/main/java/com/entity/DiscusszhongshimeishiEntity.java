@@ -28,7 +28,7 @@ import com.baomidou.mybatisplus.enums.IdType;
  * @email 
  * @date 2022-04-09 17:21:19
  */
-@TableName("discusszhongshimeishi")
+@TableName("recipe_comment")
 public class DiscusszhongshimeishiEntity<T> implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -80,6 +80,11 @@ public class DiscusszhongshimeishiEntity<T> implements Serializable {
 	 */
 					
 	private String reply;
+
+	/**
+	 * 来源类型（用于区分原 waiguomeishi/zhongshimeishi 评论）
+	 */
+	private String sourceType;
 	
 	
 	@JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
@@ -159,6 +164,20 @@ public class DiscusszhongshimeishiEntity<T> implements Serializable {
 	 */
 	public String getReply() {
 		return reply;
+	}
+
+	/**
+	 * 设置：来源类型
+	 */
+	public void setSourceType(String sourceType) {
+		this.sourceType = sourceType;
+	}
+
+	/**
+	 * 获取：来源类型
+	 */
+	public String getSourceType() {
+		return sourceType;
 	}
 
 }

@@ -25,26 +25,26 @@
 
 	<select id="selectListVO"
 		resultType="com.entity.vo.ZhongshimeishiVO" >
-		SELECT * FROM zhongshimeishi  zhongshimeishi         
+		SELECT * FROM recipe  recipe         
         <where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 	
 	<select id="selectVO"
 		resultType="com.entity.vo.ZhongshimeishiVO" >
-		SELECT  zhongshimeishi.* FROM zhongshimeishi  zhongshimeishi 	
+		SELECT  recipe.* FROM recipe  recipe 	
  		<where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 
     <select id="selectListView"
 		resultType="com.entity.view.ZhongshimeishiView" >
 
-		SELECT  zhongshimeishi.* FROM zhongshimeishi  zhongshimeishi 	        
+		SELECT  recipe.* FROM recipe  recipe 	        
         <where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 	
 	<select id="selectView"
 		resultType="com.entity.view.ZhongshimeishiView" >
-		SELECT * FROM zhongshimeishi  zhongshimeishi <where> 1=1 ${ew.sqlSegment}</where>
+		SELECT * FROM recipe  recipe <where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 	
 

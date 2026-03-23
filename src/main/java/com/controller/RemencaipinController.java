@@ -89,6 +89,7 @@ public class RemencaipinController {
 
         EntityWrapper<ZhongshimeishiEntity> zhongshiEw = new EntityWrapper<>();
         zhongshiEw.eq("sfsh", "是");
+        zhongshiEw.eq("sourceType", "zhongshimeishi");
         List<ZhongshimeishiEntity> zhongshiList = zhongshimeishiService.selectList(zhongshiEw);
         Map<Long, Integer> zhongshiStoreupMap = new HashMap<>();
         if (!zhongshiList.isEmpty()) {
@@ -131,6 +132,7 @@ public class RemencaipinController {
 
         EntityWrapper<WaiguomeishiEntity> waiguoEw = new EntityWrapper<>();
         waiguoEw.eq("sfsh", "是");
+        waiguoEw.eq("sourceType", "waiguomeishi");
         List<WaiguomeishiEntity> waiguoList = waiguomeishiService.selectList(waiguoEw);
         Map<Long, Integer> waiguoStoreupMap = new HashMap<>();
         if (!waiguoList.isEmpty()) {

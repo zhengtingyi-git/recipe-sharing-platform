@@ -117,11 +117,13 @@ public class NotifyController {
         // 1.2 我发布的中式美食被评论
         EntityWrapper<ZhongshimeishiEntity> zhongshiEw = new EntityWrapper<>();
         zhongshiEw.eq("userid", userId);
+        zhongshiEw.eq("sourceType", "zhongshimeishi");
         List<ZhongshimeishiEntity> myZhongshi = zhongshimeishiService.selectList(zhongshiEw);
         if (!myZhongshi.isEmpty()) {
             List<Long> myZhongshiIds = myZhongshi.stream().map(ZhongshimeishiEntity::getId).collect(Collectors.toList());
             EntityWrapper<DiscusszhongshimeishiEntity> discussZhongshiEw = new EntityWrapper<>();
             discussZhongshiEw.in("refid", myZhongshiIds);
+            discussZhongshiEw.eq("sourceType", "zhongshimeishi");
             discussZhongshiEw.orderBy("addtime", false);
             List<DiscusszhongshimeishiEntity> commentsZhongshi = discusszhongshimeishiService.selectList(discussZhongshiEw);
             for (DiscusszhongshimeishiEntity c : commentsZhongshi) {
@@ -151,11 +153,13 @@ public class NotifyController {
         // 1.3 我发布的外国美食被评论
         EntityWrapper<WaiguomeishiEntity> waiguoEw = new EntityWrapper<>();
         waiguoEw.eq("userid", userId);
+        waiguoEw.eq("sourceType", "waiguomeishi");
         List<WaiguomeishiEntity> myWaiguo = waiguomeishiService.selectList(waiguoEw);
         if (!myWaiguo.isEmpty()) {
             List<Long> myWaiguoIdsForReply = myWaiguo.stream().map(WaiguomeishiEntity::getId).collect(Collectors.toList());
             EntityWrapper<DiscusswaiguomeishiEntity> discussWaiguoEw = new EntityWrapper<>();
             discussWaiguoEw.in("refid", myWaiguoIdsForReply);
+            discussWaiguoEw.eq("sourceType", "waiguomeishi");
             discussWaiguoEw.orderBy("addtime", false);
             List<DiscusswaiguomeishiEntity> commentsWaiguo = discusswaiguomeishiService.selectList(discussWaiguoEw);
             for (DiscusswaiguomeishiEntity c : commentsWaiguo) {
@@ -218,7 +222,8 @@ public class NotifyController {
         EntityWrapper<DiscusszhongshimeishiEntity> myDiscussZhongshiEw = new EntityWrapper<>();
         myDiscussZhongshiEw.eq("userid", userId)
                 .isNotNull("reply")
-                .ne("reply", "");
+                .ne("reply", "")
+                .eq("sourceType", "zhongshimeishi");
         myDiscussZhongshiEw.orderBy("addtime", false);
         List<DiscusszhongshimeishiEntity> myDiscussZhongshi = discusszhongshimeishiService.selectList(myDiscussZhongshiEw);
         for (DiscusszhongshimeishiEntity c : myDiscussZhongshi) {
@@ -249,7 +254,8 @@ public class NotifyController {
         EntityWrapper<DiscusswaiguomeishiEntity> myDiscussWaiguoEw = new EntityWrapper<>();
         myDiscussWaiguoEw.eq("userid", userId)
                 .isNotNull("reply")
-                .ne("reply", "");
+                .ne("reply", "")
+                .eq("sourceType", "waiguomeishi");
         myDiscussWaiguoEw.orderBy("addtime", false);
         List<DiscusswaiguomeishiEntity> myDiscussWaiguo = discusswaiguomeishiService.selectList(myDiscussWaiguoEw);
         for (DiscusswaiguomeishiEntity c : myDiscussWaiguo) {
@@ -287,10 +293,12 @@ public class NotifyController {
         // 2. 点赞我的：我的美食 / 帖子 被点赞（type=21）
         EntityWrapper<ZhongshimeishiEntity> zew = new EntityWrapper<>();
         zew.eq("userid", userId);
+        zew.eq("sourceType", "zhongshimeishi");
         List<Long> myZhongshiIds = zhongshimeishiService.selectList(zew).stream()
                 .map(ZhongshimeishiEntity::getId).collect(Collectors.toList());
         EntityWrapper<WaiguomeishiEntity> wew = new EntityWrapper<>();
         wew.eq("userid", userId);
+        wew.eq("sourceType", "waiguomeishi");
         List<Long> myWaiguoIds = waiguomeishiService.selectList(wew).stream()
                 .map(WaiguomeishiEntity::getId).collect(Collectors.toList());
 

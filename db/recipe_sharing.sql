@@ -26,7 +26,6 @@ CREATE TABLE `admin`  (
   `username` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '用户名',
   `shouji` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '手机号',
   `password` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
-  `role` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL DEFAULT '管理员' COMMENT '角色',
   `addtime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '新增时间',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci COMMENT = '管理员表' ROW_FORMAT = DYNAMIC;
@@ -34,8 +33,10 @@ CREATE TABLE `admin`  (
 -- ----------------------------
 -- Records of admin
 -- ----------------------------
-INSERT INTO `admin` VALUES (1, 'abo', '13458674512', 'abo', '管理员', '2022-04-09 17:21:55');
-INSERT INTO `admin` VALUES (2, 'admin', '15264985421', 'admin', '管理员', '2026-02-14 18:11:35');
+INSERT INTO `admin` VALUES (1, 'abo', '13458674512', 'abo', '2022-04-09 17:21:55');
+INSERT INTO `admin` VALUES (2, 'admin', '15264985421', 'admin', '2026-02-14 18:11:35');
+
+-- 旧库若存在 admin.role 列且需与代码一致，可执行：ALTER TABLE `admin` DROP COLUMN `role`;
 
 -- ----------------------------
 -- Table structure for config
@@ -315,42 +316,7 @@ INSERT INTO `storeup` VALUES (1772051685814, '2026-02-26 04:34:45', 13, 17720499
 INSERT INTO `storeup` VALUES (1772314033129, '2026-03-01 05:27:12', 14, 1772190652932, 'news', '挖到宝！这家老城区的糖水铺，是老广的夏日续命神器', 'upload/luntan01.png', '21', NULL);
 INSERT INTO `storeup` VALUES (1772314033936, '2026-03-01 05:27:13', 14, 1772190652932, 'news', '挖到宝！这家老城区的糖水铺，是老广的夏日续命神器', 'upload/luntan01.png', '1', NULL);
 
--- ----------------------------
--- Table structure for token
--- ----------------------------
-DROP TABLE IF EXISTS `token`;
-CREATE TABLE `token`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `userid` bigint NOT NULL COMMENT '用户id',
-  `username` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '用户名',
-  `tablename` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL DEFAULT NULL COMMENT '表名',
-  `role` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL DEFAULT NULL COMMENT '角色',
-  `token` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '密码',
-  `addtime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '新增时间',
-  `expiratedtime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '过期时间',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci COMMENT = 'token表' ROW_FORMAT = DYNAMIC;
-
--- ----------------------------
--- Records of token
--- ----------------------------
-INSERT INTO `token` VALUES (1, 1649496213444, '11', 'yonghu', '用户', 'm8faykgyktfg6c7sbxdrf5jmes1hxr3o', '2022-04-09 17:24:08', '2022-04-09 18:24:09');
-INSERT INTO `token` VALUES (2, 1, 'abo', 'users', '管理员', 'pk2df7plvwos5imawxcdgt8trkv814sc', '2022-04-09 17:29:35', '2026-03-01 07:20:40');
-INSERT INTO `token` VALUES (3, 11, '用户账号1', 'yonghu', '用户', 'k21nukbnjf5kf616qjtddk54r6z6u0pc', '2026-02-12 15:17:54', '2026-02-23 14:34:27');
-INSERT INTO `token` VALUES (4, 12, 'xiaohao', 'yonghu', '用户', 'vchwzh8gyq2rjrbpfvqqufv9748c6022', '2026-02-12 23:51:14', '2026-02-21 17:16:26');
-INSERT INTO `token` VALUES (5, 15, 'xiaoyun', 'yonghu', '用户', 'kcztz18c2qnlzd4sdd6cvqj1x5gky33f', '2026-02-13 00:33:38', '2026-02-14 15:52:27');
-INSERT INTO `token` VALUES (6, 13, 'xiaoer', 'yonghu', '用户', 'l5mg3ellcf2rfiq0pqcv5snsglaaupre', '2026-02-13 00:48:09', '2026-02-23 03:31:38');
-INSERT INTO `token` VALUES (7, 14, 'xiaohuang', 'yonghu', '用户', 'anjvfsvhffwi6t1y3s9bsch1tbxg9nxb', '2026-02-13 04:50:52', '2026-02-23 02:24:38');
-INSERT INTO `token` VALUES (8, 16, 'xiaohong', 'yonghu', '用户', 'crt6t927u3hztrafjve1nyucpsvafsug', '2026-02-14 16:58:39', '2026-02-23 03:29:10');
-INSERT INTO `token` VALUES (9, 2, 'admin', 'users', '管理员', 'xygae9z0cmx4tsbp27g407t456xd5cvj', '2026-02-14 18:11:55', '2026-02-14 19:11:55');
-INSERT INTO `token` VALUES (10, 17, 'xiaoliu', 'yonghu', '用户', '402pr7o72jnp88575ppkf7h6i9oolr9c', '2026-02-14 21:29:41', '2026-02-23 02:46:30');
-INSERT INTO `token` VALUES (11, 14, 'xiaohuang', 'user', '用户表', 'vu5ncibznxjdcyfdft9itjypbiiljsyz', '2026-02-23 17:39:43', '2026-03-03 03:18:35');
-INSERT INTO `token` VALUES (12, 13, 'xiaoer', 'user', '用户表', 'k5rlkuznvt06dz6mlefr67mawntbtrsv', '2026-02-23 17:42:37', '2026-02-26 17:48:10');
-INSERT INTO `token` VALUES (13, 15, 'xiaoyun', 'user', '用户表', 'awdt17btr4hn56tcc6jbppxuzqnpluw3', '2026-02-23 18:24:03', '2026-02-26 18:21:08');
-INSERT INTO `token` VALUES (14, 17, 'xiaoliu', 'user', '用户表', 'i8t2z4dprwxfbm1j6no1hdfkfaowgxrp', '2026-02-24 01:19:00', '2026-02-27 20:09:52');
-INSERT INTO `token` VALUES (15, 12, 'xiaohao', 'user', '用户表', '52yxc2abvc58g0qrpfw1su8turr24wwd', '2026-02-24 03:24:37', '2026-02-26 18:03:57');
-INSERT INTO `token` VALUES (16, 16, 'xiaohong', 'user', '用户表', 'p8qr3xc3pbex4fmeibencn2nb7g25v3s', '2026-02-24 03:33:00', '2026-02-27 18:44:08');
-INSERT INTO `token` VALUES (17, 11, 'xiaolin', 'user', '用户表', 'eufuk6c5tliv1m7z67jy6sdnav4s582o', '2026-02-25 15:10:25', '2026-02-26 04:24:44');
+-- 登录令牌已改为 JWT，不再使用 token 表。已有库可执行：DROP TABLE IF EXISTS `token`;
 
 -- ----------------------------
 -- Table structure for user

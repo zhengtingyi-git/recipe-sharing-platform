@@ -44,6 +44,8 @@ import com.entity.StoreupEntity;
 @RestController
 @RequestMapping("/zhongshimeishi")
 public class ZhongshimeishiController {
+    private static final String SOURCE_TYPE = "zhongshimeishi";
+
     @Autowired
     private ZhongshimeishiService zhongshimeishiService;
 
@@ -67,6 +69,7 @@ public class ZhongshimeishiController {
 			zhongshimeishi.setUserid((Long)request.getSession().getAttribute("userId"));
 		}
         EntityWrapper<ZhongshimeishiEntity> ew = new EntityWrapper<ZhongshimeishiEntity>();
+        ew.eq("sourceType", SOURCE_TYPE);
 		PageUtils page = zhongshimeishiService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, zhongshimeishi), params), params));
 
         // 根据用户id回填当前账号和昵称
@@ -96,6 +99,7 @@ public class ZhongshimeishiController {
         String sort = params.get("sort") != null ? params.get("sort").toString() : "";
         if ("storeupnum".equals(sort)) {
             EntityWrapper<ZhongshimeishiEntity> ew = new EntityWrapper<>();
+            ew.eq("sourceType", SOURCE_TYPE);
             if (params.get("caipinmingcheng") != null && !params.get("caipinmingcheng").toString().trim().isEmpty()) {
                 ew.like("caipinmingcheng", params.get("caipinmingcheng").toString().replace("%", "").trim());
                 zhongshimeishi.setCaipinmingcheng(null);
@@ -134,6 +138,7 @@ public class ZhongshimeishiController {
             return R.ok().put("data", page);
         }
         EntityWrapper<ZhongshimeishiEntity> ew = new EntityWrapper<ZhongshimeishiEntity>();
+        ew.eq("sourceType", SOURCE_TYPE);
         // 显式按 菜品名称/材料/菜系 模糊筛选，确保三种搜索都生效
         if (params.get("caipinmingcheng") != null && !params.get("caipinmingcheng").toString().trim().isEmpty()) {
             ew.like("caipinmingcheng", params.get("caipinmingcheng").toString().replace("%", "").trim());
@@ -157,6 +162,7 @@ public class ZhongshimeishiController {
     @RequestMapping("/lists")
     public R list( ZhongshimeishiEntity zhongshimeishi){
        	EntityWrapper<ZhongshimeishiEntity> ew = new EntityWrapper<ZhongshimeishiEntity>();
+      	ew.eq("sourceType", SOURCE_TYPE);
       	ew.allEq(MPUtil.allEQMapPre( zhongshimeishi, "zhongshimeishi")); 
         return R.ok().put("data", zhongshimeishiService.selectListView(ew));
     }
@@ -167,6 +173,7 @@ public class ZhongshimeishiController {
     @RequestMapping("/query")
     public R query(ZhongshimeishiEntity zhongshimeishi){
         EntityWrapper< ZhongshimeishiEntity> ew = new EntityWrapper< ZhongshimeishiEntity>();
+		ew.eq("sourceType", SOURCE_TYPE);
  		ew.allEq(MPUtil.allEQMapPre( zhongshimeishi, "zhongshimeishi")); 
 		ZhongshimeishiView zhongshimeishiView =  zhongshimeishiService.selectView(ew);
 		return R.ok("查询中式美食成功").put("data", zhongshimeishiView);
@@ -232,6 +239,7 @@ public class ZhongshimeishiController {
     @RequestMapping("/save")
     public R save(@RequestBody ZhongshimeishiEntity zhongshimeishi, HttpServletRequest request){
     	zhongshimeishi.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
+        zhongshimeishi.setSourceType(SOURCE_TYPE);
         Long userId = (Long)request.getSession().getAttribute("userId");
         if(userId != null) {
             zhongshimeishi.setUserid(userId);
@@ -248,6 +256,7 @@ public class ZhongshimeishiController {
     @RequestMapping("/add")
     public R add(@RequestBody ZhongshimeishiEntity zhongshimeishi, HttpServletRequest request){
     	zhongshimeishi.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
+        zhongshimeishi.setSourceType(SOURCE_TYPE);
         Long userId = (Long)request.getSession().getAttribute("userId");
         if(userId != null) {
             zhongshimeishi.setUserid(userId);
@@ -263,6 +272,7 @@ public class ZhongshimeishiController {
     @RequestMapping("/update")
     public R update(@RequestBody ZhongshimeishiEntity zhongshimeishi, HttpServletRequest request){
         //ValidatorUtils.validateEntity(zhongshimeishi);
+        zhongshimeishi.setSourceType(SOURCE_TYPE);
         zhongshimeishiService.updateById(zhongshimeishi);//全部更新
         return R.ok();
     }
@@ -308,6 +318,7 @@ public class ZhongshimeishiController {
 		}
 		
 		Wrapper<ZhongshimeishiEntity> wrapper = new EntityWrapper<ZhongshimeishiEntity>();
+		wrapper.eq("sourceType", SOURCE_TYPE);
 		if(map.get("remindstart")!=null) {
 			wrapper.ge(columnName, map.get("remindstart"));
 		}

@@ -28,11 +28,6 @@ public class AdminEntity implements Serializable {
 	private String password;
 	
 	/**
-	 * 用户类型
-	 */
-	private String role;
-	
-	/**
 	 * 手机号
 	 */
 	private String shouji;
@@ -53,14 +48,6 @@ public class AdminEntity implements Serializable {
 
 	public void setPassword(String password) {
 		this.password = password;
-	}
-
-	public String getRole() {
-		return role;
-	}
-
-	public void setRole(String role) {
-		this.role = role;
 	}
 
 	public String getShouji() {

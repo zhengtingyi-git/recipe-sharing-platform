@@ -25,6 +25,11 @@ spring:
     resources:
       static-locations: classpath:static/,file:static/
 
+# JWT（登录态无状态校验，请在线上改为足够长的随机密钥）
+jwt:
+  secret: recipe-sharing-jwt-secret-change-me-use-at-least-32-chars
+  expire-hours: 1
+
 #mybatis
 mybatis-plus:
   mapper-locations: classpath*:mapper/*.xml

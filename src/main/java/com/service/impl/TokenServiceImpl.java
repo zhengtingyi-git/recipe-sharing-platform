@@ -1,79 +1,73 @@
 
 package com.service.impl;
 
-
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.mapper.Wrapper;
-import com.baomidou.mybatisplus.plugins.Page;
-import com.baomidou.mybatisplus.service.impl.ServiceImpl;
-import com.dao.TokenDao;
-import com.entity.TokenEntity;
 import com.entity.TokenEntity;
 import com.service.TokenService;
-import com.utils.CommonUtil;
-import com.utils.PageUtils;
-import com.utils.Query;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 /**
- * token
+ * JWT 签发与解析（替代原 token 表存储）。
  */
 @Service("tokenService")
-public class TokenServiceImpl extends ServiceImpl<TokenDao, TokenEntity> implements TokenService {
+public class TokenServiceImpl implements TokenService {
+
+	@Value("${jwt.secret}")
+	private String jwtSecret;
+
+	@Value("${jwt.expire-hours:1}")
+	private int expireHours;
 
 	@Override
-	public PageUtils queryPage(Map<String, Object> params) {
-		Page<TokenEntity> page = this.selectPage(
-                new Query<TokenEntity>(params).getPage(),
-                new EntityWrapper<TokenEntity>()
-        );
-        return new PageUtils(page);
-	}
-
-	@Override
-	public List<TokenEntity> selectListView(Wrapper<TokenEntity> wrapper) {
-		return baseMapper.selectListView(wrapper);
-	}
-
-	@Override
-	public PageUtils queryPage(Map<String, Object> params,
-			Wrapper<TokenEntity> wrapper) {
-		 Page<TokenEntity> page =new Query<TokenEntity>(params).getPage();
-	        page.setRecords(baseMapper.selectListView(page,wrapper));
-	    	PageUtils pageUtil = new PageUtils(page);
-	    	return pageUtil;
-	}
-
-	@Override
-	public String generateToken(Long userid,String username, String tableName, String role) {
-		TokenEntity tokenEntity = this.selectOne(new EntityWrapper<TokenEntity>().eq("userid", userid).eq("role", role));
-		String token = CommonUtil.getRandomString(32);
-		Calendar cal = Calendar.getInstance();   
-    	cal.setTime(new Date());   
-    	cal.add(Calendar.HOUR_OF_DAY, 1);
-		if(tokenEntity!=null) {
-			tokenEntity.setToken(token);
-			tokenEntity.setExpiratedtime(cal.getTime());
-			this.updateById(tokenEntity);
-		} else {
-			this.insert(new TokenEntity(userid,username, tableName, role, token, cal.getTime()));
-		}
-		return token;
+	public String generateToken(Long userid, String username, String tableName, String role) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(new Date());
+		cal.add(Calendar.HOUR_OF_DAY, expireHours);
+		Date exp = cal.getTime();
+		return Jwts.builder()
+				.claim("userid", userid)
+				.claim("username", username)
+				.claim("tablename", tableName)
+				.claim("role", role)
+				.setIssuedAt(new Date())
+				.setExpiration(exp)
+				.signWith(SignatureAlgorithm.HS256, jwtSecret.getBytes(StandardCharsets.UTF_8))
+				.compact();
 	}
 
 	@Override
 	public TokenEntity getTokenEntity(String token) {
-		TokenEntity tokenEntity = this.selectOne(new EntityWrapper<TokenEntity>().eq("token", token));
-		if(tokenEntity == null || tokenEntity.getExpiratedtime().getTime()<new Date().getTime()) {
+		if (token == null || token.trim().isEmpty()) {
 			return null;
 		}
-		return tokenEntity;
+		try {
+			Claims claims = Jwts.parser()
+					.setSigningKey(jwtSecret.getBytes(StandardCharsets.UTF_8))
+					.parseClaimsJws(token.trim())
+					.getBody();
+			Object uid = claims.get("userid");
+			if (uid == null) {
+				return null;
+			}
+			long userId = uid instanceof Number ? ((Number) uid).longValue() : Long.parseLong(uid.toString());
+			TokenEntity te = new TokenEntity();
+			te.setUserid(userId);
+			te.setUsername(claims.get("username", String.class));
+			te.setTablename(claims.get("tablename", String.class));
+			te.setRole(claims.get("role", String.class));
+			te.setExpiratedtime(claims.getExpiration());
+			return te;
+		} catch (Exception e) {
+			return null;
+		}
 	}
 }

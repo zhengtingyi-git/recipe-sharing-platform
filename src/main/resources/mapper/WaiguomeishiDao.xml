@@ -25,26 +25,26 @@
 
 	<select id="selectListVO"
 		resultType="com.entity.vo.WaiguomeishiVO" >
-		SELECT * FROM waiguomeishi  waiguomeishi         
+		SELECT * FROM recipe  recipe         
         <where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 	
 	<select id="selectVO"
 		resultType="com.entity.vo.WaiguomeishiVO" >
-		SELECT  waiguomeishi.* FROM waiguomeishi  waiguomeishi 	
+		SELECT  recipe.* FROM recipe  recipe 	
  		<where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 
     <select id="selectListView"
 		resultType="com.entity.view.WaiguomeishiView" >
 
-		SELECT  waiguomeishi.* FROM waiguomeishi  waiguomeishi 	        
+		SELECT  recipe.* FROM recipe  recipe 	        
         <where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 	
 	<select id="selectView"
 		resultType="com.entity.view.WaiguomeishiView" >
-		SELECT * FROM waiguomeishi  waiguomeishi <where> 1=1 ${ew.sqlSegment}</where>
+		SELECT * FROM recipe  recipe <where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 	
 

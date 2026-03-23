@@ -43,7 +43,7 @@ public class AdminController{
 		if(user==null || !user.getPassword().equals(password)) {
 			return R.error("账号或密码不正确");
 		}
-		String token = tokenService.generateToken(user.getId(),username, "admin", user.getRole());
+		String token = tokenService.generateToken(user.getId(), username, "admin", "管理员");
 		return R.ok().put("token", token);
 	}
 
@@ -52,9 +52,6 @@ public class AdminController{
 	public R register(@RequestBody AdminEntity user){
     	if(adminService.selectOne(new EntityWrapper<AdminEntity>().eq("username", user.getUsername())) !=null) {
     		return R.error("用户已存在");
-    	}
-    	if(user.getRole() == null || user.getRole().trim().isEmpty()) {
-    		user.setRole("管理员");
     	}
         adminService.insert(user);
         return R.ok();
