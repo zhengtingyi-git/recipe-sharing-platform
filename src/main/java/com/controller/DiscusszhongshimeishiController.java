@@ -39,8 +39,6 @@ import com.utils.MPUtil;
 @RestController
 @RequestMapping("/discusszhongshimeishi")
 public class DiscusszhongshimeishiController {
-    private static final String SOURCE_TYPE = "zhongshimeishi";
-
     @Autowired
     private DiscusszhongshimeishiService discusszhongshimeishiService;
     @Autowired
@@ -56,8 +54,8 @@ public class DiscusszhongshimeishiController {
     @RequestMapping("/page")
     public R page(@RequestParam Map<String, Object> params,DiscusszhongshimeishiEntity discusszhongshimeishi,
 		HttpServletRequest request){
+    	discusszhongshimeishi.setRecipetype("zhongshimeishi");
         EntityWrapper<DiscusszhongshimeishiEntity> ew = new EntityWrapper<DiscusszhongshimeishiEntity>();
-		ew.eq("sourceType", SOURCE_TYPE);
 		PageUtils page = discusszhongshimeishiService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, discusszhongshimeishi), params), params));
 
         return R.ok().put("data", page);
@@ -70,8 +68,8 @@ public class DiscusszhongshimeishiController {
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params,DiscusszhongshimeishiEntity discusszhongshimeishi, 
 		HttpServletRequest request){
+    	discusszhongshimeishi.setRecipetype("zhongshimeishi");
         EntityWrapper<DiscusszhongshimeishiEntity> ew = new EntityWrapper<DiscusszhongshimeishiEntity>();
-		ew.eq("sourceType", SOURCE_TYPE);
 		PageUtils page = discusszhongshimeishiService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, discusszhongshimeishi), params), params));
         List<DiscusszhongshimeishiEntity> records = (List<DiscusszhongshimeishiEntity>) page.getList();
         List<Map<String, Object>> list = new ArrayList<>();
@@ -107,8 +105,8 @@ public class DiscusszhongshimeishiController {
      */
     @RequestMapping("/lists")
     public R list( DiscusszhongshimeishiEntity discusszhongshimeishi){
+    	discusszhongshimeishi.setRecipetype("zhongshimeishi");
        	EntityWrapper<DiscusszhongshimeishiEntity> ew = new EntityWrapper<DiscusszhongshimeishiEntity>();
-      	ew.eq("sourceType", SOURCE_TYPE);
       	ew.allEq(MPUtil.allEQMapPre( discusszhongshimeishi, "discusszhongshimeishi")); 
         return R.ok().put("data", discusszhongshimeishiService.selectListView(ew));
     }
@@ -118,8 +116,8 @@ public class DiscusszhongshimeishiController {
      */
     @RequestMapping("/query")
     public R query(DiscusszhongshimeishiEntity discusszhongshimeishi){
+    	discusszhongshimeishi.setRecipetype("zhongshimeishi");
         EntityWrapper< DiscusszhongshimeishiEntity> ew = new EntityWrapper< DiscusszhongshimeishiEntity>();
-		ew.eq("sourceType", SOURCE_TYPE);
  		ew.allEq(MPUtil.allEQMapPre( discusszhongshimeishi, "discusszhongshimeishi")); 
 		DiscusszhongshimeishiView discusszhongshimeishiView =  discusszhongshimeishiService.selectView(ew);
 		return R.ok("查询中式美食评论表成功").put("data", discusszhongshimeishiView);
@@ -152,8 +150,8 @@ public class DiscusszhongshimeishiController {
      */
     @RequestMapping("/save")
     public R save(@RequestBody DiscusszhongshimeishiEntity discusszhongshimeishi, HttpServletRequest request){
+    	discusszhongshimeishi.setRecipetype("zhongshimeishi");
     	discusszhongshimeishi.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
-    	discusszhongshimeishi.setSourceType(SOURCE_TYPE);
     	if (discusszhongshimeishi.getUserid() != null) {
             UserEntity y = userService.selectById(discusszhongshimeishi.getUserid());
             if (y != null && y.getYonghuxingming() != null && !y.getYonghuxingming().isEmpty()) {
@@ -169,8 +167,8 @@ public class DiscusszhongshimeishiController {
      */
     @RequestMapping("/add")
     public R add(@RequestBody DiscusszhongshimeishiEntity discusszhongshimeishi, HttpServletRequest request){
+    	discusszhongshimeishi.setRecipetype("zhongshimeishi");
     	discusszhongshimeishi.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
-        discusszhongshimeishi.setSourceType(SOURCE_TYPE);
     	if (discusszhongshimeishi.getUserid() != null) {
             UserEntity y = userService.selectById(discusszhongshimeishi.getUserid());
             if (y != null && y.getYonghuxingming() != null && !y.getYonghuxingming().isEmpty()) {
@@ -186,8 +184,8 @@ public class DiscusszhongshimeishiController {
      */
     @RequestMapping("/update")
     public R update(@RequestBody DiscusszhongshimeishiEntity discusszhongshimeishi, HttpServletRequest request){
+    	discusszhongshimeishi.setRecipetype("zhongshimeishi");
         //ValidatorUtils.validateEntity(discusszhongshimeishi);
-        discusszhongshimeishi.setSourceType(SOURCE_TYPE);
         discusszhongshimeishiService.updateById(discusszhongshimeishi);//全部更新
         return R.ok();
     }
@@ -270,7 +268,7 @@ public class DiscusszhongshimeishiController {
 		}
 		
 		Wrapper<DiscusszhongshimeishiEntity> wrapper = new EntityWrapper<DiscusszhongshimeishiEntity>();
-		wrapper.eq("sourceType", SOURCE_TYPE);
+		wrapper.eq("recipetype", "zhongshimeishi");
 		if(map.get("remindstart")!=null) {
 			wrapper.ge(columnName, map.get("remindstart"));
 		}

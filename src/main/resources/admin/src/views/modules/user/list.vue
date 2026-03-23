@@ -109,11 +109,11 @@
                      </template>
                 </el-table-column>
                 <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign" 
-                    prop="lianxifangshi"
+                    prop="phone"
                    :header-align="contents.tableAlign"
 		    label="联系方式">
 		     <template slot-scope="scope">
-                       {{scope.row.lianxifangshi}}
+                       {{scope.row.phone}}
                      </template>
                 </el-table-column>
                   <el-table-column :sortable="contents.tableSortable" :align="contents.tableAlign"  prop="touxiang"

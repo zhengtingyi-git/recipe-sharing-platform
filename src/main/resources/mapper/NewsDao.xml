@@ -9,7 +9,6 @@
         <result property="introduction" column="introduction"/>
         <result property="picture" column="picture"/>
         <result property="content" column="content"/>
-        <result property="thumbsupnum" column="thumbsupnum"/>
     </resultMap>
 
 	<select id="selectListVO"

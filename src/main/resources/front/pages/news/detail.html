@@ -312,7 +312,6 @@
 										_this.detail.thumbsupnum = 0;
 									}
 									_this.thumbsupFlag = 0;
-									layui.http.requestJson(`${_this.detailTable}/update`, 'post', _this.detail, function() {});
 									layer.msg('取消成功', { time: 1000, icon: 5 });
 								});
 								return;
@@ -328,7 +327,6 @@
 							}, function() {
 								_this.detail.thumbsupnum = parseInt(_this.detail.thumbsupnum == null ? 0 : _this.detail.thumbsupnum) + 1;
 								_this.thumbsupFlag = 1;
-								layui.http.requestJson(`${_this.detailTable}/update`, 'post', _this.detail, function() {});
 								layer.msg('点赞成功', { time: 1000, icon: 6 });
 							});
 						});

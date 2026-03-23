@@ -9,7 +9,7 @@
         <result property="yonghuxingming" column="yonghuxingming"/>
         <result property="mima" column="mima"/>
         <result property="xingbie" column="xingbie"/>
-        <result property="lianxifangshi" column="lianxifangshi"/>
+        <result property="phone" column="phone"/>
         <result property="touxiang" column="touxiang"/>
     </resultMap>
 

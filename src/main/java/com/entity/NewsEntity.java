@@ -98,6 +98,7 @@ public class NewsEntity<T> implements Serializable {
 	/**
 	 * 赞
 	 */
+	@TableField(exist = false)
 	private Integer thumbsupnum;
 	
 	

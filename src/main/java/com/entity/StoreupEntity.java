@@ -87,13 +87,6 @@ public class StoreupEntity<T> implements Serializable {
 					
 	private String type;
 	
-	/**
-	 * 推荐类型
-	 */
-					
-	private String inteltype;
-	
-	
 	@JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
 	@DateTimeFormat
 	private Date addtime;
@@ -184,17 +177,4 @@ public class StoreupEntity<T> implements Serializable {
 	public String getType() {
 		return type;
 	}
-	/**
-	 * 设置：推荐类型
-	 */
-	public void setInteltype(String inteltype) {
-		this.inteltype = inteltype;
-	}
-	/**
-	 * 获取：推荐类型
-	 */
-	public String getInteltype() {
-		return inteltype;
-	}
-
 }

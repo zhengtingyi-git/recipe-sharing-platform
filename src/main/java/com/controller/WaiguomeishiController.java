@@ -44,8 +44,6 @@ import com.entity.StoreupEntity;
 @RestController
 @RequestMapping("/waiguomeishi")
 public class WaiguomeishiController {
-    private static final String SOURCE_TYPE = "waiguomeishi";
-
     @Autowired
     private WaiguomeishiService waiguomeishiService;
 
@@ -54,6 +52,12 @@ public class WaiguomeishiController {
 
     @Autowired
     private UserService userService;
+
+    private int countAction(Long refid, String type) {
+        EntityWrapper<StoreupEntity> ew = new EntityWrapper<>();
+        ew.eq("tablename", "waiguomeishi").eq("refid", refid).eq("type", type);
+        return storeupService.selectCount(ew);
+    }
 
     
 
@@ -64,12 +68,12 @@ public class WaiguomeishiController {
     @RequestMapping("/page")
     public R page(@RequestParam Map<String, Object> params,WaiguomeishiEntity waiguomeishi,
 		HttpServletRequest request){
+		waiguomeishi.setRecipetype("waiguomeishi");
 		String tableName = request.getSession().getAttribute("tableName").toString();
 		if(tableName.equals("user")) {
 			waiguomeishi.setUserid((Long)request.getSession().getAttribute("userId"));
 		}
         EntityWrapper<WaiguomeishiEntity> ew = new EntityWrapper<WaiguomeishiEntity>();
-        ew.eq("sourceType", SOURCE_TYPE);
 		PageUtils page = waiguomeishiService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, waiguomeishi), params), params));
 
         // 根据用户id回填当前账号和昵称，保证显示为最新
@@ -82,6 +86,10 @@ public class WaiguomeishiController {
                         entity.setYonghuzhanghao(user.getYonghuzhanghao());
                         entity.setYonghuxingming(user.getYonghuxingming());
                     }
+                }
+                if (entity.getId() != null) {
+                    entity.setThumbsupnum(countAction(entity.getId(), "21"));
+                    entity.setStoreupnum(countAction(entity.getId(), "1"));
                 }
             }
         }
@@ -96,10 +104,10 @@ public class WaiguomeishiController {
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params, WaiguomeishiEntity waiguomeishi,
 		HttpServletRequest request){
+		waiguomeishi.setRecipetype("waiguomeishi");
         String sort = params.get("sort") != null ? params.get("sort").toString() : "";
         if ("storeupnum".equals(sort)) {
             EntityWrapper<WaiguomeishiEntity> ew = new EntityWrapper<>();
-            ew.eq("sourceType", SOURCE_TYPE);
             if (params.get("caipinmingcheng") != null && !params.get("caipinmingcheng").toString().trim().isEmpty()) {
                 ew.like("caipinmingcheng", params.get("caipinmingcheng").toString().replace("%", "").trim());
                 waiguomeishi.setCaipinmingcheng(null);
@@ -136,9 +144,49 @@ public class WaiguomeishiController {
             List<WaiguomeishiEntity> pageList = from < all.size() ? all.subList(from, to) : new ArrayList<>();
             PageUtils page = new PageUtils(pageList, all.size(), limitNum, pageNum);
             return R.ok().put("data", page);
+        } else if ("thumbsupnum".equals(sort)) {
+            EntityWrapper<WaiguomeishiEntity> ew = new EntityWrapper<>();
+            if (params.get("caipinmingcheng") != null && !params.get("caipinmingcheng").toString().trim().isEmpty()) {
+                ew.like("caipinmingcheng", params.get("caipinmingcheng").toString().replace("%", "").trim());
+                waiguomeishi.setCaipinmingcheng(null);
+            }
+            if (params.get("cailiao") != null && !params.get("cailiao").toString().trim().isEmpty()) {
+                ew.like("cailiao", params.get("cailiao").toString().replace("%", "").trim());
+                waiguomeishi.setCailiao(null);
+            }
+            if (params.get("caixi") != null && !params.get("caixi").toString().trim().isEmpty()) {
+                ew.like("caixi", params.get("caixi").toString().replace("%", "").trim());
+                waiguomeishi.setCaixi(null);
+            }
+            Map<String, Object> paramsNoSort = new HashMap<>(params);
+            paramsNoSort.remove("sort");
+            paramsNoSort.remove("order");
+            Wrapper<WaiguomeishiEntity> wrapper = MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, waiguomeishi), paramsNoSort), paramsNoSort);
+            List<WaiguomeishiEntity> all = waiguomeishiService.selectList(wrapper);
+            if (!all.isEmpty()) {
+                List<Long> ids = all.stream().map(WaiguomeishiEntity::getId).collect(Collectors.toList());
+                EntityWrapper<StoreupEntity> suEw = new EntityWrapper<>();
+                suEw.eq("tablename", "waiguomeishi").in("refid", ids).eq("type", "21");
+                List<StoreupEntity> suList = storeupService.selectList(suEw);
+                Map<Long, Integer> countMap = new HashMap<>();
+                for (StoreupEntity su : suList) {
+                    countMap.put(su.getRefid(), countMap.getOrDefault(su.getRefid(), 0) + 1);
+                }
+                final Map<Long, Integer> thumbsCount = countMap;
+                all.sort(Comparator.comparing((WaiguomeishiEntity d) -> thumbsCount.getOrDefault(d.getId(), 0)).reversed());
+                for (WaiguomeishiEntity d : all) {
+                    d.setThumbsupnum(thumbsCount.getOrDefault(d.getId(), 0));
+                }
+            }
+            int pageNum = params.get("page") != null ? Integer.parseInt(params.get("page").toString()) : 1;
+            int limitNum = params.get("limit") != null ? Integer.parseInt(params.get("limit").toString()) : 10;
+            int from = (pageNum - 1) * limitNum;
+            int to = Math.min(from + limitNum, all.size());
+            List<WaiguomeishiEntity> pageList = from < all.size() ? all.subList(from, to) : new ArrayList<>();
+            PageUtils page = new PageUtils(pageList, all.size(), limitNum, pageNum);
+            return R.ok().put("data", page);
         }
         EntityWrapper<WaiguomeishiEntity> ew = new EntityWrapper<WaiguomeishiEntity>();
-        ew.eq("sourceType", SOURCE_TYPE);
         // 显式按 菜品名称/材料/菜系 模糊筛选，确保三种搜索都生效
         if (params.get("caipinmingcheng") != null && !params.get("caipinmingcheng").toString().trim().isEmpty()) {
             ew.like("caipinmingcheng", params.get("caipinmingcheng").toString().replace("%", "").trim());
@@ -153,6 +201,15 @@ public class WaiguomeishiController {
             waiguomeishi.setCaixi(null);
         }
 		PageUtils page = waiguomeishiService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, waiguomeishi), params), params));
+        for(Object obj : page.getList()) {
+            if(obj instanceof WaiguomeishiEntity) {
+                WaiguomeishiEntity entity = (WaiguomeishiEntity)obj;
+                if (entity.getId() != null) {
+                    entity.setThumbsupnum(countAction(entity.getId(), "21"));
+                    entity.setStoreupnum(countAction(entity.getId(), "1"));
+                }
+            }
+        }
         return R.ok().put("data", page);
     }
 
@@ -161,8 +218,8 @@ public class WaiguomeishiController {
      */
     @RequestMapping("/lists")
     public R list( WaiguomeishiEntity waiguomeishi){
+    	waiguomeishi.setRecipetype("waiguomeishi");
        	EntityWrapper<WaiguomeishiEntity> ew = new EntityWrapper<WaiguomeishiEntity>();
-      	ew.eq("sourceType", SOURCE_TYPE);
       	ew.allEq(MPUtil.allEQMapPre( waiguomeishi, "waiguomeishi")); 
         return R.ok().put("data", waiguomeishiService.selectListView(ew));
     }
@@ -172,8 +229,8 @@ public class WaiguomeishiController {
      */
     @RequestMapping("/query")
     public R query(WaiguomeishiEntity waiguomeishi){
+    	waiguomeishi.setRecipetype("waiguomeishi");
         EntityWrapper< WaiguomeishiEntity> ew = new EntityWrapper< WaiguomeishiEntity>();
-        ew.eq("sourceType", SOURCE_TYPE);
  		ew.allEq(MPUtil.allEQMapPre( waiguomeishi, "waiguomeishi")); 
 		WaiguomeishiView waiguomeishiView =  waiguomeishiService.selectView(ew);
 		return R.ok("查询外国美食成功").put("data", waiguomeishiView);
@@ -194,8 +251,9 @@ public class WaiguomeishiController {
             }
         }
 		waiguomeishi.setClicknum(waiguomeishi.getClicknum()+1);
-		waiguomeishi.setSourceType(SOURCE_TYPE);
 		waiguomeishiService.updateById(waiguomeishi);
+        waiguomeishi.setThumbsupnum(countAction(id, "21"));
+        waiguomeishi.setStoreupnum(countAction(id, "1"));
         return R.ok().put("data", waiguomeishi);
     }
 
@@ -215,8 +273,9 @@ public class WaiguomeishiController {
             }
         }
 		waiguomeishi.setClicknum(waiguomeishi.getClicknum()+1);
-		waiguomeishi.setSourceType(SOURCE_TYPE);
 		waiguomeishiService.updateById(waiguomeishi);
+        waiguomeishi.setThumbsupnum(countAction(id, "21"));
+        waiguomeishi.setStoreupnum(countAction(id, "1"));
         return R.ok().put("data", waiguomeishi);
     }
     
@@ -227,12 +286,7 @@ public class WaiguomeishiController {
      */
     @RequestMapping("/thumbsup/{id}")
     public R vote(@PathVariable("id") String id,String type){
-        WaiguomeishiEntity waiguomeishi = waiguomeishiService.selectById(id);
-        if(type.equals("1")) {
-        	waiguomeishi.setThumbsupnum(waiguomeishi.getThumbsupnum()+1);
-        }
-        waiguomeishi.setSourceType(SOURCE_TYPE);
-        waiguomeishiService.updateById(waiguomeishi);
+        // 点赞行为统一以 storeup(type=21) 为唯一事实源，不再写入主表 thumbsupnum
         return R.ok("投票成功");
     }
 
@@ -241,12 +295,16 @@ public class WaiguomeishiController {
      */
     @RequestMapping("/save")
     public R save(@RequestBody WaiguomeishiEntity waiguomeishi, HttpServletRequest request){
+    	waiguomeishi.setRecipetype("waiguomeishi");
     	waiguomeishi.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
-    	waiguomeishi.setSourceType(SOURCE_TYPE);
         // 记录发布用户id
         Long userId = (Long)request.getSession().getAttribute("userId");
         if(userId != null) {
             waiguomeishi.setUserid(userId);
+        }
+        // 兼容：如果前端没传 addtime，则用当前时间兜底
+        if (waiguomeishi.getAddtime() == null) {
+            waiguomeishi.setAddtime(new Date());
         }
     	//ValidatorUtils.validateEntity(waiguomeishi);
         waiguomeishiService.insert(waiguomeishi);
@@ -259,11 +317,15 @@ public class WaiguomeishiController {
 	@IgnoreAuth
     @RequestMapping("/add")
     public R add(@RequestBody WaiguomeishiEntity waiguomeishi, HttpServletRequest request){
+    	waiguomeishi.setRecipetype("waiguomeishi");
     	waiguomeishi.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
-        waiguomeishi.setSourceType(SOURCE_TYPE);
         Long userId = (Long)request.getSession().getAttribute("userId");
         if(userId != null) {
             waiguomeishi.setUserid(userId);
+        }
+        // 兼容：如果前端没传 addtime，则用当前时间兜底
+        if (waiguomeishi.getAddtime() == null) {
+            waiguomeishi.setAddtime(new Date());
         }
     	//ValidatorUtils.validateEntity(waiguomeishi);
         waiguomeishiService.insert(waiguomeishi);
@@ -275,8 +337,8 @@ public class WaiguomeishiController {
      */
     @RequestMapping("/update")
     public R update(@RequestBody WaiguomeishiEntity waiguomeishi, HttpServletRequest request){
+    	waiguomeishi.setRecipetype("waiguomeishi");
         //ValidatorUtils.validateEntity(waiguomeishi);
-        waiguomeishi.setSourceType(SOURCE_TYPE);
         waiguomeishiService.updateById(waiguomeishi);//全部更新
         return R.ok();
     }
@@ -322,7 +384,7 @@ public class WaiguomeishiController {
 		}
 		
 		Wrapper<WaiguomeishiEntity> wrapper = new EntityWrapper<WaiguomeishiEntity>();
-		wrapper.eq("sourceType", SOURCE_TYPE);
+		wrapper.eq("recipetype", "waiguomeishi");
 		if(map.get("remindstart")!=null) {
 			wrapper.ge(columnName, map.get("remindstart"));
 		}
@@ -332,7 +394,7 @@ public class WaiguomeishiController {
 
 		String tableName = request.getSession().getAttribute("tableName").toString();
 		if(tableName.equals("user")) {
-			wrapper.eq("yonghuzhanghao", (String)request.getSession().getAttribute("username"));
+			wrapper.eq("userid", (Long)request.getSession().getAttribute("userId"));
 		}
 
 		int count = waiguomeishiService.selectCount(wrapper);

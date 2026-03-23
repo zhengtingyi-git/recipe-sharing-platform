@@ -53,13 +53,6 @@ public class StoreupVO  implements Serializable {
 	private String type;
 		
 	/**
-	 * 推荐类型
-	 */
-	
-	private String inteltype;
-				
-	
-	/**
 	 * 设置：收藏id
 	 */
 	 
@@ -139,19 +132,4 @@ public class StoreupVO  implements Serializable {
 	}
 				
 	
-	/**
-	 * 设置：推荐类型
-	 */
-	 
-	public void setInteltype(String inteltype) {
-		this.inteltype = inteltype;
-	}
-	
-	/**
-	 * 获取：推荐类型
-	 */
-	public String getInteltype() {
-		return inteltype;
-	}
-			
 }

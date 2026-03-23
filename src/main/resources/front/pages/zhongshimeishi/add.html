@@ -130,7 +130,7 @@
                     <div  :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="layui-form-item" pane>
 						<label  :style='{"width":"94px","padding":"0 12px 0 0","fontSize":"14px","color":"#333","textAlign":"right"}' class="layui-form-label">时间：</label>
 						<div class="layui-input-block">
-							<input :style='{"padding":"0 12px","boxShadow":"0 0 6px rgba(255,0,0,.8)","borderColor":"#DCDFE6","backgroundColor":"#f5f5f5","color":"#333","borderRadius":"4px","textAlign":"left","borderWidth":"1px","fontSize":"14px","borderStyle":"solid","height":"40px"}' v-model="detail.shijian" type="text" name="shijian" id="shijian" readonly autocomplete="off" class="layui-input">
+							<input :style='{"padding":"0 12px","boxShadow":"0 0 6px rgba(255,0,0,.8)","borderColor":"#DCDFE6","backgroundColor":"#f5f5f5","color":"#333","borderRadius":"4px","textAlign":"left","borderWidth":"1px","fontSize":"14px","borderStyle":"solid","height":"40px"}' v-model="detail.addtime" type="text" name="addtime" id="addtime" readonly autocomplete="off" class="layui-input">
 						</div>
 					</div>
 
@@ -184,7 +184,7 @@
 				        pengrenfangfa : false,
 				        yonghuzhanghao : false,
 				        yonghuxingming : false,
-				        shijian : false,
+				        addtime : false,
 				        sfsh : false,
 				        shhf : false,
 				        thumbsupnum : false,
@@ -199,7 +199,7 @@
                         pengrenfangfa: '',
                         yonghuzhanghao: '',
                         yonghuxingming: '',
-                        shijian: '',
+                        addtime: '',
                         sfsh: '',
                         shhf: '',
                         thumbsupnum: '',
@@ -320,8 +320,8 @@
 					var pad = function(n) { return n < 10 ? '0' + n : n; };
 					return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
 				}
-				vue.detail.shijian = formatDateTime(new Date());
-				vue.ro.shijian = true;
+				vue.detail.addtime = formatDateTime(new Date());
+				vue.ro.addtime = true;
 
                 // session独取
 				let table = localStorage.getItem("userTable");
@@ -387,10 +387,10 @@
 						vue.ro.yonghuxingming = true;
 						continue;
                                         }
-					if(o=='shijian'){
+					if(o=='addtime'){
           	                                vue.detail[o] = obj[o];
-						vue.ro.shijian = true;
-						jquery('#shijian').val(obj[o]);						
+						vue.ro.addtime = true;
+						jquery('#addtime').val(obj[o]);
 						continue;
                                         }
 					if(o=='thumbsupnum'){

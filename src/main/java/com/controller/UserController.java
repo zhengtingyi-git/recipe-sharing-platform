@@ -66,7 +66,7 @@ public class UserController {
     @RequestMapping("/register")
     public R register(@RequestBody UserEntity yonghu){
     	//ValidatorUtils.validateEntity(user);
-    	if(yonghu.getLianxifangshi() == null || yonghu.getLianxifangshi().trim().isEmpty()) {
+    	if(yonghu.getPhone() == null || yonghu.getPhone().trim().isEmpty()) {
 			return R.error("手机号不能为空");
 		}
     	UserEntity user = userService.selectOne(new EntityWrapper<UserEntity>().eq("yonghuzhanghao", yonghu.getYonghuzhanghao()));

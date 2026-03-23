@@ -88,11 +88,6 @@ public class ZhongshimeishiEntity<T> implements Serializable {
 	private String pengrenfangfa;
 	
 	/**
-	 * 评分
-	 */
-					
-	private String pingfen;
-	/**
 	 * 用户id
 	 */
 					
@@ -101,13 +96,13 @@ public class ZhongshimeishiEntity<T> implements Serializable {
 	/**
 	 * 用户账号
 	 */
-					
+	@TableField(exist = false)			
 	private String yonghuzhanghao;
 	
 	/**
 	 * 用户昵称
 	 */
-					
+	@TableField(exist = false)			
 	private String yonghuxingming;
 	
 	/**
@@ -115,14 +110,6 @@ public class ZhongshimeishiEntity<T> implements Serializable {
 	 */
 	@TableField(exist = false)
 	private String touxiang;
-	
-	/**
-	 * 时间
-	 */
-				
-	@JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd")
-	@DateTimeFormat 		
-	private Date shijian;
 	
 	/**
 	 * 是否审核
@@ -139,7 +126,7 @@ public class ZhongshimeishiEntity<T> implements Serializable {
 	/**
 	 * 赞
 	 */
-					
+	@TableField(exist = false)			
 	private Integer thumbsupnum;
 	
 	/**
@@ -149,9 +136,15 @@ public class ZhongshimeishiEntity<T> implements Serializable {
 	private Integer clicknum;
 
 	/**
-	 * 来源类型（用于区分原 waiguomeishi/zhongshimeishi）
+	 * 收藏数（运行时统计，不存库）
 	 */
-	private String sourceType;
+	@TableField(exist = false)
+	private Integer storeupnum;
+
+	/**
+	 * 来源类型（用于兼容合并前的分类：waiguomeishi/zhongshimeishi）
+	 */
+	private String recipetype;
 	
 	
 	@JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
@@ -245,18 +238,6 @@ public class ZhongshimeishiEntity<T> implements Serializable {
 		return pengrenfangfa;
 	}
 	/**
-	 * 设置：评分
-	 */
-	public void setPingfen(String pingfen) {
-		this.pingfen = pingfen;
-	}
-	/**
-	 * 获取：评分
-	 */
-	public String getPingfen() {
-		return pingfen;
-	}
-	/**
 	 * 设置：用户id
 	 */
 	public void setUserid(Long userid) {
@@ -303,18 +284,6 @@ public class ZhongshimeishiEntity<T> implements Serializable {
 	 */
 	public String getTouxiang() {
 		return touxiang;
-	}
-	/**
-	 * 设置：时间
-	 */
-	public void setShijian(Date shijian) {
-		this.shijian = shijian;
-	}
-	/**
-	 * 获取：时间
-	 */
-	public Date getShijian() {
-		return shijian;
 	}
 	/**
 	 * 设置：是否审核
@@ -366,17 +335,31 @@ public class ZhongshimeishiEntity<T> implements Serializable {
 	}
 
 	/**
-	 * 设置：来源类型
+	 * 设置：收藏数
 	 */
-	public void setSourceType(String sourceType) {
-		this.sourceType = sourceType;
+	public void setStoreupnum(Integer storeupnum) {
+		this.storeupnum = storeupnum;
+	}
+
+	/**
+	 * 获取：收藏数
+	 */
+	public Integer getStoreupnum() {
+		return storeupnum;
 	}
 
 	/**
 	 * 获取：来源类型
 	 */
-	public String getSourceType() {
-		return sourceType;
+	public String getRecipetype() {
+		return recipetype;
+	}
+
+	/**
+	 * 设置：来源类型
+	 */
+	public void setRecipetype(String recipetype) {
+		this.recipetype = recipetype;
 	}
 
 }

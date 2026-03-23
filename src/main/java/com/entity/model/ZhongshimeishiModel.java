@@ -54,12 +54,6 @@ public class ZhongshimeishiModel  implements Serializable {
 	private String pengrenfangfa;
 		
 	/**
-	 * 评分
-	 */
-	
-	private String pingfen;
-		
-	/**
 	 * 用户账号
 	 */
 	
@@ -70,14 +64,6 @@ public class ZhongshimeishiModel  implements Serializable {
 	 */
 	
 	private String yonghuxingming;
-		
-	/**
-	 * 时间
-	 */
-		
-	@JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
-	@DateTimeFormat 
-	private Date shijian;
 		
 	/**
 	 * 是否审核
@@ -185,22 +171,6 @@ public class ZhongshimeishiModel  implements Serializable {
 				
 	
 	/**
-	 * 设置：评分
-	 */
-	 
-	public void setPingfen(String pingfen) {
-		this.pingfen = pingfen;
-	}
-	
-	/**
-	 * 获取：评分
-	 */
-	public String getPingfen() {
-		return pingfen;
-	}
-				
-	
-	/**
 	 * 设置：用户账号
 	 */
 	 
@@ -232,21 +202,7 @@ public class ZhongshimeishiModel  implements Serializable {
 	}
 				
 	
-	/**
-	 * 设置：时间
-	 */
-	 
-	public void setShijian(Date shijian) {
-		this.shijian = shijian;
-	}
-	
-	/**
-	 * 获取：时间
-	 */
-	public Date getShijian() {
-		return shijian;
-	}
-				
+			
 	
 	/**
 	 * 设置：是否审核

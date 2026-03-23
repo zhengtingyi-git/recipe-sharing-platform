@@ -144,7 +144,7 @@ public class GuanzhuController {
                 item.put("yonghuxingming", u.getYonghuxingming() != null ? u.getYonghuxingming() : "用户");
                 item.put("touxiang", u.getTouxiang() != null ? u.getTouxiang() : "");
                 item.put("xingbie", u.getXingbie() != null ? u.getXingbie() : "");
-                item.put("lianxifangshi", u.getLianxifangshi() != null ? u.getLianxifangshi() : "");
+                item.put("phone", u.getPhone() != null ? u.getPhone() : "");
             }
             result.add(item);
         }
@@ -175,7 +175,7 @@ public class GuanzhuController {
                 item.put("yonghuxingming", u.getYonghuxingming() != null ? u.getYonghuxingming() : "用户");
                 item.put("touxiang", u.getTouxiang() != null ? u.getTouxiang() : "");
                 item.put("xingbie", u.getXingbie() != null ? u.getXingbie() : "");
-                item.put("lianxifangshi", u.getLianxifangshi() != null ? u.getLianxifangshi() : "");
+                item.put("phone", u.getPhone() != null ? u.getPhone() : "");
             }
             result.add(item);
         }

@@ -11,7 +11,6 @@
         <result property="name" column="name"/>
         <result property="picture" column="picture"/>
         <result property="type" column="type"/>
-        <result property="inteltype" column="inteltype"/>
     </resultMap>
 
 	<select id="selectListVO"

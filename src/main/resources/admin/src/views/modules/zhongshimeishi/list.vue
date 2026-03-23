@@ -153,11 +153,11 @@
                      </template>
                 </el-table-column>
                 <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign" 
-                    prop="shijian"
+                    prop="addtime"
                    :header-align="contents.tableAlign"
 		    label="时间">
 		     <template slot-scope="scope">
-                       {{scope.row.shijian}}
+                       {{scope.row.addtime}}
                      </template>
                 </el-table-column>
               <el-table-column :sortable="contents.tableSortable" :align="contents.tableAlign" 
@@ -552,7 +552,7 @@ export default {
           pengrenfangfa: row.pengrenfangfa,
           yonghuzhanghao: row.yonghuzhanghao,
           yonghuxingming: row.yonghuxingming,
-          shijian: row.shijian,
+          addtime: row.addtime,
           sfsh: row.sfsh,
           shhf: row.shhf,
           thumbsupnum: row.thumbsupnum,

@@ -12,39 +12,35 @@
         <result property="cailiao" column="cailiao"/>
         <result property="pengrenfangfa" column="pengrenfangfa"/>
         <result property="meishideyoulai" column="meishideyoulai"/>
-        <result property="pingfen" column="pingfen"/>
         <result property="userid" column="userid"/>
-        <result property="yonghuzhanghao" column="yonghuzhanghao"/>
-        <result property="yonghuxingming" column="yonghuxingming"/>
-        <result property="shijian" column="shijian"/>
+        <result property="addtime" column="addtime"/>
         <result property="sfsh" column="sfsh"/>
         <result property="shhf" column="shhf"/>
-        <result property="thumbsupnum" column="thumbsupnum"/>
         <result property="clicknum" column="clicknum"/>
     </resultMap>
 
 	<select id="selectListVO"
 		resultType="com.entity.vo.ZhongshimeishiVO" >
-		SELECT * FROM recipe  recipe         
+		SELECT * FROM recipe  zhongshimeishi         
         <where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 	
 	<select id="selectVO"
 		resultType="com.entity.vo.ZhongshimeishiVO" >
-		SELECT  recipe.* FROM recipe  recipe 	
+		SELECT  zhongshimeishi.* FROM recipe  zhongshimeishi 	
  		<where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 
     <select id="selectListView"
 		resultType="com.entity.view.ZhongshimeishiView" >
 
-		SELECT  recipe.* FROM recipe  recipe 	        
+		SELECT  zhongshimeishi.* FROM recipe  zhongshimeishi 	        
         <where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 	
 	<select id="selectView"
 		resultType="com.entity.view.ZhongshimeishiView" >
-		SELECT * FROM recipe  recipe <where> 1=1 ${ew.sqlSegment}</where>
+		SELECT * FROM recipe  zhongshimeishi <where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 	
 

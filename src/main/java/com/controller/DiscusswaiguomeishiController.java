@@ -39,8 +39,6 @@ import com.utils.MPUtil;
 @RestController
 @RequestMapping("/discusswaiguomeishi")
 public class DiscusswaiguomeishiController {
-    private static final String SOURCE_TYPE = "waiguomeishi";
-
     @Autowired
     private DiscusswaiguomeishiService discusswaiguomeishiService;
     @Autowired
@@ -56,8 +54,8 @@ public class DiscusswaiguomeishiController {
     @RequestMapping("/page")
     public R page(@RequestParam Map<String, Object> params,DiscusswaiguomeishiEntity discusswaiguomeishi,
 		HttpServletRequest request){
+    	discusswaiguomeishi.setRecipetype("waiguomeishi");
         EntityWrapper<DiscusswaiguomeishiEntity> ew = new EntityWrapper<DiscusswaiguomeishiEntity>();
-		ew.eq("sourceType", SOURCE_TYPE);
 		PageUtils page = discusswaiguomeishiService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, discusswaiguomeishi), params), params));
 
         return R.ok().put("data", page);
@@ -70,8 +68,8 @@ public class DiscusswaiguomeishiController {
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params,DiscusswaiguomeishiEntity discusswaiguomeishi, 
 		HttpServletRequest request){
+    	discusswaiguomeishi.setRecipetype("waiguomeishi");
         EntityWrapper<DiscusswaiguomeishiEntity> ew = new EntityWrapper<DiscusswaiguomeishiEntity>();
-		ew.eq("sourceType", SOURCE_TYPE);
 		PageUtils page = discusswaiguomeishiService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, discusswaiguomeishi), params), params));
         List<DiscusswaiguomeishiEntity> records = (List<DiscusswaiguomeishiEntity>) page.getList();
         List<Map<String, Object>> list = new ArrayList<>();
@@ -107,8 +105,8 @@ public class DiscusswaiguomeishiController {
      */
     @RequestMapping("/lists")
     public R list( DiscusswaiguomeishiEntity discusswaiguomeishi){
+    	discusswaiguomeishi.setRecipetype("waiguomeishi");
        	EntityWrapper<DiscusswaiguomeishiEntity> ew = new EntityWrapper<DiscusswaiguomeishiEntity>();
-      	ew.eq("sourceType", SOURCE_TYPE);
       	ew.allEq(MPUtil.allEQMapPre( discusswaiguomeishi, "discusswaiguomeishi")); 
         return R.ok().put("data", discusswaiguomeishiService.selectListView(ew));
     }
@@ -118,8 +116,8 @@ public class DiscusswaiguomeishiController {
      */
     @RequestMapping("/query")
     public R query(DiscusswaiguomeishiEntity discusswaiguomeishi){
+    	discusswaiguomeishi.setRecipetype("waiguomeishi");
         EntityWrapper< DiscusswaiguomeishiEntity> ew = new EntityWrapper< DiscusswaiguomeishiEntity>();
-		ew.eq("sourceType", SOURCE_TYPE);
  		ew.allEq(MPUtil.allEQMapPre( discusswaiguomeishi, "discusswaiguomeishi")); 
 		DiscusswaiguomeishiView discusswaiguomeishiView =  discusswaiguomeishiService.selectView(ew);
 		return R.ok("查询外国美食评论表成功").put("data", discusswaiguomeishiView);
@@ -152,8 +150,8 @@ public class DiscusswaiguomeishiController {
      */
     @RequestMapping("/save")
     public R save(@RequestBody DiscusswaiguomeishiEntity discusswaiguomeishi, HttpServletRequest request){
+    	discusswaiguomeishi.setRecipetype("waiguomeishi");
     	discusswaiguomeishi.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
-    	discusswaiguomeishi.setSourceType(SOURCE_TYPE);
     	if (discusswaiguomeishi.getUserid() != null) {
             UserEntity y = userService.selectById(discusswaiguomeishi.getUserid());
             if (y != null && y.getYonghuxingming() != null && !y.getYonghuxingming().isEmpty()) {
@@ -169,8 +167,8 @@ public class DiscusswaiguomeishiController {
      */
     @RequestMapping("/add")
     public R add(@RequestBody DiscusswaiguomeishiEntity discusswaiguomeishi, HttpServletRequest request){
+    	discusswaiguomeishi.setRecipetype("waiguomeishi");
     	discusswaiguomeishi.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
-        discusswaiguomeishi.setSourceType(SOURCE_TYPE);
     	if (discusswaiguomeishi.getUserid() != null) {
             UserEntity y = userService.selectById(discusswaiguomeishi.getUserid());
             if (y != null && y.getYonghuxingming() != null && !y.getYonghuxingming().isEmpty()) {
@@ -186,8 +184,8 @@ public class DiscusswaiguomeishiController {
      */
     @RequestMapping("/update")
     public R update(@RequestBody DiscusswaiguomeishiEntity discusswaiguomeishi, HttpServletRequest request){
+    	discusswaiguomeishi.setRecipetype("waiguomeishi");
         //ValidatorUtils.validateEntity(discusswaiguomeishi);
-        discusswaiguomeishi.setSourceType(SOURCE_TYPE);
         discusswaiguomeishiService.updateById(discusswaiguomeishi);//全部更新
         return R.ok();
     }
@@ -270,7 +268,7 @@ public class DiscusswaiguomeishiController {
 		}
 		
 		Wrapper<DiscusswaiguomeishiEntity> wrapper = new EntityWrapper<DiscusswaiguomeishiEntity>();
-		wrapper.eq("sourceType", SOURCE_TYPE);
+		wrapper.eq("recipetype", "waiguomeishi");
 		if(map.get("remindstart")!=null) {
 			wrapper.ge(columnName, map.get("remindstart"));
 		}

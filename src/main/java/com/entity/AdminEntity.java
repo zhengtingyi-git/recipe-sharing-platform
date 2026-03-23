@@ -30,7 +30,7 @@ public class AdminEntity implements Serializable {
 	/**
 	 * 手机号
 	 */
-	private String shouji;
+	private String phone;
 	
 	private Date addtime;
 
@@ -50,12 +50,12 @@ public class AdminEntity implements Serializable {
 		this.password = password;
 	}
 
-	public String getShouji() {
-		return shouji;
+	public String getPhone() {
+		return phone;
 	}
 
-	public void setShouji(String shouji) {
-		this.shouji = shouji;
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 
 	public Date getAddtime() {

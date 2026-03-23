@@ -60,6 +60,12 @@ public class NewsController {
     @Autowired
     private StoreupService storeupService;
 
+    private int countAction(Long refid, String type) {
+        EntityWrapper<StoreupEntity> ew = new EntityWrapper<>();
+        ew.eq("tablename", "news").eq("refid", refid).eq("type", type);
+        return storeupService.selectCount(ew);
+    }
+
 
     
 
@@ -79,6 +85,14 @@ public class NewsController {
             }
         }
 		PageUtils page = newsService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, news), params), params));
+        for (Object obj : page.getList()) {
+            if (obj instanceof NewsEntity) {
+                NewsEntity entity = (NewsEntity) obj;
+                if (entity.getId() != null) {
+                    entity.setThumbsupnum(countAction(entity.getId(), "21"));
+                }
+            }
+        }
 
         return R.ok().put("data", page);
     }
@@ -117,6 +131,19 @@ public class NewsController {
                         .reversed()
                         .thenComparing((NewsEntity n) -> n.getAddtime() != null ? n.getAddtime().getTime() : 0L,
                                 Comparator.reverseOrder()));
+                EntityWrapper<StoreupEntity> thumbsEw = new EntityWrapper<>();
+                thumbsEw.eq("tablename", "news").in("refid", ids).eq("type", "21");
+                List<StoreupEntity> thumbsList = storeupService.selectList(thumbsEw);
+                Map<Long, Integer> thumbsMap = new HashMap<>();
+                for (StoreupEntity thumbs : thumbsList) {
+                    Long refId = thumbs.getRefid();
+                    if (refId != null) {
+                        thumbsMap.put(refId, thumbsMap.getOrDefault(refId, 0) + 1);
+                    }
+                }
+                for (NewsEntity n : all) {
+                    n.setThumbsupnum(thumbsMap.getOrDefault(n.getId(), 0));
+                }
             }
             int pageNum = params.get("page") != null ? Integer.parseInt(params.get("page").toString()) : 1;
             int limitNum = params.get("limit") != null ? Integer.parseInt(params.get("limit").toString()) : 10;
@@ -128,6 +155,14 @@ public class NewsController {
         }
         EntityWrapper<NewsEntity> ew = new EntityWrapper<NewsEntity>();
 		PageUtils page = newsService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, news), params), params));
+        for (Object obj : page.getList()) {
+            if (obj instanceof NewsEntity) {
+                NewsEntity entity = (NewsEntity) obj;
+                if (entity.getId() != null) {
+                    entity.setThumbsupnum(countAction(entity.getId(), "21"));
+                }
+            }
+        }
         return R.ok().put("data", page);
     }
 
@@ -166,6 +201,9 @@ public class NewsController {
                 news.setTouxiang(user.getTouxiang());
             }
         }
+        if (news != null && news.getId() != null) {
+            news.setThumbsupnum(countAction(news.getId(), "21"));
+        }
         return R.ok().put("data", news);
     }
 
@@ -183,6 +221,9 @@ public class NewsController {
                 news.setYonghuxingming(user.getYonghuxingming());
                 news.setTouxiang(user.getTouxiang());
             }
+        }
+        if (news != null && news.getId() != null) {
+            news.setThumbsupnum(countAction(news.getId(), "21"));
         }
         return R.ok().put("data", news);
     }

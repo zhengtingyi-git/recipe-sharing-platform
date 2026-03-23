@@ -105,19 +105,19 @@
         </div>
       </el-col>
       <el-col :span="12">
-        <el-form-item class="date" v-if="type!='info'" label="时间" prop="shijian">
+        <el-form-item class="date" v-if="type!='info'" label="时间" prop="addtime">
             <el-date-picker
                 format="yyyy 年 MM 月 dd 日"
                 value-format="yyyy-MM-dd"
-                v-model="ruleForm.shijian" 
+                v-model="ruleForm.addtime" 
                 type="date"
-                :readonly="ro.shijian"
+                :readonly="ro.addtime"
                 placeholder="时间">
             </el-date-picker> 
         </el-form-item>
         <div v-else>
-          <el-form-item class="input" v-if="ruleForm.shijian" label="时间" prop="shijian">
-              <el-input v-model="ruleForm.shijian" 
+          <el-form-item class="input" v-if="ruleForm.addtime" label="时间" prop="addtime">
+              <el-input v-model="ruleForm.addtime" 
                 placeholder="时间" readonly></el-input>
           </el-form-item>
         </div>
@@ -232,7 +232,7 @@ export default {
 	pengrenfangfa : false,
 	yonghuzhanghao : false,
 	yonghuxingming : false,
-	shijian : false,
+	addtime : false,
 	sfsh : false,
 	shhf : false,
 	thumbsupnum : false,
@@ -247,7 +247,7 @@ export default {
         pengrenfangfa: '',
         yonghuzhanghao: '',
         yonghuxingming: '',
-        shijian: '',
+        addtime: null,
         shhf: '',
       },
           caipinleixingOptions: [],
@@ -268,7 +268,7 @@ export default {
           ],
           yonghuxingming: [
           ],
-          shijian: [
+          addtime: [
           ],
           sfsh: [
           ],
@@ -352,9 +352,9 @@ export default {
 	    this.ro.yonghuxingming = true;
             continue;
           }
-          if(o=='shijian'){
-            this.ruleForm.shijian = obj[o];
-	    this.ro.shijian = true;
+          if(o=='addtime'){
+            this.ruleForm.addtime = obj[o];
+	    this.ro.addtime = true;
             continue;
           }
           if(o=='thumbsupnum'){

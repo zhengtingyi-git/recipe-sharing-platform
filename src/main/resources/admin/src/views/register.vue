@@ -15,7 +15,7 @@
 			  <el-input v-model="ruleForm.password2" autocomplete="off" placeholder="确认密码" type="password"/>
 			</el-form-item>
 			<el-form-item label="手机号" class="input" v-if="tableName==='admin'">
-			  <el-input v-model="ruleForm.shouji" autocomplete="off" placeholder="手机号" />
+			  <el-input v-model="ruleForm.phone" autocomplete="off" placeholder="手机号" />
 			</el-form-item>
 			<!-- 用户(user)注册表单 -->
 			<el-form-item label="用户账号" class="input" v-if="tableName==='user'">
@@ -31,7 +31,7 @@
 			  <el-input v-model="ruleForm.mima2" autocomplete="off" placeholder="确认密码" type="password"/>
 			</el-form-item>
 			<el-form-item label="联系方式" class="input" v-if="tableName==='user'">
-			  <el-input v-model="ruleForm.lianxifangshi" autocomplete="off" placeholder="联系方式"  />
+			  <el-input v-model="ruleForm.phone" autocomplete="off" placeholder="联系方式"  />
 			</el-form-item>
 			<div style="display: flex;flex-wrap: wrap;width: 100%;justify-content: center;">
 				<el-button class="btn" type="primary" @click="login()">注册</el-button>
@@ -95,11 +95,11 @@ export default {
           this.$message.error(`两次密码输入不一致`);
           return;
         }
-        if(!this.ruleForm.shouji){
+        if(!this.ruleForm.phone){
           this.$message.error(`手机号不能为空`);
           return;
         }
-        if(!this.$validate.isMobile(this.ruleForm.shouji)){
+        if(!this.$validate.isMobile(this.ruleForm.phone)){
           this.$message.error(`手机号应输入手机格式`);
           return;
         }
@@ -121,14 +121,14 @@ export default {
 	    this.$message.error(`两次密码输入不一致`);
 	    return
       }
-      if(this.tableName === 'user' && this.ruleForm.lianxifangshi && (!this.$validate.isMobile(this.ruleForm.lianxifangshi))){
+      if(this.tableName === 'user' && this.ruleForm.phone && (!this.$validate.isMobile(this.ruleForm.phone))){
         this.$message.error(`联系方式应输入手机格式`);
         return
       }
       // 提交数据：管理员注册必须带 role='管理员'
       let postData = this.ruleForm;
       if(this.tableName === 'admin'){
-        postData = { username: this.ruleForm.username, password: this.ruleForm.password, shouji: this.ruleForm.shouji, role: '管理员' };
+        postData = { username: this.ruleForm.username, password: this.ruleForm.password, phone: this.ruleForm.phone, role: '管理员' };
       }
       this.$http({
         url: url,

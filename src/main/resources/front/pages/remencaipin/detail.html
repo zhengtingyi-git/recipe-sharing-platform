@@ -391,10 +391,7 @@ color: #999 !important;
 						vue.dataList = res.data.list
 						if(res.data.list.length==1) {
 							layui.http.requestJson(`storeup/delete`, 'post', [res.data.list[0].id], function(res) {
-								_this.detail.thumbsupnum = parseInt(_this.detail.thumbsupnum==null?0:_this.detail.thumbsupnum) - 1
-								layui.http.requestJson(`${_this.detailTable}/update`, 'post', _this.detail, function(res2) {
-									console.log(res2);
-								})
+								_this.detail.thumbsupnum = Math.max(0, parseInt(_this.detail.thumbsupnum==null?0:_this.detail.thumbsupnum) - 1)
 								layer.msg('取消成功', {
 									time: 1000,
 									icon: 5
@@ -413,9 +410,6 @@ color: #999 !important;
 							tablename: this.detailTable
 						}, function(res) {
 							_this.detail.thumbsupnum = parseInt(_this.detail.thumbsupnum==null?0:_this.detail.thumbsupnum) + 1
-							layui.http.requestJson(`${_this.detailTable}/update`, 'post', _this.detail, function(res2) {
-								console.log(res2);
-							})
 							layer.msg('点赞成功', {
 								time: 1000,
 								icon: 6

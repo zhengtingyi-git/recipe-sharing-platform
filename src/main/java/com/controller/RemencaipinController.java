@@ -89,18 +89,27 @@ public class RemencaipinController {
 
         EntityWrapper<ZhongshimeishiEntity> zhongshiEw = new EntityWrapper<>();
         zhongshiEw.eq("sfsh", "是");
-        zhongshiEw.eq("sourceType", "zhongshimeishi");
+        zhongshiEw.eq("recipetype", "zhongshimeishi");
         List<ZhongshimeishiEntity> zhongshiList = zhongshimeishiService.selectList(zhongshiEw);
         Map<Long, Integer> zhongshiStoreupMap = new HashMap<>();
+        Map<Long, Integer> zhongshiThumbsMap = new HashMap<>();
         if (!zhongshiList.isEmpty()) {
             List<Long> zhongshiIds = zhongshiList.stream().map(ZhongshimeishiEntity::getId).collect(Collectors.toList());
-            EntityWrapper<StoreupEntity> storeupWrapper = new EntityWrapper<>();
-            storeupWrapper.eq("tablename", "zhongshimeishi");
-            storeupWrapper.in("refid", zhongshiIds);
-            storeupWrapper.eq("type", "1");
-            List<StoreupEntity> storeupList = storeupService.selectList(storeupWrapper);
+            EntityWrapper<StoreupEntity> storeupWrapper1 = new EntityWrapper<>();
+            storeupWrapper1.eq("tablename", "zhongshimeishi");
+            storeupWrapper1.in("refid", zhongshiIds);
+            storeupWrapper1.eq("type", "1");
+            List<StoreupEntity> storeupList = storeupService.selectList(storeupWrapper1);
             for (StoreupEntity storeup : storeupList) {
                 zhongshiStoreupMap.put(storeup.getRefid(), zhongshiStoreupMap.getOrDefault(storeup.getRefid(), 0) + 1);
+            }
+            EntityWrapper<StoreupEntity> storeupWrapper21 = new EntityWrapper<>();
+            storeupWrapper21.eq("tablename", "zhongshimeishi");
+            storeupWrapper21.in("refid", zhongshiIds);
+            storeupWrapper21.eq("type", "21");
+            List<StoreupEntity> thumbsList = storeupService.selectList(storeupWrapper21);
+            for (StoreupEntity thumbs : thumbsList) {
+                zhongshiThumbsMap.put(thumbs.getRefid(), zhongshiThumbsMap.getOrDefault(thumbs.getRefid(), 0) + 1);
             }
         }
         for (ZhongshimeishiEntity dish : zhongshiList) {
@@ -124,7 +133,7 @@ public class RemencaipinController {
                     dish.getTupian(),
                     "zhongshimeishi",
                     dish.getCaixi(),
-                    dish.getThumbsupnum(),
+                    zhongshiThumbsMap.getOrDefault(dish.getId(), 0),
                     zhongshiStoreupMap.getOrDefault(dish.getId(), 0),
                     dish.getAddtime()
             ));
@@ -132,18 +141,27 @@ public class RemencaipinController {
 
         EntityWrapper<WaiguomeishiEntity> waiguoEw = new EntityWrapper<>();
         waiguoEw.eq("sfsh", "是");
-        waiguoEw.eq("sourceType", "waiguomeishi");
+        waiguoEw.eq("recipetype", "waiguomeishi");
         List<WaiguomeishiEntity> waiguoList = waiguomeishiService.selectList(waiguoEw);
         Map<Long, Integer> waiguoStoreupMap = new HashMap<>();
+        Map<Long, Integer> waiguoThumbsMap = new HashMap<>();
         if (!waiguoList.isEmpty()) {
             List<Long> waiguoIds = waiguoList.stream().map(WaiguomeishiEntity::getId).collect(Collectors.toList());
-            EntityWrapper<StoreupEntity> storeupWrapper = new EntityWrapper<>();
-            storeupWrapper.eq("tablename", "waiguomeishi");
-            storeupWrapper.in("refid", waiguoIds);
-            storeupWrapper.eq("type", "1");
-            List<StoreupEntity> storeupList = storeupService.selectList(storeupWrapper);
+            EntityWrapper<StoreupEntity> storeupWrapper1 = new EntityWrapper<>();
+            storeupWrapper1.eq("tablename", "waiguomeishi");
+            storeupWrapper1.in("refid", waiguoIds);
+            storeupWrapper1.eq("type", "1");
+            List<StoreupEntity> storeupList = storeupService.selectList(storeupWrapper1);
             for (StoreupEntity storeup : storeupList) {
                 waiguoStoreupMap.put(storeup.getRefid(), waiguoStoreupMap.getOrDefault(storeup.getRefid(), 0) + 1);
+            }
+            EntityWrapper<StoreupEntity> storeupWrapper21 = new EntityWrapper<>();
+            storeupWrapper21.eq("tablename", "waiguomeishi");
+            storeupWrapper21.in("refid", waiguoIds);
+            storeupWrapper21.eq("type", "21");
+            List<StoreupEntity> thumbsList = storeupService.selectList(storeupWrapper21);
+            for (StoreupEntity thumbs : thumbsList) {
+                waiguoThumbsMap.put(thumbs.getRefid(), waiguoThumbsMap.getOrDefault(thumbs.getRefid(), 0) + 1);
             }
         }
         for (WaiguomeishiEntity dish : waiguoList) {
@@ -167,7 +185,7 @@ public class RemencaipinController {
                     dish.getTupian(),
                     "waiguomeishi",
                     dish.getCaixi(),
-                    dish.getThumbsupnum(),
+                    waiguoThumbsMap.getOrDefault(dish.getId(), 0),
                     waiguoStoreupMap.getOrDefault(dish.getId(), 0),
                     dish.getAddtime()
             ));

@@ -79,7 +79,7 @@
 				</div>
 				<div :style='{"padding":"0","boxShadow":"0 0 6px rgba(255,0,0,0)","margin":"0 auto","borderColor":"rgba(0,0,0,1)","backgroundColor":"#fff","borderRadius":"0","borderWidth":"0 0 1px 0","width":"80%","borderStyle":"solid","height":"64px"}' class="form-item layui-form-text">
 					<label v-if="true" :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,0)","borderColor":"rgba(0,0,0,0)","backgroundColor":"transparent","color":"#333","borderRadius":"0","textAlign":"right","borderWidth":"0","width":"84px","fontSize":"16px","borderStyle":"solid"}' class="form-label">手机号：</label>
-					<input :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(0,0,0,.5)","borderColor":"#ccc","backgroundColor":"#fff","color":"#333","borderRadius":"8px","textAlign":"left","borderWidth":"0","width":"180px","fontSize":"14px","borderStyle":"solid","height":"40px"}' type="text" id="lianxifangshi" name="lianxifangshi" placeholder="请输入手机号（必填）" required lay-verify="required" autocomplete="off" class="layui-input">
+					<input :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(0,0,0,.5)","borderColor":"#ccc","backgroundColor":"#fff","color":"#333","borderRadius":"8px","textAlign":"left","borderWidth":"0","width":"180px","fontSize":"14px","borderStyle":"solid","height":"40px"}' type="text" id="phone" name="phone" placeholder="请输入手机号（必填）" required lay-verify="required" autocomplete="off" class="layui-input">
 				</div>
 				<button :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,.5)","margin":"10px auto","borderColor":"#ccc","backgroundColor":"red","color":"#fff","borderRadius":"8px","borderWidth":"0","width":"60%","fontSize":"14px","borderStyle":"solid","height":"44px"}' class="layui-btn layui-btn-fluid layui-btn-danger btn-submit" lay-submit lay-filter="register" style="width: 280px;">注册</button>
             	<p :style='{"color":"#999","textAlign":"center","fontSize":"12px"}' class="txt"><a style="color: inherit;" href="javascript:window.location.href='../login/login.html'">已有账号登录</a></p>
@@ -120,7 +120,7 @@
 				// 注册
 				form.on('submit(register)', function(data) {
 					data = data.field;
-					var shouji = (data.lianxifangshi == null ? '' : String(data.lianxifangshi)).trim();
+					var shouji = (data.phone == null ? '' : String(data.phone)).trim();
                     if(!data.yonghuzhanghao){
                         layer.msg('用户账号不能为空', {
 							time: 2000,
@@ -142,7 +142,7 @@
 						});
                         return false
                     }
-					data.lianxifangshi = shouji;
+					data.phone = shouji;
 
                     if(data.mima!=data.mima2) {
                         layer.msg('两次密码输入不一致', {

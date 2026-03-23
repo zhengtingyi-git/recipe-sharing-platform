@@ -248,7 +248,7 @@
                         <div class="layui-form-item"  :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}'>
 							<label  :style='{"width":"94px","padding":"0 12px 0 0","fontSize":"14px","color":"#333","textAlign":"right"}' class="layui-form-label">联系方式</label>
 							<div class="layui-input-block input">
-								<input type="text"  name="lianxifangshi" id="lianxifangshi" placeholder="联系方式" autocomplete="off" class="layui-input">
+								<input type="text"  name="phone" id="phone" placeholder="联系方式" autocomplete="off" class="layui-input">
 							</div>
 						</div>
                         <div class="layui-form-item"  :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}'>
@@ -518,7 +518,7 @@
 												});
 						return false
 					}
-					if(!isMobile(data.lianxifangshi)){
+					if(!isMobile(data.phone)){
 						layer.msg('联系方式应输入手机格式', {
 														time: 2000,
 														icon: 5

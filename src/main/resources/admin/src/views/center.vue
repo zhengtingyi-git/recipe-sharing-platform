@@ -31,8 +31,8 @@
         </el-form-item>
       </el-col>
       <el-col :span="12">
-        <el-form-item   v-if="flag=='user'"  label="联系方式" prop="lianxifangshi">
-          <el-input v-model="ruleForm.lianxifangshi"               placeholder="联系方式" clearable></el-input>
+        <el-form-item   v-if="flag=='user'"  label="联系方式" prop="phone">
+          <el-input v-model="ruleForm.phone"               placeholder="联系方式" clearable></el-input>
         </el-form-item>
       </el-col>
       <el-col :span="24">  
@@ -97,7 +97,7 @@ export default {
         this.$message.error('用户账号不能为空');
         return
       }
-      if( 'user' ==this.flag && this.ruleForm.lianxifangshi&&(!isMobile(this.ruleForm.lianxifangshi))){
+      if( 'user' ==this.flag && this.ruleForm.phone&&(!isMobile(this.ruleForm.phone))){
         this.$message.error(`联系方式应输入手机格式`);
         return
       }

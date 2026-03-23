@@ -38,7 +38,7 @@ public class YonghuModel  implements Serializable {
 	 * 联系方式
 	 */
 	
-	private String lianxifangshi;
+	private String phone;
 		
 	/**
 	 * 头像
@@ -99,15 +99,15 @@ public class YonghuModel  implements Serializable {
 	 * 设置：联系方式
 	 */
 	 
-	public void setLianxifangshi(String lianxifangshi) {
-		this.lianxifangshi = lianxifangshi;
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 	
 	/**
 	 * 获取：联系方式
 	 */
-	public String getLianxifangshi() {
-		return lianxifangshi;
+	public String getPhone() {
+		return phone;
 	}
 				
 	

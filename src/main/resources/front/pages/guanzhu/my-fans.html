@@ -142,7 +142,7 @@
 							<div class="user-name">{{ item.yonghuxingming || '用户' }}</div>
 							<div class="user-detail">
 								<span v-if="item.xingbie">性别：{{ item.xingbie }}</span>
-								<span v-if="item.lianxifangshi" style="margin-left: 15px;">联系方式：{{ item.lianxifangshi }}</span>
+								<span v-if="item.phone" style="margin-left: 15px;">联系方式：{{ item.phone }}</span>
 							</div>
 						</div>
 						<button class="user-btn-follow" :class="{ followed: item.isFollowed }" @click.stop="toggleFollow(item.followerId, index)">

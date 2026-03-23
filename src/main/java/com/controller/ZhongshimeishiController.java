@@ -44,8 +44,6 @@ import com.entity.StoreupEntity;
 @RestController
 @RequestMapping("/zhongshimeishi")
 public class ZhongshimeishiController {
-    private static final String SOURCE_TYPE = "zhongshimeishi";
-
     @Autowired
     private ZhongshimeishiService zhongshimeishiService;
 
@@ -54,6 +52,12 @@ public class ZhongshimeishiController {
 
     @Autowired
     private UserService userService;
+
+    private int countAction(Long refid, String type) {
+        EntityWrapper<StoreupEntity> ew = new EntityWrapper<>();
+        ew.eq("tablename", "zhongshimeishi").eq("refid", refid).eq("type", type);
+        return storeupService.selectCount(ew);
+    }
 
     
 
@@ -64,12 +68,12 @@ public class ZhongshimeishiController {
     @RequestMapping("/page")
     public R page(@RequestParam Map<String, Object> params,ZhongshimeishiEntity zhongshimeishi,
 		HttpServletRequest request){
+		zhongshimeishi.setRecipetype("zhongshimeishi");
 		String tableName = request.getSession().getAttribute("tableName").toString();
 		if(tableName.equals("user")) {
 			zhongshimeishi.setUserid((Long)request.getSession().getAttribute("userId"));
 		}
         EntityWrapper<ZhongshimeishiEntity> ew = new EntityWrapper<ZhongshimeishiEntity>();
-        ew.eq("sourceType", SOURCE_TYPE);
 		PageUtils page = zhongshimeishiService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, zhongshimeishi), params), params));
 
         // 根据用户id回填当前账号和昵称
@@ -82,6 +86,10 @@ public class ZhongshimeishiController {
                         entity.setYonghuzhanghao(user.getYonghuzhanghao());
                         entity.setYonghuxingming(user.getYonghuxingming());
                     }
+                }
+                if (entity.getId() != null) {
+                    entity.setThumbsupnum(countAction(entity.getId(), "21"));
+                    entity.setStoreupnum(countAction(entity.getId(), "1"));
                 }
             }
         }
@@ -96,10 +104,10 @@ public class ZhongshimeishiController {
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params, ZhongshimeishiEntity zhongshimeishi,
 		HttpServletRequest request){
+		zhongshimeishi.setRecipetype("zhongshimeishi");
         String sort = params.get("sort") != null ? params.get("sort").toString() : "";
         if ("storeupnum".equals(sort)) {
             EntityWrapper<ZhongshimeishiEntity> ew = new EntityWrapper<>();
-            ew.eq("sourceType", SOURCE_TYPE);
             if (params.get("caipinmingcheng") != null && !params.get("caipinmingcheng").toString().trim().isEmpty()) {
                 ew.like("caipinmingcheng", params.get("caipinmingcheng").toString().replace("%", "").trim());
                 zhongshimeishi.setCaipinmingcheng(null);
@@ -136,9 +144,49 @@ public class ZhongshimeishiController {
             List<ZhongshimeishiEntity> pageList = from < all.size() ? all.subList(from, to) : new ArrayList<>();
             PageUtils page = new PageUtils(pageList, all.size(), limitNum, pageNum);
             return R.ok().put("data", page);
+        } else if ("thumbsupnum".equals(sort)) {
+            EntityWrapper<ZhongshimeishiEntity> ew = new EntityWrapper<>();
+            if (params.get("caipinmingcheng") != null && !params.get("caipinmingcheng").toString().trim().isEmpty()) {
+                ew.like("caipinmingcheng", params.get("caipinmingcheng").toString().replace("%", "").trim());
+                zhongshimeishi.setCaipinmingcheng(null);
+            }
+            if (params.get("cailiao") != null && !params.get("cailiao").toString().trim().isEmpty()) {
+                ew.like("cailiao", params.get("cailiao").toString().replace("%", "").trim());
+                zhongshimeishi.setCailiao(null);
+            }
+            if (params.get("caixi") != null && !params.get("caixi").toString().trim().isEmpty()) {
+                ew.like("caixi", params.get("caixi").toString().replace("%", "").trim());
+                zhongshimeishi.setCaixi(null);
+            }
+            Map<String, Object> paramsNoSort = new HashMap<>(params);
+            paramsNoSort.remove("sort");
+            paramsNoSort.remove("order");
+            Wrapper<ZhongshimeishiEntity> wrapper = MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, zhongshimeishi), paramsNoSort), paramsNoSort);
+            List<ZhongshimeishiEntity> all = zhongshimeishiService.selectList(wrapper);
+            if (!all.isEmpty()) {
+                List<Long> ids = all.stream().map(ZhongshimeishiEntity::getId).collect(Collectors.toList());
+                EntityWrapper<StoreupEntity> suEw = new EntityWrapper<>();
+                suEw.eq("tablename", "zhongshimeishi").in("refid", ids).eq("type", "21");
+                List<StoreupEntity> suList = storeupService.selectList(suEw);
+                Map<Long, Integer> countMap = new HashMap<>();
+                for (StoreupEntity su : suList) {
+                    countMap.put(su.getRefid(), countMap.getOrDefault(su.getRefid(), 0) + 1);
+                }
+                final Map<Long, Integer> thumbsCount = countMap;
+                all.sort(Comparator.comparing((ZhongshimeishiEntity d) -> thumbsCount.getOrDefault(d.getId(), 0)).reversed());
+                for (ZhongshimeishiEntity d : all) {
+                    d.setThumbsupnum(thumbsCount.getOrDefault(d.getId(), 0));
+                }
+            }
+            int pageNum = params.get("page") != null ? Integer.parseInt(params.get("page").toString()) : 1;
+            int limitNum = params.get("limit") != null ? Integer.parseInt(params.get("limit").toString()) : 10;
+            int from = (pageNum - 1) * limitNum;
+            int to = Math.min(from + limitNum, all.size());
+            List<ZhongshimeishiEntity> pageList = from < all.size() ? all.subList(from, to) : new ArrayList<>();
+            PageUtils page = new PageUtils(pageList, all.size(), limitNum, pageNum);
+            return R.ok().put("data", page);
         }
         EntityWrapper<ZhongshimeishiEntity> ew = new EntityWrapper<ZhongshimeishiEntity>();
-        ew.eq("sourceType", SOURCE_TYPE);
         // 显式按 菜品名称/材料/菜系 模糊筛选，确保三种搜索都生效
         if (params.get("caipinmingcheng") != null && !params.get("caipinmingcheng").toString().trim().isEmpty()) {
             ew.like("caipinmingcheng", params.get("caipinmingcheng").toString().replace("%", "").trim());
@@ -153,6 +201,15 @@ public class ZhongshimeishiController {
             zhongshimeishi.setCaixi(null);
         }
 		PageUtils page = zhongshimeishiService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, zhongshimeishi), params), params));
+        for(Object obj : page.getList()) {
+            if(obj instanceof ZhongshimeishiEntity) {
+                ZhongshimeishiEntity entity = (ZhongshimeishiEntity)obj;
+                if (entity.getId() != null) {
+                    entity.setThumbsupnum(countAction(entity.getId(), "21"));
+                    entity.setStoreupnum(countAction(entity.getId(), "1"));
+                }
+            }
+        }
         return R.ok().put("data", page);
     }
 
@@ -161,8 +218,8 @@ public class ZhongshimeishiController {
      */
     @RequestMapping("/lists")
     public R list( ZhongshimeishiEntity zhongshimeishi){
+    	zhongshimeishi.setRecipetype("zhongshimeishi");
        	EntityWrapper<ZhongshimeishiEntity> ew = new EntityWrapper<ZhongshimeishiEntity>();
-      	ew.eq("sourceType", SOURCE_TYPE);
       	ew.allEq(MPUtil.allEQMapPre( zhongshimeishi, "zhongshimeishi")); 
         return R.ok().put("data", zhongshimeishiService.selectListView(ew));
     }
@@ -172,8 +229,8 @@ public class ZhongshimeishiController {
      */
     @RequestMapping("/query")
     public R query(ZhongshimeishiEntity zhongshimeishi){
+    	zhongshimeishi.setRecipetype("zhongshimeishi");
         EntityWrapper< ZhongshimeishiEntity> ew = new EntityWrapper< ZhongshimeishiEntity>();
-		ew.eq("sourceType", SOURCE_TYPE);
  		ew.allEq(MPUtil.allEQMapPre( zhongshimeishi, "zhongshimeishi")); 
 		ZhongshimeishiView zhongshimeishiView =  zhongshimeishiService.selectView(ew);
 		return R.ok("查询中式美食成功").put("data", zhongshimeishiView);
@@ -195,6 +252,8 @@ public class ZhongshimeishiController {
         }
 		zhongshimeishi.setClicknum(zhongshimeishi.getClicknum()+1);
 		zhongshimeishiService.updateById(zhongshimeishi);
+        zhongshimeishi.setThumbsupnum(countAction(id, "21"));
+        zhongshimeishi.setStoreupnum(countAction(id, "1"));
         return R.ok().put("data", zhongshimeishi);
     }
 
@@ -215,6 +274,8 @@ public class ZhongshimeishiController {
         }
 		zhongshimeishi.setClicknum(zhongshimeishi.getClicknum()+1);
 		zhongshimeishiService.updateById(zhongshimeishi);
+        zhongshimeishi.setThumbsupnum(countAction(id, "21"));
+        zhongshimeishi.setStoreupnum(countAction(id, "1"));
         return R.ok().put("data", zhongshimeishi);
     }
     
@@ -225,11 +286,7 @@ public class ZhongshimeishiController {
      */
     @RequestMapping("/thumbsup/{id}")
     public R vote(@PathVariable("id") String id,String type){
-        ZhongshimeishiEntity zhongshimeishi = zhongshimeishiService.selectById(id);
-        if(type.equals("1")) {
-        	zhongshimeishi.setThumbsupnum(zhongshimeishi.getThumbsupnum()+1);
-        }
-        zhongshimeishiService.updateById(zhongshimeishi);
+        // 点赞行为统一以 storeup(type=21) 为唯一事实源，不再写入主表 thumbsupnum
         return R.ok("投票成功");
     }
 
@@ -238,11 +295,15 @@ public class ZhongshimeishiController {
      */
     @RequestMapping("/save")
     public R save(@RequestBody ZhongshimeishiEntity zhongshimeishi, HttpServletRequest request){
+    	zhongshimeishi.setRecipetype("zhongshimeishi");
     	zhongshimeishi.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
-        zhongshimeishi.setSourceType(SOURCE_TYPE);
         Long userId = (Long)request.getSession().getAttribute("userId");
         if(userId != null) {
             zhongshimeishi.setUserid(userId);
+        }
+        // 兼容：如果前端没传 addtime，则用当前时间兜底
+        if (zhongshimeishi.getAddtime() == null) {
+            zhongshimeishi.setAddtime(new Date());
         }
     	//ValidatorUtils.validateEntity(zhongshimeishi);
         zhongshimeishiService.insert(zhongshimeishi);
@@ -255,11 +316,15 @@ public class ZhongshimeishiController {
 	@IgnoreAuth
     @RequestMapping("/add")
     public R add(@RequestBody ZhongshimeishiEntity zhongshimeishi, HttpServletRequest request){
+    	zhongshimeishi.setRecipetype("zhongshimeishi");
     	zhongshimeishi.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
-        zhongshimeishi.setSourceType(SOURCE_TYPE);
         Long userId = (Long)request.getSession().getAttribute("userId");
         if(userId != null) {
             zhongshimeishi.setUserid(userId);
+        }
+        // 兼容：如果前端没传 addtime，则用当前时间兜底
+        if (zhongshimeishi.getAddtime() == null) {
+            zhongshimeishi.setAddtime(new Date());
         }
     	//ValidatorUtils.validateEntity(zhongshimeishi);
         zhongshimeishiService.insert(zhongshimeishi);
@@ -271,8 +336,8 @@ public class ZhongshimeishiController {
      */
     @RequestMapping("/update")
     public R update(@RequestBody ZhongshimeishiEntity zhongshimeishi, HttpServletRequest request){
+    	zhongshimeishi.setRecipetype("zhongshimeishi");
         //ValidatorUtils.validateEntity(zhongshimeishi);
-        zhongshimeishi.setSourceType(SOURCE_TYPE);
         zhongshimeishiService.updateById(zhongshimeishi);//全部更新
         return R.ok();
     }
@@ -318,7 +383,7 @@ public class ZhongshimeishiController {
 		}
 		
 		Wrapper<ZhongshimeishiEntity> wrapper = new EntityWrapper<ZhongshimeishiEntity>();
-		wrapper.eq("sourceType", SOURCE_TYPE);
+		wrapper.eq("recipetype", "zhongshimeishi");
 		if(map.get("remindstart")!=null) {
 			wrapper.ge(columnName, map.get("remindstart"));
 		}
@@ -328,7 +393,7 @@ public class ZhongshimeishiController {
 
 		String tableName = request.getSession().getAttribute("tableName").toString();
 		if(tableName.equals("user")) {
-			wrapper.eq("yonghuzhanghao", (String)request.getSession().getAttribute("username"));
+			wrapper.eq("userid", (Long)request.getSession().getAttribute("userId"));
 		}
 
 		int count = zhongshimeishiService.selectCount(wrapper);

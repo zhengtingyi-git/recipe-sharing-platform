@@ -82,9 +82,9 @@ public class DiscusswaiguomeishiEntity<T> implements Serializable {
 	private String reply;
 
 	/**
-	 * 来源类型（用于区分原 waiguomeishi/zhongshimeishi 评论）
+	 * 来源类型（用于兼容合并前的分类：waiguomeishi/zhongshimeishi）
 	 */
-	private String sourceType;
+	private String recipetype;
 	
 	
 	@JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
@@ -167,17 +167,17 @@ public class DiscusswaiguomeishiEntity<T> implements Serializable {
 	}
 
 	/**
-	 * 设置：来源类型
+	 * 获取：来源类型
 	 */
-	public void setSourceType(String sourceType) {
-		this.sourceType = sourceType;
+	public String getRecipetype() {
+		return recipetype;
 	}
 
 	/**
-	 * 获取：来源类型
+	 * 设置：来源类型
 	 */
-	public String getSourceType() {
-		return sourceType;
+	public void setRecipetype(String recipetype) {
+		this.recipetype = recipetype;
 	}
 
 }

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="addEdit-block">
     <el-form
       class="detail-form-content"
@@ -64,13 +64,13 @@
         </div>
       </el-col>
       <el-col :span="12">
-        <el-form-item class="input" v-if="type!='info'"  label="联系方式" prop="lianxifangshi">
-          <el-input v-model="ruleForm.lianxifangshi" 
-              placeholder="联系方式" clearable  :readonly="ro.lianxifangshi"></el-input>
+        <el-form-item class="input" v-if="type!='info'"  label="联系方式" prop="phone">
+          <el-input v-model="ruleForm.phone" 
+              placeholder="联系方式" clearable  :readonly="ro.phone"></el-input>
         </el-form-item>
         <div v-else>
-          <el-form-item class="input" label="联系方式" prop="lianxifangshi">
-              <el-input v-model="ruleForm.lianxifangshi" 
+          <el-form-item class="input" label="联系方式" prop="phone">
+              <el-input v-model="ruleForm.phone" 
                 placeholder="联系方式" readonly></el-input>
           </el-form-item>
         </div>
@@ -181,7 +181,7 @@ export default {
 	yonghuxingming : false,
 	mima : false,
 	xingbie : false,
-	lianxifangshi : false,
+	phone : false,
 	touxiang : false,
       },
       ruleForm: {
@@ -189,7 +189,7 @@ export default {
         yonghuxingming: '',
         mima: '',
         xingbie: '',
-        lianxifangshi: '',
+        phone: '',
         touxiang: '',
       },
           xingbieOptions: [],
@@ -203,7 +203,7 @@ export default {
           ],
           xingbie: [
           ],
-          lianxifangshi: [
+          phone: [
                 { validator: validateMobile, trigger: 'blur' },
           ],
           touxiang: [
@@ -260,9 +260,9 @@ export default {
 	    this.ro.xingbie = true;
             continue;
           }
-          if(o=='lianxifangshi'){
-            this.ruleForm.lianxifangshi = obj[o];
-	    this.ro.lianxifangshi = true;
+          if(o=='phone'){
+            this.ruleForm.phone = obj[o];
+	    this.ro.phone = true;
             continue;
           }
           if(o=='touxiang'){

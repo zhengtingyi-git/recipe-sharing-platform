@@ -14,26 +14,26 @@
 
 	<select id="selectListVO"
 		resultType="com.entity.vo.DiscusswaiguomeishiVO" >
-		SELECT * FROM recipe_comment  recipe_comment         
+		SELECT * FROM recipe_comment  discusswaiguomeishi         
         <where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 	
 	<select id="selectVO"
 		resultType="com.entity.vo.DiscusswaiguomeishiVO" >
-		SELECT  recipe_comment.* FROM recipe_comment  recipe_comment 	
+		SELECT  discusswaiguomeishi.* FROM recipe_comment  discusswaiguomeishi 	
  		<where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 
     <select id="selectListView"
 		resultType="com.entity.view.DiscusswaiguomeishiView" >
 
-		SELECT  recipe_comment.* FROM recipe_comment  recipe_comment 	        
+		SELECT  discusswaiguomeishi.* FROM recipe_comment  discusswaiguomeishi 	        
         <where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 	
 	<select id="selectView"
 		resultType="com.entity.view.DiscusswaiguomeishiView" >
-		SELECT * FROM recipe_comment  recipe_comment <where> 1=1 ${ew.sqlSegment}</where>
+		SELECT * FROM recipe_comment  discusswaiguomeishi <where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 	
 

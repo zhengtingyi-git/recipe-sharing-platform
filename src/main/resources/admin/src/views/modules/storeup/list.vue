@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="main-content">
     <!-- 列表页 -->
     <div v-if="showFlag">
@@ -98,14 +98,6 @@
                       <div v-else>无图片</div>
                     </template>
                   </el-table-column>
-                <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign" 
-                    prop="inteltype"
-                   :header-align="contents.tableAlign"
-		    label="推荐类型">
-		     <template slot-scope="scope">
-                       {{scope.row.inteltype}}
-                     </template>
-                </el-table-column>
             <el-table-column width="300" :align="contents.tableAlign" 
                :header-align="contents.tableAlign"
                 label="操作">

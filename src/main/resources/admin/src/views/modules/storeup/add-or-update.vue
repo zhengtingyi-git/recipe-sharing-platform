@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="addEdit-block">
     <el-form
       class="detail-form-content"
@@ -35,18 +35,6 @@
         <div v-else>
           <el-form-item v-if="ruleForm.picture" label="收藏图片" prop="picture">
             <img style="margin-right:20px;" v-bind:key="index" v-for="(item,index) in ruleForm.picture.split(',')" :src="$base.url+item" width="100" height="100">
-          </el-form-item>
-        </div>
-      </el-col>
-      <el-col :span="12">
-        <el-form-item class="input" v-if="type!='info'"  label="推荐类型" prop="inteltype">
-          <el-input v-model="ruleForm.inteltype" 
-              placeholder="推荐类型" clearable  :readonly="ro.inteltype"></el-input>
-        </el-form-item>
-        <div v-else>
-          <el-form-item class="input" label="推荐类型" prop="inteltype">
-              <el-input v-model="ruleForm.inteltype" 
-                placeholder="推荐类型" readonly></el-input>
           </el-form-item>
         </div>
       </el-col>
@@ -141,7 +129,6 @@ export default {
 	name : false,
 	picture : false,
 	type : false,
-	inteltype : false,
       },
       ruleForm: {
         userid: '',
@@ -149,7 +136,6 @@ export default {
         tablename: '',
         name: '',
         picture: '',
-        inteltype: '',
       },
       rules: {
           userid: [
@@ -166,8 +152,6 @@ export default {
                 { required: true, message: '收藏图片不能为空', trigger: 'blur' },
           ],
           type: [
-          ],
-          inteltype: [
           ],
       }
     };
@@ -229,11 +213,6 @@ export default {
           if(o=='type'){
             this.ruleForm.type = obj[o];
 	    this.ro.type = true;
-            continue;
-          }
-          if(o=='inteltype'){
-            this.ruleForm.inteltype = obj[o];
-	    this.ro.inteltype = true;
             continue;
           }
         }
