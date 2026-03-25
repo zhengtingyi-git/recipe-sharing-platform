@@ -56,7 +56,7 @@ public class ForumPostCommentEntity<T> implements Serializable {
 	@TableField("user_id")
 	private Long userId;
 
-	@TableField("display_name")
+	@TableField(exist = false)
 	private String displayName;
 
 	@TableField("comment_content")

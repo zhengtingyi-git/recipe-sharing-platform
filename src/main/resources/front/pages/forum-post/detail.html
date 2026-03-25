@@ -165,11 +165,11 @@
 						<i class="layui-icon" style="font-size: 20px;color: red;margin-right: 10px;">&#xe6c6;</i>
 						取消赞({{ detail.thumbsupnum==null?0:detail.thumbsupnum }})
 					</div>
-					<a v-if='storeupFlag' @click="storeUp()" href="javascript:void(0)" style="display:flex;align-items:center;margin-left: 15px;color:#fff;">
-						<i class="layui-icon" style="font-size: 20px;color: red;margin-right: 6px;">&#xe67a;</i>取消收藏({{ storeupCount }})
+					<a v-if='userInteractionsFlag' @click="userInteractionsUp()" href="javascript:void(0)" style="display:flex;align-items:center;margin-left: 15px;color:#fff;">
+						<i class="layui-icon" style="font-size: 20px;color: red;margin-right: 6px;">&#xe67a;</i>取消收藏({{ userInteractionsCount }})
 					</a>
-					<a v-if='!storeupFlag' @click="storeUp()" href="javascript:void(0)" style="display:flex;align-items:center;margin-left: 15px;color:#fff;">
-						<i class="layui-icon" style="font-size: 20px;color: red;margin-right: 6px;">&#xe67b;</i>点我收藏({{ storeupCount }})
+					<a v-if='!userInteractionsFlag' @click="userInteractionsUp()" href="javascript:void(0)" style="display:flex;align-items:center;margin-left: 15px;color:#fff;">
+						<i class="layui-icon" style="font-size: 20px;color: red;margin-right: 6px;">&#xe67b;</i>点我收藏({{ userInteractionsCount }})
 					</a>
 				</div>
 				<div class="title" style="font-size: 18px;color:#999;">
@@ -271,10 +271,10 @@
 				dataList: [],
 				currentUserId: localStorage.getItem('userid') || '',
 				cpicture: '',
-				storeupFlag: 0,
+				userInteractionsFlag: 0,
 				thumbsupFlag: 0,
 				followFlag: 0,
-				storeupCount: 0,
+				userInteractionsCount: 0,
 				detailTable: 'forum_post',
 				commentPrefix: 'forum-post-comment'
 			},
@@ -346,7 +346,7 @@
 						layer.msg('请先登录', { icon: 5 });
 						return;
 					}
-					layui.http.request('storeup/list', 'get', {
+					layui.http.request('user-interactions/list', 'get', {
 						page: 1,
 						limit: 1,
 						type: '21',
@@ -355,12 +355,12 @@
 						userid: localStorage.getItem('userid'),
 					}, function(res) {
 						if (res.data.list.length === 1) {
-							layui.http.requestJson('storeup/delete', 'post', [res.data.list[0].id], function() {
+							layui.http.requestJson('user-interactions/delete', 'post', [res.data.list[0].id], function() {
 								layer.msg('取消成功', { time: 1000, icon: 5 }, function() { location.reload(); });
 							});
 							return;
 						}
-						layui.http.requestJson('storeup/save', 'post', {
+						layui.http.requestJson('user-interactions/save', 'post', {
 							userid: localStorage.getItem('userid'),
 							type: '21',
 							name: _this.title,
@@ -372,13 +372,13 @@
 						});
 					});
 				},
-				storeUp: function() {
+				userInteractionsUp: function() {
 					var _this = this;
 					if (!localStorage.getItem('userid')) {
 						layer.msg('请先登录', { icon: 5 });
 						return;
 					}
-					layui.http.request('storeup/list', 'get', {
+					layui.http.request('user-interactions/list', 'get', {
 						page: 1,
 						limit: 1,
 						type: 1,
@@ -387,12 +387,12 @@
 						userid: localStorage.getItem('userid'),
 					}, function(res) {
 						if (res.data.list.length === 1) {
-							layui.http.requestJson('storeup/delete', 'post', [res.data.list[0].id], function() {
+							layui.http.requestJson('user-interactions/delete', 'post', [res.data.list[0].id], function() {
 								layer.msg('取消成功', { time: 1000, icon: 5 }, function() { location.reload(); });
 							});
 							return;
 						}
-						layui.http.requestJson('storeup/save', 'post', {
+						layui.http.requestJson('user-interactions/save', 'post', {
 							userid: localStorage.getItem('userid'),
 							name: _this.title,
 							type: 1,
@@ -693,17 +693,17 @@
 						vue.followFlag = (r.data && r.data.followed) ? 1 : 0;
 					});
 				}
-				http.request('storeup/list', 'get', {
+				http.request('user-interactions/list', 'get', {
 					page: 1,
 					limit: 1,
 					type: 1,
 					refid: vue.detail.id,
 					tablename: vue.detailTable
 				}, function(rc) {
-					vue.storeupCount = rc.data && typeof rc.data.total === 'number' ? rc.data.total : 0;
+					vue.userInteractionsCount = rc.data && typeof rc.data.total === 'number' ? rc.data.total : 0;
 				});
 				if (localStorage.getItem('userid')) {
-					http.request('storeup/list', 'get', {
+					http.request('user-interactions/list', 'get', {
 						page: 1,
 						limit: 1,
 						type: 1,
@@ -711,9 +711,9 @@
 						tablename: vue.detailTable,
 						userid: localStorage.getItem('userid'),
 					}, function(r1) {
-						vue.storeupFlag = r1.data.list.length;
+						vue.userInteractionsFlag = r1.data.list.length;
 					});
-					http.request('storeup/list', 'get', {
+					http.request('user-interactions/list', 'get', {
 						page: 1,
 						limit: 1,
 						type: '21',

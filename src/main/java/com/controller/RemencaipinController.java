@@ -19,9 +19,9 @@ import com.service.ZhongshimeishiService;
 import com.service.WaiguomeishiService;
 import com.utils.PageUtils;
 import com.utils.R;
-import com.service.StoreupService;
+import com.service.UserInteractionsService;
 import com.service.TokenService;
-import com.entity.StoreupEntity;
+import com.entity.UserInteractionsEntity;
 import com.entity.TokenEntity;
 import com.entity.ZhongshimeishiEntity;
 import com.entity.WaiguomeishiEntity;
@@ -39,7 +39,7 @@ import java.util.Arrays;
 public class RemencaipinController {
 
     @Autowired
-    private StoreupService storeupService;
+    private UserInteractionsService userInteractionsService;
 
     @Autowired
     private TokenService tokenService;
@@ -51,7 +51,7 @@ public class RemencaipinController {
     private WaiguomeishiService waiguomeishiService;
 
     /**
-     * 前端列表 - 显示全部中式美食和外国美食（sfsh=是），支持排序：addtime 最新、thumbsupnum 最多点赞、storeupnum 最多收藏
+     * 前端列表 - 显示全部中式美食和外国美食（sfsh=是），支持排序：addtime 最新、thumbsupnum 最多点赞、userInteractionsNum 最多收藏
      */
     @IgnoreAuth
     @RequestMapping("/list")
@@ -64,17 +64,17 @@ public class RemencaipinController {
             String type;
             String cuisine;
             Integer thumbsupnum;
-            Integer storeupnum;
+            Integer userInteractionsNum;
             Date addtime;
 
-            DishInfo(Long id, String name, String image, String type, String cuisine, Integer thumbsupnum, Integer storeupnum, Date addtime) {
+            DishInfo(Long id, String name, String image, String type, String cuisine, Integer thumbsupnum, Integer userInteractionsNum, Date addtime) {
                 this.id = id;
                 this.name = name;
                 this.image = image;
                 this.type = type;
                 this.cuisine = cuisine;
                 this.thumbsupnum = thumbsupnum != null ? thumbsupnum : 0;
-                this.storeupnum = storeupnum != null ? storeupnum : 0;
+                this.userInteractionsNum = userInteractionsNum != null ? userInteractionsNum : 0;
                 this.addtime = addtime;
             }
         }
@@ -91,22 +91,22 @@ public class RemencaipinController {
         zhongshiEw.eq("sfsh", "是");
         zhongshiEw.eq("recipetype", "zhongshimeishi");
         List<ZhongshimeishiEntity> zhongshiList = zhongshimeishiService.selectList(zhongshiEw);
-        Map<Long, Integer> zhongshiStoreupMap = new HashMap<>();
+        Map<Long, Integer> zhongshiUserInteractionsMap = new HashMap<>();
         Map<Long, Integer> zhongshiThumbsMap = new HashMap<>();
         if (!zhongshiList.isEmpty()) {
             List<Long> zhongshiIds = zhongshiList.stream().map(ZhongshimeishiEntity::getId).collect(Collectors.toList());
-            EntityWrapper<StoreupEntity> storeupWrapper1 = new EntityWrapper<>();
-            storeupWrapper1.in("refid", zhongshiIds);
-            storeupWrapper1.eq("type", "1");
-            List<StoreupEntity> storeupList = storeupService.selectList(storeupWrapper1);
-            for (StoreupEntity storeup : storeupList) {
-                zhongshiStoreupMap.put(storeup.getRefid(), zhongshiStoreupMap.getOrDefault(storeup.getRefid(), 0) + 1);
+            EntityWrapper<UserInteractionsEntity> userInteractionsWrapper1 = new EntityWrapper<>();
+            userInteractionsWrapper1.in("resource_id", zhongshiIds);
+            userInteractionsWrapper1.eq("interaction_type", "1");
+            List<UserInteractionsEntity> userInteractionsList = userInteractionsService.selectList(userInteractionsWrapper1);
+            for (UserInteractionsEntity userInteraction : userInteractionsList) {
+                zhongshiUserInteractionsMap.put(userInteraction.getRefid(), zhongshiUserInteractionsMap.getOrDefault(userInteraction.getRefid(), 0) + 1);
             }
-            EntityWrapper<StoreupEntity> storeupWrapper21 = new EntityWrapper<>();
-            storeupWrapper21.in("refid", zhongshiIds);
-            storeupWrapper21.eq("type", "21");
-            List<StoreupEntity> thumbsList = storeupService.selectList(storeupWrapper21);
-            for (StoreupEntity thumbs : thumbsList) {
+            EntityWrapper<UserInteractionsEntity> userInteractionsWrapper21 = new EntityWrapper<>();
+            userInteractionsWrapper21.in("resource_id", zhongshiIds);
+            userInteractionsWrapper21.eq("interaction_type", "21");
+            List<UserInteractionsEntity> thumbsList = userInteractionsService.selectList(userInteractionsWrapper21);
+            for (UserInteractionsEntity thumbs : thumbsList) {
                 zhongshiThumbsMap.put(thumbs.getRefid(), zhongshiThumbsMap.getOrDefault(thumbs.getRefid(), 0) + 1);
             }
         }
@@ -132,7 +132,7 @@ public class RemencaipinController {
                     "zhongshimeishi",
                     dish.getCaixi(),
                     zhongshiThumbsMap.getOrDefault(dish.getId(), 0),
-                    zhongshiStoreupMap.getOrDefault(dish.getId(), 0),
+                    zhongshiUserInteractionsMap.getOrDefault(dish.getId(), 0),
                     dish.getAddtime()
             ));
         }
@@ -141,22 +141,22 @@ public class RemencaipinController {
         waiguoEw.eq("sfsh", "是");
         waiguoEw.eq("recipetype", "waiguomeishi");
         List<WaiguomeishiEntity> waiguoList = waiguomeishiService.selectList(waiguoEw);
-        Map<Long, Integer> waiguoStoreupMap = new HashMap<>();
+        Map<Long, Integer> waiguoUserInteractionsMap = new HashMap<>();
         Map<Long, Integer> waiguoThumbsMap = new HashMap<>();
         if (!waiguoList.isEmpty()) {
             List<Long> waiguoIds = waiguoList.stream().map(WaiguomeishiEntity::getId).collect(Collectors.toList());
-            EntityWrapper<StoreupEntity> storeupWrapper1 = new EntityWrapper<>();
-            storeupWrapper1.in("refid", waiguoIds);
-            storeupWrapper1.eq("type", "1");
-            List<StoreupEntity> storeupList = storeupService.selectList(storeupWrapper1);
-            for (StoreupEntity storeup : storeupList) {
-                waiguoStoreupMap.put(storeup.getRefid(), waiguoStoreupMap.getOrDefault(storeup.getRefid(), 0) + 1);
+            EntityWrapper<UserInteractionsEntity> userInteractionsWrapper1 = new EntityWrapper<>();
+            userInteractionsWrapper1.in("resource_id", waiguoIds);
+            userInteractionsWrapper1.eq("interaction_type", "1");
+            List<UserInteractionsEntity> userInteractionsList = userInteractionsService.selectList(userInteractionsWrapper1);
+            for (UserInteractionsEntity userInteraction : userInteractionsList) {
+                waiguoUserInteractionsMap.put(userInteraction.getRefid(), waiguoUserInteractionsMap.getOrDefault(userInteraction.getRefid(), 0) + 1);
             }
-            EntityWrapper<StoreupEntity> storeupWrapper21 = new EntityWrapper<>();
-            storeupWrapper21.in("refid", waiguoIds);
-            storeupWrapper21.eq("type", "21");
-            List<StoreupEntity> thumbsList = storeupService.selectList(storeupWrapper21);
-            for (StoreupEntity thumbs : thumbsList) {
+            EntityWrapper<UserInteractionsEntity> userInteractionsWrapper21 = new EntityWrapper<>();
+            userInteractionsWrapper21.in("resource_id", waiguoIds);
+            userInteractionsWrapper21.eq("interaction_type", "21");
+            List<UserInteractionsEntity> thumbsList = userInteractionsService.selectList(userInteractionsWrapper21);
+            for (UserInteractionsEntity thumbs : thumbsList) {
                 waiguoThumbsMap.put(thumbs.getRefid(), waiguoThumbsMap.getOrDefault(thumbs.getRefid(), 0) + 1);
             }
         }
@@ -182,15 +182,15 @@ public class RemencaipinController {
                     "waiguomeishi",
                     dish.getCaixi(),
                     waiguoThumbsMap.getOrDefault(dish.getId(), 0),
-                    waiguoStoreupMap.getOrDefault(dish.getId(), 0),
+                    waiguoUserInteractionsMap.getOrDefault(dish.getId(), 0),
                     dish.getAddtime()
             ));
         }
 
         if ("thumbsupnum".equals(sort)) {
             allDishes.sort(Comparator.comparing((DishInfo d) -> d.thumbsupnum).reversed());
-        } else if ("storeupnum".equals(sort)) {
-            allDishes.sort(Comparator.comparing((DishInfo d) -> d.storeupnum).reversed());
+        } else if ("userInteractionsNum".equals(sort)) {
+            allDishes.sort(Comparator.comparing((DishInfo d) -> d.userInteractionsNum).reversed());
         } else if ("recommend".equals(sort)) {
             // 推荐排序（分三段）：
             // 1) 用户已点赞/收藏的菜品置顶
@@ -205,10 +205,10 @@ public class RemencaipinController {
             if (token != null && !token.trim().isEmpty()) {
                 TokenEntity te = tokenService.getTokenEntity(token.trim());
                 if (te != null && te.getUserid() != null) {
-                    EntityWrapper<StoreupEntity> userEw = new EntityWrapper<>();
-                    userEw.eq("userid", te.getUserid());
-                    userEw.in(true, "type", Arrays.asList("1", "21"));
-                    for (StoreupEntity s : storeupService.selectList(userEw)) {
+                    EntityWrapper<UserInteractionsEntity> userEw = new EntityWrapper<>();
+                    userEw.eq("user_id", te.getUserid());
+                    userEw.in(true, "interaction_type", Arrays.asList("1", "21"));
+                    for (UserInteractionsEntity s : userInteractionsService.selectList(userEw)) {
                         String resolvedType = resolveRecipeType(s.getRefid(), dishMap);
                         if (resolvedType == null) {
                             continue;

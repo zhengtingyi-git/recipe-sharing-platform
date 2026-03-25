@@ -1,6 +1,6 @@
 package com.entity.model;
 
-import com.entity.StoreupEntity;
+import com.entity.UserInteractionsEntity;
 
 import com.baomidou.mybatisplus.annotations.TableName;
 import java.util.Date;
@@ -19,7 +19,7 @@ import java.io.Serializable;
  * @email 
  * @date 2022-04-09 17:21:19
  */
-public class StoreupModel  implements Serializable {
+public class UserInteractionsModel  implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	 			

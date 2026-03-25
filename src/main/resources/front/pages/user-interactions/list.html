@@ -245,7 +245,7 @@
 						param['tablename'] = currentCategory;
 					}
 					// 获取列表数据
-					http.request('storeup/list', 'get', param, function(res) {
+					http.request('user-interactions/list', 'get', param, function(res) {
 						vue.dataList = res.data.list
 						// 分页
 						laypage.render({
@@ -272,7 +272,7 @@
 									if (currentCategory) {
 										pageParam['tablename'] = currentCategory;
 									}
-									http.request('storeup/list', 'get', pageParam, function(res) {
+									http.request('user-interactions/list', 'get', pageParam, function(res) {
 										vue.dataList = res.data.list
 									})
 								}

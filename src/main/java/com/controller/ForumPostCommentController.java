@@ -66,6 +66,7 @@ public class ForumPostCommentController {
             m.put("userid", e.getUserid());
             m.put("userId", e.getUserId());
             m.put("nickname", e.getNickname());
+            // displayName 统一由 user_id 查询获得，不依赖冗余列
             m.put("displayName", e.getDisplayName());
             m.put("cpicture", e.getCpicture());
             m.put("commentImage", e.getCommentImage());
@@ -81,6 +82,7 @@ public class ForumPostCommentController {
                 if (y != null) {
                     if (y.getYonghuxingming() != null && !y.getYonghuxingming().isEmpty()) {
                         m.put("nickname", y.getYonghuxingming());
+                        m.put("displayName", y.getYonghuxingming());
                     }
                     if (y.getTouxiang() != null) {
                         m.put("touxiang", y.getTouxiang());

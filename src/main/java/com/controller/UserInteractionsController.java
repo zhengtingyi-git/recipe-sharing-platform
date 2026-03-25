@@ -1,0 +1,467 @@
+package com.controller;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
+
+import com.utils.ValidatorUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.annotation.IgnoreAuth;
+
+import com.entity.UserInteractionsEntity;
+import com.entity.ForumPostEntity;
+import com.entity.ZhongshimeishiEntity;
+import com.entity.WaiguomeishiEntity;
+import com.entity.view.UserInteractionsView;
+
+import com.service.UserInteractionsService;
+import com.service.ForumPostService;
+import com.service.ZhongshimeishiService;
+import com.service.WaiguomeishiService;
+import com.utils.PageUtils;
+import com.utils.R;
+import com.utils.MD5Util;
+import com.utils.MPUtil;
+import com.utils.CommonUtil;
+import java.io.IOException;
+
+/**
+ * 收藏表
+ * 后端接口
+ * @author 
+ * @email 
+ * @date 2022-04-09 17:21:19
+ */
+@RestController
+@RequestMapping("/user-interactions")
+public class UserInteractionsController {
+    @Autowired
+    private UserInteractionsService userInteractionsService;
+    @Autowired
+    private ForumPostService forumPostService;
+    @Autowired
+    private ZhongshimeishiService zhongshimeishiService;
+    @Autowired
+    private WaiguomeishiService waiguomeishiService;
+
+
+    
+
+
+    /**
+     * 后端列表
+     */
+    @RequestMapping("/page")
+    public R page(@RequestParam Map<String, Object> params,UserInteractionsEntity userInteractions,
+		HttpServletRequest request){
+    	if(!request.getSession().getAttribute("role").toString().equals("管理员")) {
+    		userInteractions.setUserid((Long)request.getSession().getAttribute("userId"));
+    	}
+        // 注意：user_interactions 表已经删除了 tablename/name/picture 等列，
+        // 这些字段在实体里仍然存在（exist=false），如果直接参与 likeOrEq，会生成不存在的 where 条件。
+        userInteractions.setTablename(null);
+        userInteractions.setName(null);
+        userInteractions.setPicture(null);
+        String categoryTablename = params.get("tablename") != null ? params.get("tablename").toString().trim() : "";
+        params.remove("name");
+        params.remove("tablename");
+        normalizeUserInteractionsParams(params);
+
+        EntityWrapper<UserInteractionsEntity> ew = new EntityWrapper<UserInteractionsEntity>();
+        // 仅对物理列过滤：避免 MPUtil 依据旧字段名生成不存在 where 条件
+        if (userInteractions.getId() != null) {
+            ew.eq("id", userInteractions.getId());
+        }
+        if (userInteractions.getUserid() != null) {
+            ew.eq("user_id", userInteractions.getUserid());
+        }
+        if (userInteractions.getRefid() != null) {
+            ew.eq("resource_id", userInteractions.getRefid());
+        }
+        if (userInteractions.getType() != null) {
+            ew.eq("interaction_type", userInteractions.getType());
+        }
+        if (userInteractions.getAddtime() != null) {
+            ew.eq("created_at", userInteractions.getAddtime());
+        }
+
+        // Between 条件（_start/_end）+ 排序（sort）
+        ew = (EntityWrapper<UserInteractionsEntity>) MPUtil.between(ew, params);
+		applyUserInteractionsCategoryFilter(ew, categoryTablename);
+		ew = (EntityWrapper<UserInteractionsEntity>) MPUtil.sort(ew, params);
+		PageUtils page = userInteractionsService.queryPage(params, ew);
+        enrichUserInteractionsPage(page);
+
+        return R.ok().put("data", page);
+    }
+    
+    /**
+     * 前端列表
+     */
+    @RequestMapping("/list")
+    public R list(@RequestParam Map<String, Object> params,UserInteractionsEntity userInteractions, 
+		HttpServletRequest request){
+    	if(!request.getSession().getAttribute("role").toString().equals("管理员")) {
+    		userInteractions.setUserid((Long)request.getSession().getAttribute("userId"));
+    	}
+        // 同 page：避免生成不存在的 where(tablename/name/picture)
+        userInteractions.setTablename(null);
+        userInteractions.setName(null);
+        userInteractions.setPicture(null);
+        String categoryTablename = params.get("tablename") != null ? params.get("tablename").toString().trim() : "";
+        params.remove("name");
+        params.remove("tablename");
+        normalizeUserInteractionsParams(params);
+
+        EntityWrapper<UserInteractionsEntity> ew = new EntityWrapper<UserInteractionsEntity>();
+        if (userInteractions.getId() != null) {
+            ew.eq("id", userInteractions.getId());
+        }
+        if (userInteractions.getUserid() != null) {
+            ew.eq("user_id", userInteractions.getUserid());
+        }
+        if (userInteractions.getRefid() != null) {
+            ew.eq("resource_id", userInteractions.getRefid());
+        }
+        if (userInteractions.getType() != null) {
+            ew.eq("interaction_type", userInteractions.getType());
+        }
+        if (userInteractions.getAddtime() != null) {
+            ew.eq("created_at", userInteractions.getAddtime());
+        }
+
+        ew = (EntityWrapper<UserInteractionsEntity>) MPUtil.between(ew, params);
+		applyUserInteractionsCategoryFilter(ew, categoryTablename);
+		ew = (EntityWrapper<UserInteractionsEntity>) MPUtil.sort(ew, params);
+		PageUtils page = userInteractionsService.queryPage(params, ew);
+        enrichUserInteractionsPage(page);
+        return R.ok().put("data", page);
+    }
+
+	/**
+     * 列表
+     */
+    @RequestMapping("/lists")
+    public R list(UserInteractionsEntity userInteractions){
+       	EntityWrapper<UserInteractionsEntity> ew = new EntityWrapper<UserInteractionsEntity>();
+        if (userInteractions.getId() != null) {
+            ew.eq("id", userInteractions.getId());
+        }
+        if (userInteractions.getUserid() != null) {
+            ew.eq("user_id", userInteractions.getUserid());
+        }
+        if (userInteractions.getRefid() != null) {
+            ew.eq("resource_id", userInteractions.getRefid());
+        }
+        if (userInteractions.getType() != null) {
+            ew.eq("interaction_type", userInteractions.getType());
+        }
+        if (userInteractions.getAddtime() != null) {
+            ew.eq("created_at", userInteractions.getAddtime());
+        }
+        return R.ok().put("data", userInteractionsService.selectListView(ew));
+    }
+
+	 /**
+     * 查询
+     */
+    @RequestMapping("/query")
+    public R query(UserInteractionsEntity userInteractions){
+        EntityWrapper< UserInteractionsEntity> ew = new EntityWrapper< UserInteractionsEntity>();
+        if (userInteractions.getId() != null) {
+            ew.eq("id", userInteractions.getId());
+        }
+        if (userInteractions.getUserid() != null) {
+            ew.eq("user_id", userInteractions.getUserid());
+        }
+        if (userInteractions.getRefid() != null) {
+            ew.eq("resource_id", userInteractions.getRefid());
+        }
+        if (userInteractions.getType() != null) {
+            ew.eq("interaction_type", userInteractions.getType());
+        }
+        if (userInteractions.getAddtime() != null) {
+            ew.eq("created_at", userInteractions.getAddtime());
+        }
+		UserInteractionsView userInteractionsView = userInteractionsService.selectView(ew);
+		return R.ok("查询收藏表成功").put("data", userInteractionsView);
+    }
+	
+    /**
+     * 后端详情
+     */
+    @RequestMapping("/info/{id}")
+    public R info(@PathVariable("id") Long id){
+        UserInteractionsEntity userInteractions = userInteractionsService.selectById(id);
+        return R.ok().put("data", userInteractions);
+    }
+
+    /**
+     * 前端详情
+     */
+	@IgnoreAuth
+    @RequestMapping("/detail/{id}")
+    public R detail(@PathVariable("id") Long id){
+        UserInteractionsEntity userInteractions = userInteractionsService.selectById(id);
+        if (userInteractions != null) {
+            fillTargetFields(userInteractions);
+        }
+        return R.ok().put("data", userInteractions);
+    }
+    
+
+
+
+    /**
+     * 后端保存
+     */
+    @RequestMapping("/save")
+    public R save(@RequestBody UserInteractionsEntity userInteractions, HttpServletRequest request){
+    	userInteractions.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
+    	//ValidatorUtils.validateEntity(userInteractions);
+    	userInteractions.setUserid((Long)request.getSession().getAttribute("userId"));
+    	if (userInteractions.getType() != null && !("1".equals(userInteractions.getType()) || "21".equals(userInteractions.getType()))) {
+    		return R.error("user-interactions.type 只允许 1(收藏) 或 21(赞)");
+    	}
+        userInteractionsService.insert(userInteractions);
+        return R.ok();
+    }
+    
+    /**
+     * 前端保存
+     */
+    @RequestMapping("/add")
+    public R add(@RequestBody UserInteractionsEntity userInteractions, HttpServletRequest request){
+    	userInteractions.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
+    	//ValidatorUtils.validateEntity(userInteractions);
+    	userInteractions.setUserid((Long)request.getSession().getAttribute("userId"));
+    	if (userInteractions.getType() != null && !("1".equals(userInteractions.getType()) || "21".equals(userInteractions.getType()))) {
+    		return R.error("user-interactions.type 只允许 1(收藏) 或 21(赞)");
+    	}
+        userInteractionsService.insert(userInteractions);
+        return R.ok();
+    }
+
+    /**
+     * 修改
+     */
+    @RequestMapping("/update")
+    public R update(@RequestBody UserInteractionsEntity userInteractions, HttpServletRequest request){
+        //ValidatorUtils.validateEntity(userInteractions);
+    	if (userInteractions.getType() != null && !("1".equals(userInteractions.getType()) || "21".equals(userInteractions.getType()))) {
+    		return R.error("user-interactions.type 只允许 1(收藏) 或 21(赞)");
+    	}
+        userInteractionsService.updateById(userInteractions);//全部更新
+        return R.ok();
+    }
+    
+
+    /**
+     * 删除
+     */
+    @RequestMapping("/delete")
+    public R delete(@RequestBody Long[] ids){
+        userInteractionsService.deleteBatchIds(Arrays.asList(ids));
+        return R.ok();
+    }
+    
+    /**
+     * 提醒接口
+     */
+	@RequestMapping("/remind/{columnName}/{type}")
+	public R remindCount(@PathVariable("columnName") String columnName, HttpServletRequest request, 
+						 @PathVariable("type") String type,@RequestParam Map<String, Object> map) {
+		String normalizedColumn = normalizeUserInteractionsColumn(columnName);
+		map.put("column", columnName);
+		map.put("type", type);
+		
+		if(type.equals("2")) {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			Calendar c = Calendar.getInstance();
+			Date remindStartDate = null;
+			Date remindEndDate = null;
+			if(map.get("remindstart")!=null) {
+				Integer remindStart = Integer.parseInt(map.get("remindstart").toString());
+				c.setTime(new Date()); 
+				c.add(Calendar.DAY_OF_MONTH,remindStart);
+				remindStartDate = c.getTime();
+				map.put("remindstart", sdf.format(remindStartDate));
+			}
+			if(map.get("remindend")!=null) {
+				Integer remindEnd = Integer.parseInt(map.get("remindend").toString());
+				c.setTime(new Date());
+				c.add(Calendar.DAY_OF_MONTH,remindEnd);
+				remindEndDate = c.getTime();
+				map.put("remindend", sdf.format(remindEndDate));
+			}
+		}
+		
+		Wrapper<UserInteractionsEntity> wrapper = new EntityWrapper<UserInteractionsEntity>();
+		if(map.get("remindstart")!=null) {
+			wrapper.ge(normalizedColumn, map.get("remindstart"));
+		}
+		if(map.get("remindend")!=null) {
+			wrapper.le(normalizedColumn, map.get("remindend"));
+		}
+		if(!request.getSession().getAttribute("role").toString().equals("管理员")) {
+    		wrapper.eq("user_id", (Long)request.getSession().getAttribute("userId"));
+    	}
+
+
+		int count = userInteractionsService.selectCount(wrapper);
+		return R.ok().put("count", count);
+	}
+	
+
+
+
+
+
+
+
+    /**
+     * 个人中心「我的收藏/我的点赞」按分类筛选：库表无 tablename 列，通过 refid 与 recipe / forum_post 关联。
+     * 中式/外国美食共用 recipe 表，以 recipetype 区分。
+     */
+    private void applyUserInteractionsCategoryFilter(EntityWrapper<UserInteractionsEntity> ew, String tablename) {
+        if (ew == null || StringUtils.isBlank(tablename)) {
+            return;
+        }
+        switch (tablename) {
+            case "waiguomeishi":
+                ew.andNew().where("resource_id IN (SELECT id FROM recipe WHERE recipetype = {0})", "waiguomeishi");
+                break;
+            case "zhongshimeishi":
+                ew.andNew().where("resource_id IN (SELECT id FROM recipe WHERE recipetype = {0})", "zhongshimeishi");
+                break;
+            case "forum_post":
+                ew.andNew().where("resource_id IN (SELECT id FROM forum_post)");
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void enrichUserInteractionsPage(PageUtils page) {
+        if (page == null || page.getList() == null) {
+            return;
+        }
+        List<?> records = page.getList();
+        List<Object> enriched = records.stream().map(item -> {
+            if (item instanceof UserInteractionsEntity) {
+                UserInteractionsEntity userInteractions = (UserInteractionsEntity) item;
+                fillTargetFields(userInteractions);
+                return userInteractions;
+            }
+            return item;
+        }).collect(Collectors.toList());
+        page.setList(enriched);
+    }
+
+    private void fillTargetFields(UserInteractionsEntity userInteractions) {
+        if (userInteractions == null || userInteractions.getRefid() == null) {
+            return;
+        }
+        Long refId = userInteractions.getRefid();
+
+        ForumPostEntity post = forumPostService.selectById(refId);
+        if (post != null) {
+            userInteractions.setTablename("forum_post");
+            userInteractions.setName(post.getTitle());
+            userInteractions.setPicture(post.getPicture());
+            return;
+        }
+
+        ZhongshimeishiEntity zhongshi = zhongshimeishiService.selectById(refId);
+        if (zhongshi != null) {
+            userInteractions.setTablename("zhongshimeishi");
+            userInteractions.setName(zhongshi.getCaipinmingcheng());
+            userInteractions.setPicture(zhongshi.getTupian());
+            return;
+        }
+
+        WaiguomeishiEntity waiguo = waiguomeishiService.selectById(refId);
+        if (waiguo != null) {
+            userInteractions.setTablename("waiguomeishi");
+            userInteractions.setName(waiguo.getCaipinmingcheng());
+            userInteractions.setPicture(waiguo.getTupian());
+        }
+    }
+
+    /**
+     * 规范化 Storeup（物理列：user_id/resource_id/interaction_type/created_at）相关参数。
+     * 目的：让 MPUtil.between / sort 使用正确的“物理列名”。
+     */
+    private void normalizeUserInteractionsParams(Map<String, Object> params) {
+        if (params == null) {
+            return;
+        }
+
+        // sort 是“列名”，直接规范列名
+        Object sortObj = params.get("sort");
+        if (sortObj != null) {
+            String sort = String.valueOf(sortObj).trim();
+            if (!sort.isEmpty()) {
+                params.put("sort", normalizeUserInteractionsColumn(sort));
+            }
+        }
+
+        // between 范围用 xxx_start / xxx_end 作为 key
+        Map<String, Object> normalized = new HashMap<>();
+        for (Map.Entry<String, Object> e : params.entrySet()) {
+            String key = e.getKey();
+            Object val = e.getValue();
+            if (key == null) continue;
+
+            if (key.endsWith("_start") || key.endsWith("_end")) {
+                String suffix = key.endsWith("_start") ? "_start" : "_end";
+                String prefix = key.substring(0, key.length() - suffix.length());
+                String newPrefix = normalizeUserInteractionsColumn(prefix);
+                normalized.put(newPrefix + suffix, val);
+            } else {
+                normalized.put(key, val);
+            }
+        }
+        params.clear();
+        params.putAll(normalized);
+    }
+
+    private String normalizeUserInteractionsColumn(String columnName) {
+        if (columnName == null) {
+            return "";
+        }
+        String c = columnName.trim();
+        switch (c) {
+            case "userid":
+                return "user_id";
+            case "refid":
+                return "resource_id";
+            case "type":
+                return "interaction_type";
+            case "addtime":
+                return "created_at";
+            default:
+                return c;
+        }
+    }
+
+
+
+}

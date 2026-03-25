@@ -31,8 +31,8 @@ import com.entity.UserEntity;
 import com.utils.PageUtils;
 import com.utils.R;
 import com.utils.MPUtil;
-import com.service.StoreupService;
-import com.entity.StoreupEntity;
+import com.service.UserInteractionsService;
+import com.entity.UserInteractionsEntity;
 
 /**
  * 外国美食
@@ -48,15 +48,15 @@ public class WaiguomeishiController {
     private WaiguomeishiService waiguomeishiService;
 
     @Autowired
-    private StoreupService storeupService;
+    private UserInteractionsService userInteractionsService;
 
     @Autowired
     private UserService userService;
 
     private int countAction(Long refid, String type) {
-        EntityWrapper<StoreupEntity> ew = new EntityWrapper<>();
-        ew.eq("refid", refid).eq("type", type);
-        return storeupService.selectCount(ew);
+        EntityWrapper<UserInteractionsEntity> ew = new EntityWrapper<>();
+        ew.eq("resource_id", refid).eq("interaction_type", type);
+        return userInteractionsService.selectCount(ew);
     }
 
     private void fillRecipeUser(WaiguomeishiEntity entity) {
@@ -101,7 +101,7 @@ public class WaiguomeishiController {
                 fillRecipeUser(entity);
                 if (entity.getId() != null) {
                     entity.setThumbsupnum(countAction(entity.getId(), "21"));
-                    entity.setStoreupnum(countAction(entity.getId(), "1"));
+                    entity.setUserInteractionsNum(countAction(entity.getId(), "1"));
                 }
             }
         }
@@ -110,7 +110,7 @@ public class WaiguomeishiController {
     }
     
     /**
-     * 前端列表（支持 sort=addtime/thumbsupnum/storeupnum，order=desc）
+     * 前端列表（支持 sort=addtime/thumbsupnum/userInteractionsNum，order=desc）
      */
 	@IgnoreAuth
     @RequestMapping("/list")
@@ -118,7 +118,7 @@ public class WaiguomeishiController {
 		HttpServletRequest request){
 		waiguomeishi.setRecipetype("waiguomeishi");
         String sort = params.get("sort") != null ? params.get("sort").toString() : "";
-        if ("storeupnum".equals(sort)) {
+        if ("userInteractionsNum".equals(sort)) {
             EntityWrapper<WaiguomeishiEntity> ew = new EntityWrapper<>();
             if (params.get("caipinmingcheng") != null && !params.get("caipinmingcheng").toString().trim().isEmpty()) {
                 ew.like("caipinmingcheng", params.get("caipinmingcheng").toString().replace("%", "").trim());
@@ -139,15 +139,15 @@ public class WaiguomeishiController {
             List<WaiguomeishiEntity> all = waiguomeishiService.selectList(wrapper);
             if (!all.isEmpty()) {
                 List<Long> ids = all.stream().map(WaiguomeishiEntity::getId).collect(Collectors.toList());
-                EntityWrapper<StoreupEntity> suEw = new EntityWrapper<>();
-                suEw.in("refid", ids).eq("type", "1");
-                List<StoreupEntity> suList = storeupService.selectList(suEw);
+                EntityWrapper<UserInteractionsEntity> suEw = new EntityWrapper<>();
+                suEw.in("resource_id", ids).eq("interaction_type", "1");
+                List<UserInteractionsEntity> suList = userInteractionsService.selectList(suEw);
                 Map<Long, Integer> countMap = new HashMap<>();
-                for (StoreupEntity su : suList) {
+                for (UserInteractionsEntity su : suList) {
                     countMap.put(su.getRefid(), countMap.getOrDefault(su.getRefid(), 0) + 1);
                 }
-                final Map<Long, Integer> storeupCount = countMap;
-                all.sort(Comparator.comparing((WaiguomeishiEntity d) -> storeupCount.getOrDefault(d.getId(), 0)).reversed());
+                final Map<Long, Integer> userInteractionsCount = countMap;
+                all.sort(Comparator.comparing((WaiguomeishiEntity d) -> userInteractionsCount.getOrDefault(d.getId(), 0)).reversed());
             }
             int pageNum = params.get("page") != null ? Integer.parseInt(params.get("page").toString()) : 1;
             int limitNum = params.get("limit") != null ? Integer.parseInt(params.get("limit").toString()) : 10;
@@ -178,11 +178,11 @@ public class WaiguomeishiController {
             List<WaiguomeishiEntity> all = waiguomeishiService.selectList(wrapper);
             if (!all.isEmpty()) {
                 List<Long> ids = all.stream().map(WaiguomeishiEntity::getId).collect(Collectors.toList());
-                EntityWrapper<StoreupEntity> suEw = new EntityWrapper<>();
-                suEw.in("refid", ids).eq("type", "21");
-                List<StoreupEntity> suList = storeupService.selectList(suEw);
+                EntityWrapper<UserInteractionsEntity> suEw = new EntityWrapper<>();
+                suEw.in("resource_id", ids).eq("interaction_type", "21");
+                List<UserInteractionsEntity> suList = userInteractionsService.selectList(suEw);
                 Map<Long, Integer> countMap = new HashMap<>();
-                for (StoreupEntity su : suList) {
+                for (UserInteractionsEntity su : suList) {
                     countMap.put(su.getRefid(), countMap.getOrDefault(su.getRefid(), 0) + 1);
                 }
                 final Map<Long, Integer> thumbsCount = countMap;
@@ -221,7 +221,7 @@ public class WaiguomeishiController {
                 fillRecipeUser(entity);
                 if (entity.getId() != null) {
                     entity.setThumbsupnum(countAction(entity.getId(), "21"));
-                    entity.setStoreupnum(countAction(entity.getId(), "1"));
+                    entity.setUserInteractionsNum(countAction(entity.getId(), "1"));
                 }
             }
         }
@@ -264,7 +264,7 @@ public class WaiguomeishiController {
 		waiguomeishi.setClicknum(waiguomeishi.getClicknum()+1);
 		waiguomeishiService.updateById(waiguomeishi);
         waiguomeishi.setThumbsupnum(countAction(id, "21"));
-        waiguomeishi.setStoreupnum(countAction(id, "1"));
+        waiguomeishi.setUserInteractionsNum(countAction(id, "1"));
         return R.ok().put("data", waiguomeishi);
     }
 
@@ -279,7 +279,7 @@ public class WaiguomeishiController {
 		waiguomeishi.setClicknum(waiguomeishi.getClicknum()+1);
 		waiguomeishiService.updateById(waiguomeishi);
         waiguomeishi.setThumbsupnum(countAction(id, "21"));
-        waiguomeishi.setStoreupnum(countAction(id, "1"));
+        waiguomeishi.setUserInteractionsNum(countAction(id, "1"));
         return R.ok().put("data", waiguomeishi);
     }
     
@@ -290,7 +290,7 @@ public class WaiguomeishiController {
      */
     @RequestMapping("/thumbsup/{id}")
     public R vote(@PathVariable("id") String id,String type){
-        // 点赞行为统一以 storeup(type=21) 为唯一事实源，不再写入主表 thumbsupnum
+        // 点赞行为统一以 user_interactions(type=21) 为唯一事实源，不再写入主表 thumbsupnum
         return R.ok("投票成功");
     }
 

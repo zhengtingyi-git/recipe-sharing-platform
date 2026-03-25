@@ -32,8 +32,8 @@ import com.entity.view.ForumPostView;
 import com.service.ForumPostService;
 import com.service.UserService;
 import com.entity.UserEntity;
-import com.service.StoreupService;
-import com.entity.StoreupEntity;
+import com.service.UserInteractionsService;
+import com.entity.UserInteractionsEntity;
 import com.utils.PageUtils;
 import com.utils.R;
 import com.utils.MD5Util;
@@ -58,12 +58,12 @@ public class ForumPostController {
     private UserService userService;
 
     @Autowired
-    private StoreupService storeupService;
+    private UserInteractionsService userInteractionsService;
 
     private int countAction(Long refid, String type) {
-        EntityWrapper<StoreupEntity> ew = new EntityWrapper<>();
-        ew.eq("refid", refid).eq("type", type);
-        return storeupService.selectCount(ew);
+        EntityWrapper<UserInteractionsEntity> ew = new EntityWrapper<>();
+        ew.eq("resource_id", refid).eq("interaction_type", type);
+        return userInteractionsService.selectCount(ew);
     }
 
 
@@ -115,11 +115,11 @@ public class ForumPostController {
             List<ForumPostEntity> all = forumPostService.selectList(wrapper);
             if (!all.isEmpty()) {
                 List<Long> ids = all.stream().map(ForumPostEntity::getId).collect(Collectors.toList());
-                EntityWrapper<StoreupEntity> suEw = new EntityWrapper<>();
-                suEw.in("refid", ids).in("type", Arrays.asList("1", "21"));
-                List<StoreupEntity> suList = storeupService.selectList(suEw);
+                EntityWrapper<UserInteractionsEntity> suEw = new EntityWrapper<>();
+                suEw.in("resource_id", ids).in("interaction_type", Arrays.asList("1", "21"));
+                List<UserInteractionsEntity> suList = userInteractionsService.selectList(suEw);
                 Map<Long, Integer> countMap = new HashMap<>();
-                for (StoreupEntity su : suList) {
+                for (UserInteractionsEntity su : suList) {
                     Long refId = su.getRefid();
                     if (refId != null) {
                         countMap.put(refId, countMap.getOrDefault(refId, 0) + 1);
@@ -131,11 +131,11 @@ public class ForumPostController {
                         .reversed()
                         .thenComparing((ForumPostEntity n) -> n.getCreatedAt() != null ? n.getCreatedAt().getTime() : 0L,
                                 Comparator.reverseOrder()));
-                EntityWrapper<StoreupEntity> thumbsEw = new EntityWrapper<>();
-                thumbsEw.in("refid", ids).eq("type", "21");
-                List<StoreupEntity> thumbsList = storeupService.selectList(thumbsEw);
+                EntityWrapper<UserInteractionsEntity> thumbsEw = new EntityWrapper<>();
+                thumbsEw.in("resource_id", ids).eq("interaction_type", "21");
+                List<UserInteractionsEntity> thumbsList = userInteractionsService.selectList(thumbsEw);
                 Map<Long, Integer> thumbsMap = new HashMap<>();
-                for (StoreupEntity thumbs : thumbsList) {
+                for (UserInteractionsEntity thumbs : thumbsList) {
                     Long refId = thumbs.getRefid();
                     if (refId != null) {
                         thumbsMap.put(refId, thumbsMap.getOrDefault(refId, 0) + 1);

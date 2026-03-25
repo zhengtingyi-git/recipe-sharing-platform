@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dao.UserInteractionsDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.entity.UserInteractionsEntity" id="userInteractionsMap">
+        <result property="userid" column="user_id"/>
+        <result property="refid" column="resource_id"/>
+        <result property="type" column="interaction_type"/>
+    </resultMap>
+
+	<select id="selectListVO"
+		resultType="com.entity.vo.UserInteractionsVO" >
+		SELECT
+			user_interactions.resource_id AS refid,
+			NULL AS tablename,
+			NULL AS name,
+			NULL AS picture,
+			user_interactions.interaction_type AS type
+		FROM user_interactions
+        <where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+	
+	<select id="selectVO"
+		resultType="com.entity.vo.UserInteractionsVO" >
+		SELECT
+			user_interactions.resource_id AS refid,
+			NULL AS tablename,
+			NULL AS name,
+			NULL AS picture,
+			user_interactions.interaction_type AS type
+		FROM user_interactions
+ 		<where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+
+    <select id="selectListView"
+		resultType="com.entity.view.UserInteractionsView" >
+
+		SELECT
+			user_interactions.id,
+			user_interactions.created_at AS addtime,
+			user_interactions.user_id AS userid,
+			user_interactions.resource_id AS refid,
+			user_interactions.interaction_type AS type
+		FROM user_interactions
+        <where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+	
+	<select id="selectView"
+		resultType="com.entity.view.UserInteractionsView" >
+		SELECT
+			user_interactions.id,
+			user_interactions.created_at AS addtime,
+			user_interactions.user_id AS userid,
+			user_interactions.resource_id AS refid,
+			user_interactions.interaction_type AS type
+		FROM user_interactions
+		<where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+	
+
+</mapper>

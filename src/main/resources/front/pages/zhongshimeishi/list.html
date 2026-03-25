@@ -308,7 +308,7 @@ width: 100%;
 		<div class="sort-tabs" style="padding:12px 10px;margin:0 0 12px 0;background:#f8f8f8;border-radius:6px;border:1px solid #eee;">
 			<span class="sort-tab" :class="{ current: sortType === 'addtime' }" @click="setSort('addtime')">最新</span>
 			<span class="sort-tab" :class="{ current: sortType === 'thumbsupnum' }" @click="setSort('thumbsupnum')">最多点赞</span>
-			<span class="sort-tab" :class="{ current: sortType === 'storeupnum' }" @click="setSort('storeupnum')">最多收藏</span>
+			<span class="sort-tab" :class="{ current: sortType === 'userInteractionsNum' }" @click="setSort('userInteractionsNum')">最多收藏</span>
 		</div>
 		<form class="layui-form filter" :style='{"padding":"0 10px","boxShadow":"0 0 0px rgba(255,0,0,.8)","margin":"10px 0 10px 0","borderColor":"#F0C0C8","backgroundColor":"#FFE4E9","borderRadius":"4px","borderWidth":"0","borderStyle":"solid","justifyContent":"flex-end","height":"64px"}'>
 			<div class="item-list">

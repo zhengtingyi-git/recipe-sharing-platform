@@ -136,10 +136,10 @@ public class WaiguomeishiEntity<T> implements Serializable {
 	private Integer clicknum;
 
 	/**
-	 * 收藏数（运行时统计，不存库）
+	 * 用户交互收藏数（运行时统计，不存库）
 	 */
 	@TableField(exist = false)
-	private Integer storeupnum;
+	private Integer userInteractionsNum;
 
 	/**
 	 * 来源类型（用于兼容合并前的分类：waiguomeishi/zhongshimeishi）
@@ -335,17 +335,17 @@ public class WaiguomeishiEntity<T> implements Serializable {
 	}
 
 	/**
-	 * 设置：收藏数
+	 * 设置：用户交互收藏数
 	 */
-	public void setStoreupnum(Integer storeupnum) {
-		this.storeupnum = storeupnum;
+	public void setUserInteractionsNum(Integer userInteractionsNum) {
+		this.userInteractionsNum = userInteractionsNum;
 	}
 
 	/**
-	 * 获取：收藏数
+	 * 获取：用户交互收藏数
 	 */
-	public Integer getStoreupnum() {
-		return storeupnum;
+	public Integer getUserInteractionsNum() {
+		return userInteractionsNum;
 	}
 
 	/**

@@ -1,6 +1,6 @@
 package com.entity.vo;
 
-import com.entity.StoreupEntity;
+import com.entity.UserInteractionsEntity;
 
 import com.baomidou.mybatisplus.annotations.TableName;
 import java.util.Date;
@@ -18,7 +18,7 @@ import java.io.Serializable;
  * @email 
  * @date 2022-04-09 17:21:19
  */
-public class StoreupVO  implements Serializable {
+public class UserInteractionsVO  implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	 			

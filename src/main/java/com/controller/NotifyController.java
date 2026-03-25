@@ -16,7 +16,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.entity.UserFollowEntity;
-import com.entity.StoreupEntity;
+import com.entity.UserInteractionsEntity;
 import com.entity.WaiguomeishiEntity;
 import com.entity.UserEntity;
 import com.entity.ZhongshimeishiEntity;
@@ -25,7 +25,7 @@ import com.entity.ForumPostCommentEntity;
 import com.entity.DiscusszhongshimeishiEntity;
 import com.entity.DiscusswaiguomeishiEntity;
 import com.service.UserFollowService;
-import com.service.StoreupService;
+import com.service.UserInteractionsService;
 import com.service.UserService;
 import com.service.ZhongshimeishiService;
 import com.service.WaiguomeishiService;
@@ -45,7 +45,7 @@ public class NotifyController {
     @Autowired
     private UserFollowService userFollowService;
     @Autowired
-    private StoreupService storeupService;
+    private UserInteractionsService userInteractionsService;
     @Autowired
     private UserService userService;
     @Autowired
@@ -309,30 +309,30 @@ public class NotifyController {
 
         List<Map<String, Object>> thumbsupList = new ArrayList<>();
         if (!myZhongshiIds.isEmpty()) {
-            EntityWrapper<StoreupEntity> storeEw = new EntityWrapper<>();
-            storeEw.eq("type", "21").in("refid", myZhongshiIds);
-            storeEw.orderBy("addtime", false);
-            List<StoreupEntity> thumbs = storeupService.selectList(storeEw);
-            for (StoreupEntity s : thumbs) {
-                thumbsupList.add(buildStoreupItem(s, "thumbsup"));
+            EntityWrapper<UserInteractionsEntity> storeEw = new EntityWrapper<>();
+            storeEw.eq("interaction_type", "21").in("resource_id", myZhongshiIds);
+            storeEw.orderBy("created_at", false);
+            List<UserInteractionsEntity> thumbs = userInteractionsService.selectList(storeEw);
+            for (UserInteractionsEntity s : thumbs) {
+                thumbsupList.add(buildUserInteractionsItem(s, "thumbsup"));
             }
         }
         if (!myWaiguoIds.isEmpty()) {
-            EntityWrapper<StoreupEntity> storeEw2 = new EntityWrapper<>();
-            storeEw2.eq("type", "21").in("refid", myWaiguoIds);
-            storeEw2.orderBy("addtime", false);
-            List<StoreupEntity> thumbs = storeupService.selectList(storeEw2);
-            for (StoreupEntity s : thumbs) {
-                thumbsupList.add(buildStoreupItem(s, "thumbsup"));
+            EntityWrapper<UserInteractionsEntity> storeEw2 = new EntityWrapper<>();
+            storeEw2.eq("interaction_type", "21").in("resource_id", myWaiguoIds);
+            storeEw2.orderBy("created_at", false);
+            List<UserInteractionsEntity> thumbs = userInteractionsService.selectList(storeEw2);
+            for (UserInteractionsEntity s : thumbs) {
+                thumbsupList.add(buildUserInteractionsItem(s, "thumbsup"));
             }
         }
         if (!myForumPostIdsForLike.isEmpty()) {
-            EntityWrapper<StoreupEntity> storeEwForumPost = new EntityWrapper<>();
-            storeEwForumPost.eq("type", "21").in("refid", myForumPostIdsForLike);
-            storeEwForumPost.orderBy("addtime", false);
-            List<StoreupEntity> forumPostThumbs = storeupService.selectList(storeEwForumPost);
-            for (StoreupEntity s : forumPostThumbs) {
-                thumbsupList.add(buildStoreupItem(s, "thumbsup"));
+            EntityWrapper<UserInteractionsEntity> storeEwForumPost = new EntityWrapper<>();
+            storeEwForumPost.eq("interaction_type", "21").in("resource_id", myForumPostIdsForLike);
+            storeEwForumPost.orderBy("created_at", false);
+            List<UserInteractionsEntity> forumPostThumbs = userInteractionsService.selectList(storeEwForumPost);
+            for (UserInteractionsEntity s : forumPostThumbs) {
+                thumbsupList.add(buildUserInteractionsItem(s, "thumbsup"));
             }
         }
         thumbsupList.sort((a, b) -> {
@@ -343,37 +343,37 @@ public class NotifyController {
         result.put("thumbsupList", thumbsupList);
 
         // 3. ????????? / ?? ????type=1?
-        List<Map<String, Object>> storeupList = new ArrayList<>();
+        List<Map<String, Object>> userInteractionsList = new ArrayList<>();
         if (!myZhongshiIds.isEmpty()) {
-            EntityWrapper<StoreupEntity> storeEw3 = new EntityWrapper<>();
-            storeEw3.eq("type", "1").in("refid", myZhongshiIds);
-            storeEw3.orderBy("addtime", false);
-            for (StoreupEntity s : storeupService.selectList(storeEw3)) {
-                storeupList.add(buildStoreupItem(s, "storeup"));
+            EntityWrapper<UserInteractionsEntity> storeEw3 = new EntityWrapper<>();
+            storeEw3.eq("interaction_type", "1").in("resource_id", myZhongshiIds);
+            storeEw3.orderBy("created_at", false);
+            for (UserInteractionsEntity s : userInteractionsService.selectList(storeEw3)) {
+                userInteractionsList.add(buildUserInteractionsItem(s, "user-interactions"));
             }
         }
         if (!myWaiguoIds.isEmpty()) {
-            EntityWrapper<StoreupEntity> storeEw4 = new EntityWrapper<>();
-            storeEw4.eq("type", "1").in("refid", myWaiguoIds);
-            storeEw4.orderBy("addtime", false);
-            for (StoreupEntity s : storeupService.selectList(storeEw4)) {
-                storeupList.add(buildStoreupItem(s, "storeup"));
+            EntityWrapper<UserInteractionsEntity> storeEw4 = new EntityWrapper<>();
+            storeEw4.eq("interaction_type", "1").in("resource_id", myWaiguoIds);
+            storeEw4.orderBy("created_at", false);
+            for (UserInteractionsEntity s : userInteractionsService.selectList(storeEw4)) {
+                userInteractionsList.add(buildUserInteractionsItem(s, "user-interactions"));
             }
         }
         if (!myForumPostIdsForLike.isEmpty()) {
-            EntityWrapper<StoreupEntity> storeEwForumPost2 = new EntityWrapper<>();
-            storeEwForumPost2.eq("type", "1").in("refid", myForumPostIdsForLike);
-            storeEwForumPost2.orderBy("addtime", false);
-            for (StoreupEntity s : storeupService.selectList(storeEwForumPost2)) {
-                storeupList.add(buildStoreupItem(s, "storeup"));
+            EntityWrapper<UserInteractionsEntity> storeEwForumPost2 = new EntityWrapper<>();
+            storeEwForumPost2.eq("interaction_type", "1").in("resource_id", myForumPostIdsForLike);
+            storeEwForumPost2.orderBy("created_at", false);
+            for (UserInteractionsEntity s : userInteractionsService.selectList(storeEwForumPost2)) {
+                userInteractionsList.add(buildUserInteractionsItem(s, "user-interactions"));
             }
         }
-        storeupList.sort((a, b) -> {
+        userInteractionsList.sort((a, b) -> {
             String t1 = a.get("addtime") != null ? a.get("addtime").toString() : "";
             String t2 = b.get("addtime") != null ? b.get("addtime").toString() : "";
             return t2.compareTo(t1);
         });
-        result.put("storeupList", storeupList);
+        result.put("userInteractionsList", userInteractionsList);
 
         // 4. ??????????
         List<Map<String, Object>> followMeList = new ArrayList<>();
@@ -395,11 +395,11 @@ public class NotifyController {
         return R.ok().put("data", result);
     }
 
-    private Map<String, Object> buildStoreupItem(StoreupEntity s, String type) {
+    private Map<String, Object> buildUserInteractionsItem(UserInteractionsEntity s, String type) {
         Map<String, Object> item = new HashMap<>();
         item.put("id", s.getId());
         item.put("refid", s.getRefid());
-        fillStoreupTargetInfo(item, s.getRefid());
+        fillUserInteractionsTargetInfo(item, s.getRefid());
         item.put("addtime", s.getAddtime());
         item.put("type", type);
         Long uid = s.getUserid();
@@ -414,7 +414,7 @@ public class NotifyController {
         return item;
     }
 
-    private void fillStoreupTargetInfo(Map<String, Object> item, Long refId) {
+    private void fillUserInteractionsTargetInfo(Map<String, Object> item, Long refId) {
         if (refId == null) {
             return;
         }

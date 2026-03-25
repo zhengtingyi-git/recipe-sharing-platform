@@ -92,7 +92,7 @@
 				<div class="notify-tabs">
 					<div class="tab" :class="{ current: currentTab === 'reply' }" @click="currentTab='reply'">回复我的</div>
 					<div class="tab" :class="{ current: currentTab === 'thumbsup' }" @click="currentTab='thumbsup'">点赞我的</div>
-					<div class="tab" :class="{ current: currentTab === 'storeup' }" @click="currentTab='storeup'">收藏我的</div>
+					<div class="tab" :class="{ current: currentTab === 'user-interactions' }" @click="currentTab='user-interactions'">收藏我的</div>
 					<div class="tab" :class="{ current: currentTab === 'followMe' }" @click="currentTab='followMe'">关注我的</div>
 				</div>
 
@@ -131,9 +131,9 @@
 				</template>
 
 				<!-- 收藏我的 -->
-				<template v-if="currentTab === 'storeup'">
-					<template v-if="storeupList.length">
-						<div v-for="(item,index) in storeupList" :key="'s'+index" class="notify-item" @click="jumpToDetail(item)">
+				<template v-if="currentTab === 'user-interactions'">
+					<template v-if="userInteractionsList.length">
+						<div v-for="(item,index) in userInteractionsList" :key="'s'+index" class="notify-item" @click="jumpToDetail(item)">
 							<img class="notify-avatar" :src="item.operatorTouxiang ? (baseurl + item.operatorTouxiang) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'" />
 							<div class="notify-body">
 								<div class="notify-title">{{ item.operatorName }} 收藏了您的《{{ item.name }}》</div>
@@ -177,7 +177,7 @@
 					currentTab: 'reply',
 					replyList: [],
 					thumbsupList: [],
-					storeupList: [],
+					userInteractionsList: [],
 					followMeList: []
 				},
 				filters: {
@@ -275,7 +275,7 @@
 					if (res.code === 0 && res.data) {
 						vue.replyList = res.data.replyList || [];
 						vue.thumbsupList = res.data.thumbsupList || [];
-						vue.storeupList = res.data.storeupList || [];
+						vue.userInteractionsList = res.data.userInteractionsList || [];
 						vue.followMeList = res.data.followMeList || [];
 					} else {
 						layer.msg(res.msg || '加载失败', { icon: 5 });

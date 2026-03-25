@@ -28,16 +28,16 @@ import com.baomidou.mybatisplus.enums.IdType;
  * @email 
  * @date 2022-04-09 17:21:19
  */
-@TableName("storeup")
-public class StoreupEntity<T> implements Serializable {
+@TableName("user_interactions")
+public class UserInteractionsEntity<T> implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 
-	public StoreupEntity() {
+	public UserInteractionsEntity() {
 		
 	}
 	
-	public StoreupEntity(T t) {
+	public UserInteractionsEntity(T t) {
 		try {
 			BeanUtils.copyProperties(this, t);
 		} catch (IllegalAccessException | InvocationTargetException e) {
@@ -54,13 +54,13 @@ public class StoreupEntity<T> implements Serializable {
 	/**
 	 * 用户id
 	 */
-					
+	@TableField("user_id")
 	private Long userid;
 	
 	/**
-	 * 收藏id
+	 * 被交互资源id（forum_post / recipe 等多态资源）
 	 */
-					
+	@TableField("resource_id")
 	private Long refid;
 	
 	/**
@@ -84,11 +84,12 @@ public class StoreupEntity<T> implements Serializable {
 	/**
 	 * 类型(1:收藏,21:赞)
 	 */
-					
+	@TableField("interaction_type")
 	private String type;
 	
 	@JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
 	@DateTimeFormat
+	@TableField("created_at")
 	private Date addtime;
 
 	public Date getAddtime() {

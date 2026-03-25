@@ -112,11 +112,11 @@ color: #999 !important;
 							<i class="layui-icon" style="font-size: 20px;color: red;margin-right: 10px;">&#xe6c6;</i>
 							取消赞({{detail.thumbsupnum==null?0:detail.thumbsupnum}})
 						</div>
-						<a v-if='storeupFlag' @click="storeUp()" href="javascript:void(0)" style="display: flex;align-items: center;margin-left: 15px;">
-							<i class="layui-icon" style="font-size: 20px;color: red;margin-right: 6px;">&#xe67a;</i>取消收藏({{storeupCount}})
+						<a v-if='userInteractionsFlag' @click="userInteractionsUp()" href="javascript:void(0)" style="display: flex;align-items: center;margin-left: 15px;">
+							<i class="layui-icon" style="font-size: 20px;color: red;margin-right: 6px;">&#xe67a;</i>取消收藏({{userInteractionsCount}})
 						</a>
-						<a v-if='!storeupFlag' @click="storeUp()" href="javascript:void(0)" style="display: flex;align-items: center;margin-left: 15px;">
-							<i class="layui-icon" style="font-size: 20px;color: red;margin-right: 6px;">&#xe67b;</i>点我收藏({{storeupCount}})
+						<a v-if='!userInteractionsFlag' @click="userInteractionsUp()" href="javascript:void(0)" style="display: flex;align-items: center;margin-left: 15px;">
+							<i class="layui-icon" style="font-size: 20px;color: red;margin-right: 6px;">&#xe67b;</i>点我收藏({{userInteractionsCount}})
 						</a>
 					</div>
 		
@@ -278,12 +278,12 @@ color: #999 !important;
 				dataList: [],
 				// 当前登录用户ID（用于控制删除按钮显示）
 				currentUserId: localStorage.getItem('userid') || '',
-				storeupFlag: 0,
+				userInteractionsFlag: 0,
 				thumbsupFlag: 0,
 				// 选座座位列表
 				numberList: [],
 				// 收藏总数
-				storeupCount: 0
+				userInteractionsCount: 0
 			},
 			// 倒计时效果
 			computed: {
@@ -415,7 +415,7 @@ color: #999 !important;
 				// 赞
 				thumbsupnumClick() {
 					var _this=this;
-					layui.http.request('storeup/list', 'get', {
+					layui.http.request('user-interactions/list', 'get', {
 						page: 1,
 						limit: 1,
 						type:'21',
@@ -425,7 +425,7 @@ color: #999 !important;
 					}, (res) => {
 						vue.dataList = res.data.list
 						if(res.data.list.length==1) {
-							layui.http.requestJson(`storeup/delete`, 'post', [res.data.list[0].id], function(res) {
+							layui.http.requestJson(`user-interactions/delete`, 'post', [res.data.list[0].id], function(res) {
 								_this.detail.thumbsupnum = Math.max(0, parseInt(_this.detail.thumbsupnum==null?0:_this.detail.thumbsupnum) - 1)
 								layer.msg('取消成功', {
 									time: 1000,
@@ -436,7 +436,7 @@ color: #999 !important;
 							});
 							return;
 						}
-						layui.http.requestJson('storeup/save', 'post', {
+						layui.http.requestJson('user-interactions/save', 'post', {
 							userid: localStorage.getItem('userid'),
 							type:'21',
 							name: this.title,
@@ -490,8 +490,8 @@ color: #999 !important;
 
 
 	    // 收藏商品
-				storeUp() {
-					layui.http.request('storeup/list', 'get', {
+				userInteractionsUp() {
+					layui.http.request('user-interactions/list', 'get', {
 						page: 1,
 						limit: 1,
 						type:1,
@@ -501,7 +501,7 @@ color: #999 !important;
 					}, (res) => {
 						vue.dataList = res.data.list
 						if(res.data.list.length==1) {
-							layui.http.requestJson(`storeup/delete`, 'post', [res.data.list[0].id], function(res) {
+							layui.http.requestJson(`user-interactions/delete`, 'post', [res.data.list[0].id], function(res) {
 								layer.msg('取消成功', {
 									time: 1000,
 									icon: 5
@@ -511,7 +511,7 @@ color: #999 !important;
 							});
 							return;
 						}
-						layui.http.requestJson('storeup/save', 'post', {
+						layui.http.requestJson('user-interactions/save', 'post', {
 							userid: localStorage.getItem('userid'),
 							name: this.title,
 						    type:1,
@@ -819,19 +819,19 @@ color: #999 !important;
 
 
 				// 收藏总数
-				http.request(`storeup/list`, 'get', {
+				http.request(`user-interactions/list`, 'get', {
 					page: 1,
 					limit: 1,
 					type: 1,
 					refid: vue.detail.id,
 					tablename: vue.detailTable
 				}, function(rc) {
-					vue.storeupCount = rc.data && typeof rc.data.total === 'number' ? rc.data.total : 0;
+					vue.userInteractionsCount = rc.data && typeof rc.data.total === 'number' ? rc.data.total : 0;
 				});
 
 			});
 			if(localStorage.getItem('userid')){
-				http.request(`storeup/list`, 'get', {
+				http.request(`user-interactions/list`, 'get', {
 					page: 1,
 					limit: 1,
 					type:1,
@@ -839,12 +839,12 @@ color: #999 !important;
 					tablename : vue.detailTable,
 					userid: localStorage.getItem('userid'),
 				}, function(res) {
-					vue.storeupFlag = res.data.list.length;
+					vue.userInteractionsFlag = res.data.list.length;
 				})
 			}
 
 			if(localStorage.getItem('userid')){
-				http.request(`storeup/list`, 'get', {
+				http.request(`user-interactions/list`, 'get', {
 					page: 1,
 					limit: 1,
 					type:'21',

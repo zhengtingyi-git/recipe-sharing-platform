@@ -42,7 +42,7 @@
 | `addtime` | 非标准时间名 | `created_at` |
 | `userid` | 非 `*_id` 风格 | `user_id` |
 | `refid` | 含义不清（引用谁） | `ref_id`（短期）→ 最终建议领域化如 `recipe_id`/`post_id` |
-| `type`（如 `storeup.type`） | 语义模糊/魔法值 | `interaction_type`（或 `favorite_type`/`action_type`） |
+| `type`（旧交互字段示例） | 语义模糊/魔法值 | `interaction_type`（或 `favorite_type`/`action_type`） |
 | `sfsh` | 缩写不可读 | `review_status`（或 `status`） |
 | `shhf` | 缩写不可读 | `review_reply`（或 `review_comment`） |
 | `yonghuzhanghao` | 拼音字段 | `username` |
@@ -60,7 +60,7 @@
 
 | 当前表/模块名 | 实际含义 | 新建议 |
 |---|---|---|
-| `storeup` | 收藏/点赞等交互 | `user_interactions`（或拆分为 `favorites`、`likes`） |
+| `旧交互表`（收藏/点赞） | 收藏/点赞等交互 | `user_interactions`（或拆分为 `favorites`、`likes`） |
 | `recipe` + `recipetype=waiguomeishi/zhongshimeishi` | 菜谱（按来源分类） | `recipes` + `recipe_type`（短期）→ 最终拆分或改为枚举字段 |
 | `recipe_comment` | 菜谱评论 | `recipe_comments` |
 | `user` | 用户 | `users` |
@@ -72,7 +72,7 @@
 
 ### 第一批（低风险，先统一 created_at）
 
-- `storeup`：已提供 `db/2026-03-25-storeup-created-at-compat.sql`（新增/回填/索引）。
+- `旧交互表`：已提供兼容脚本（新增/回填/索引）。
 - `recipe`：新增 `created_at` 回填自 `addtime`，代码排序切换到 `created_at`。
 - `recipe_comment`：新增 `created_at` 回填自 `addtime`，代码排序切换到 `created_at`。
 
@@ -84,7 +84,7 @@
 
 ### 第三批（清理语义不清字段）
 
-- `storeup.type` 迁移为 `interaction_type`（并引入枚举常量，禁用魔法值）。
+- 旧交互的 `type` 字段迁移为 `interaction_type`（并引入枚举常量，禁用魔法值）。
 - `sfsh/shhf` 迁移为 `review_status/review_reply`。
 - 拼音字段（用户、菜谱详情字段）逐步迁移为英文语义字段。
 

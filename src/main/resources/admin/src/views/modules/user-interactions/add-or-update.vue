@@ -221,7 +221,7 @@ export default {
     // 多级联动参数
     info(id) {
       this.$http({
-        url: `storeup/info/${id}`,
+        url: `user-interactions/info/${id}`,
         method: "get"
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -298,7 +298,7 @@ var objcross = this.$storage.getObj('crossObj');
 				crossrefid:this.ruleForm.crossrefid,
 			} 
 			this.$http({ 
-				url: "storeup/page", 
+				url: "user-interactions/page", 
 				method: "get", 
 				params: params 
 			}).then(({ 
@@ -310,7 +310,7 @@ var objcross = this.$storage.getObj('crossObj');
 					       return false;
 				       } else {
 					 this.$http({
-					   url: `storeup/${!this.ruleForm.id ? "save" : "update"}`,
+					   url: `user-interactions/${!this.ruleForm.id ? "save" : "update"}`,
 					   method: "post",
 					   data: this.ruleForm
 					 }).then(({ data }) => {
@@ -322,7 +322,7 @@ var objcross = this.$storage.getObj('crossObj');
 					       onClose: () => {
 						 this.parent.showFlag = true;
 						 this.parent.addOrUpdateFlag = false;
-						 this.parent.storeupCrossAddOrUpdateFlag = false;
+						 this.parent.userInteractionsCrossAddOrUpdateFlag = false;
 						 this.parent.search();
 						 this.parent.contentStyleChange();
 					       }
@@ -338,7 +338,7 @@ var objcross = this.$storage.getObj('crossObj');
 			});
 		 } else {
 			 this.$http({
-			   url: `storeup/${!this.ruleForm.id ? "save" : "update"}`,
+			   url: `user-interactions/${!this.ruleForm.id ? "save" : "update"}`,
 			   method: "post",
 			   data: this.ruleForm
 			 }).then(({ data }) => {
@@ -350,7 +350,7 @@ var objcross = this.$storage.getObj('crossObj');
 			       onClose: () => {
 				 this.parent.showFlag = true;
 				 this.parent.addOrUpdateFlag = false;
-				 this.parent.storeupCrossAddOrUpdateFlag = false;
+				 this.parent.userInteractionsCrossAddOrUpdateFlag = false;
 				 this.parent.search();
 				 this.parent.contentStyleChange();
 			       }
@@ -371,7 +371,7 @@ var objcross = this.$storage.getObj('crossObj');
     back() {
       this.parent.showFlag = true;
       this.parent.addOrUpdateFlag = false;
-      this.parent.storeupCrossAddOrUpdateFlag = false;
+      this.parent.userInteractionsCrossAddOrUpdateFlag = false;
       this.parent.contentStyleChange();
     },
     pictureUploadChange(fileUrls) {

@@ -6,7 +6,6 @@
     <resultMap type="com.entity.ForumPostCommentEntity" id="forumPostCommentMap">
         <result property="postId" column="post_id"/>
         <result property="userId" column="user_id"/>
-        <result property="displayName" column="display_name"/>
         <result property="commentContent" column="comment_content"/>
         <result property="commentImage" column="comment_image"/>
         <result property="replyContent" column="reply_content"/>
