@@ -81,28 +81,9 @@
         </div>
       </el-col>
       <el-col :span="12">
-        <el-form-item class="input" v-if="type!='info'"  label="用户账号" prop="yonghuzhanghao">
-          <el-input v-model="ruleForm.yonghuzhanghao" 
-              placeholder="用户账号" clearable  :readonly="ro.yonghuzhanghao"></el-input>
+        <el-form-item v-if="type=='info' && ruleForm.userid" class="input" label="发布用户ID">
+          <el-input :value="String(ruleForm.userid)" placeholder="发布用户ID" readonly></el-input>
         </el-form-item>
-        <div v-else>
-          <el-form-item class="input" label="用户账号" prop="yonghuzhanghao">
-              <el-input v-model="ruleForm.yonghuzhanghao" 
-                placeholder="用户账号" readonly></el-input>
-          </el-form-item>
-        </div>
-      </el-col>
-      <el-col :span="12">
-        <el-form-item class="input" v-if="type!='info'"  label="用户昵称" prop="yonghuxingming">
-          <el-input v-model="ruleForm.yonghuxingming" 
-              placeholder="用户昵称" clearable  :readonly="ro.yonghuxingming"></el-input>
-        </el-form-item>
-        <div v-else>
-          <el-form-item class="input" label="用户昵称" prop="yonghuxingming">
-              <el-input v-model="ruleForm.yonghuxingming" 
-                placeholder="用户昵称" readonly></el-input>
-          </el-form-item>
-        </div>
       </el-col>
       <el-col :span="12">
         <el-form-item class="date" v-if="type!='info'" label="时间" prop="addtime">
@@ -230,8 +211,6 @@ export default {
 	caipinleixing : false,
 	cailiao : false,
 	pengrenfangfa : false,
-	yonghuzhanghao : false,
-	yonghuxingming : false,
 	addtime : false,
 	sfsh : false,
 	shhf : false,
@@ -245,8 +224,6 @@ export default {
         caipinleixing: '',
         cailiao: '',
         pengrenfangfa: '',
-        yonghuzhanghao: '',
-        yonghuxingming: '',
         addtime: null,
         shhf: '',
       },
@@ -263,10 +240,6 @@ export default {
           cailiao: [
           ],
           pengrenfangfa: [
-          ],
-          yonghuzhanghao: [
-          ],
-          yonghuxingming: [
           ],
           addtime: [
           ],
@@ -342,16 +315,6 @@ export default {
 	    this.ro.pengrenfangfa = true;
             continue;
           }
-          if(o=='yonghuzhanghao'){
-            this.ruleForm.yonghuzhanghao = obj[o];
-	    this.ro.yonghuzhanghao = true;
-            continue;
-          }
-          if(o=='yonghuxingming'){
-            this.ruleForm.yonghuxingming = obj[o];
-	    this.ro.yonghuxingming = true;
-            continue;
-          }
           if(o=='addtime'){
             this.ruleForm.addtime = obj[o];
 	    this.ro.addtime = true;
@@ -369,25 +332,6 @@ export default {
           }
         }
       }
-      // 获取用户信息
-      this.$http({
-        url: `${this.$storage.get('sessionTable')}/session`,
-        method: "get"
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          var json = data.data;
-		if(json.yonghuzhanghao!=''&&json.yonghuzhanghao){
-                this.ruleForm.yonghuzhanghao = json.yonghuzhanghao
-	    		this.ro.yonghuzhanghao = true;
-		}
-		if(json.yonghuxingming!=''&&json.yonghuxingming){
-                this.ruleForm.yonghuxingming = json.yonghuxingming
-	    		this.ro.yonghuxingming = true;
-		}
-        } else {
-          this.$message.error(data.msg);
-        }
-      });
             this.caipinleixingOptions = "热菜,凉菜,汤羹,主食小吃,家常菜,泡酱腌菜,饮品,零食,火锅,海鲜".split(',')
     },
     // 多级联动参数

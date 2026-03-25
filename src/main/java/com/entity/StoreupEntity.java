@@ -64,21 +64,21 @@ public class StoreupEntity<T> implements Serializable {
 	private Long refid;
 	
 	/**
-	 * 表名
+	 * 兼容返回字段：目标资源类型（数据库已移除 tablename）
 	 */
-					
+	@TableField(exist = false)
 	private String tablename;
 	
 	/**
-	 * 收藏名称
+	 * 兼容返回字段：目标资源名称（数据库已移除 name）
 	 */
-					
+	@TableField(exist = false)
 	private String name;
 	
 	/**
-	 * 收藏图片
+	 * 兼容返回字段：目标资源封面（数据库已移除 picture）
 	 */
-					
+	@TableField(exist = false)
 	private String picture;
 	
 	/**

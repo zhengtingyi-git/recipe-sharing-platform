@@ -1,4 +1,4 @@
-/* 模板秀（mobanxiu.cn）做最好的织梦整站模板下载网站 */
+﻿/* 妯℃澘绉€锛坢obanxiu.cn锛夊仛鏈€濂界殑缁囨ⅵ鏁寸珯妯℃澘涓嬭浇缃戠珯 */
 @charset "utf-8";
 .banner {
 	position: relative;
@@ -72,16 +72,16 @@
 	height: 551px;
 	margin-bottom: 38px;
 }
-.news {
+.forum-post {
 	width: 1002px;
 	margin: 0 auto;
 	padding-top: 72px;
 }
-.news .title {
+.forum-post .title {
 	text-align: center;
 	margin-bottom: 62px;
 }
-.news .n_left {
+.forum-post .n_left {
 	float: left;
 	width: 305px;
 	height: 271px;
@@ -255,26 +255,26 @@
 	line-height: 27px
 }
 /*????????????*/
-.news_con .ny_right .content_title {
+.forum_post_con .ny_right .content_title {
 	margin-bottom: 30px;
 	padding-bottom: 20px;
 	text-align: center;
 	border-bottom: 1px #ddd dotted;
 }
-.news_con .ny_right .content_title h3 {
+.forum_post_con .ny_right .content_title h3 {
 	font-size: 17px;
 	color: #4d5260;
 }
-.news_con .ny_right .content_title .info {
+.forum_post_con .ny_right .content_title .info {
 	margin-top: 15px;
 	font-size: 12px;
 	color: #aaa;
 }
-.news_con .ny_right .content_title .info span {
+.forum_post_con .ny_right .content_title .info span {
 	display: inline-block;
 	margin: 0 10px;
 }
-.news_con .ny_right .content {
+.forum_post_con .ny_right .content {
 	line-height: 27px
 }
 .first_list {
@@ -313,7 +313,7 @@
 	display: block;
 	height: 20px;
 	line-height: 20px;
-	background: url(../img/news_list_time.jpg) left center no-repeat;
+	background: url(../img/forum_post_list_time.jpg) left center no-repeat;
 	padding-left: 20px;
 	margin-top: 10px;
 }
@@ -383,7 +383,7 @@
 	border-color: #d42e3b;
 }
 /*????????????*/
-.news_con .ny_right .content_tit {
+.forum_post_con .ny_right .content_tit {
 	height: 40px;
 	line-height: 40px;
 	text-align: center;
@@ -391,18 +391,18 @@
 	border-bottom: 1px solid #ccc;
 	overflow: hidden;
 }
-.news_con .ny_right .content_related {
+.forum_post_con .ny_right .content_related {
 	padding: 6px 0;
 	text-align: center;
 	margin-bottom: 30px;
 }
-.news_con .ny_right .content {
+.forum_post_con .ny_right .content {
 	line-height: 27px
 }
-.news_con .ny_right .content_btn {
+.forum_post_con .ny_right .content_btn {
 	line-height: 27px
 }
-.news_con .ny_right .content_btn a {
+.forum_post_con .ny_right .content_btn a {
 	color: #2d3140
 }
 /*????????????*/
@@ -496,3 +496,4 @@
 .pagelink a.on, .pagelink a:hover {
 	color: #F9003B;
 }
+

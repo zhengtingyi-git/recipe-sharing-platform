@@ -47,30 +47,30 @@
 }
 
 /* 首页新闻 */
-.news-home-container {
+.forum-post-home-container {
 	background: #e5e5e5;
 }
 
-.news-home-container .layui-colla-item {
+.forum-post-home-container .layui-colla-item {
 	border: 1px solid #EEEEEE;
 }
 
-.news-home-container .layui-colla-content {
+.forum-post-home-container .layui-colla-content {
 	background: #FFFFFF;
 }
 
-.news-home-container .layui-colla-title {
+.forum-post-home-container .layui-colla-title {
 	background: #d1d1d1;
 	border: 1px solid #EEEEEE;
 	color: #515151;
 }
 
-.news-home-container .layui-colla-title:hover {
+.forum-post-home-container .layui-colla-title:hover {
 	background: #ce0b07;
 	color: #FFFFFF;
 }
 
-.news-home-container .layui-card-header {
+.forum-post-home-container .layui-card-header {
 	background: #d1d1d1;
 	border: 1px solid #FFFFFF;
 	color: #515151;
@@ -149,24 +149,24 @@
 }
 
 /* 美食论坛 */
-.news-container .news-list .news-item .detail-container .h2 {
+.forum-post-container .forum-post-list .forum-post-item .detail-container .h2 {
 	color: #4e6990;
 }
 
-.news-container .news-list .news-item .detail-container .desc {
+.forum-post-container .forum-post-list .forum-post-item .detail-container .desc {
 	color: #515151;
 }
 
-.news-container .news-list .news-item .detail-container .create-time {
+.forum-post-container .forum-post-list .forum-post-item .detail-container .create-time {
 	color: #515151;
 }
 
-.news-container .title {
+.forum-post-container .title {
 	color: #ce0b07;
 }
 
 
-.news-container .bottom-container .btn {
+.forum-post-container .bottom-container .btn {
 	background: #ce0b07;
 	color: #FFFFFF;
 }

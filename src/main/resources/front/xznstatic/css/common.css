@@ -1,4 +1,4 @@
-/* 模板秀（mobanxiu.cn）做最好的织梦整站模板下载网站 */
+﻿/* 妯℃澘绉€锛坢obanxiu.cn锛夊仛鏈€濂界殑缁囨ⅵ鏁寸珯妯℃澘涓嬭浇缃戠珯 */
 html, body, ul, li, ol, dl, dd, dt, p, h1, h2, h3, h4, h5, h6, form, fieldset, legend, img {
 	margin: 0 auto;
 	padding: 0;
@@ -388,14 +388,14 @@ i, em {
 .single_con {
 	margin-top: 20px
 }
-.news_con {
+.forum_post_con {
 	margin-top: 20px
 }
 .pro_con {
 	margin-top: 20px
 }
 
-/* 前台统一：底部栏与搜索栏为浅粉色 */
+/* 鍓嶅彴缁熶竴锛氬簳閮ㄦ爮涓庢悳绱㈡爮涓烘祬绮夎壊 */
 #tabbar {
 	background-color: #FFE4E9 !important;
 }
@@ -404,9 +404,10 @@ i, em {
 	background-color: #FFE4E9 !important;
 }
 
-/* 前台主内容区背景：白色 */
+/* 鍓嶅彴涓诲唴瀹瑰尯鑳屾櫙锛氱櫧鑹?*/
 .recommend.index-pv1,
 .recommend.index-pv2 {
 	background-color: #ffffff !important;
 	background: #ffffff !important;
 }
+

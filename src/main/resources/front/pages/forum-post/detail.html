@@ -1,0 +1,794 @@
+<!-- 美食论坛详情（对齐原 news 完整模板，接口为 forum-post / forum-post-comment） -->
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title>美食论坛</title>
+	<link rel="stylesheet" href="../../layui/css/layui.css">
+	<link rel="stylesheet" href="../../css/style.css" />
+	<link rel="stylesheet" href="../../css/theme.css" />
+	<link rel="stylesheet" href="../../css/common.css" />
+</head>
+<style>
+	#swiper { overflow: hidden; }
+	#swiper .layui-carousel-ind li {
+		width: 16px;
+		height: 10px;
+		border-width: 0;
+		border-style: solid;
+		border-color: rgba(255, 69, 0, 1);
+		border-radius: 5px;
+		background-color: rgba(0, 0, 0, 0.99);
+		box-shadow: 0 0 6px rgba(255,0,0,.8);
+	}
+	#swiper .layui-carousel-ind li.layui-this {
+		width: 24px;
+		height: 10px;
+		border-width: 0;
+		border-style: solid;
+		border-color: rgba(0,0,0,.3);
+		border-radius: 5px;
+		background-color: red;
+		box-shadow: 0 0 6px rgba(255,0,0,.8);
+	}
+	.index-title {
+		text-align: center;
+		box-sizing: border-box;
+		width: 980px;
+		margin: 0 auto;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-direction: column;
+	}
+	/* 与历史 news/detail 一致：标题居中，时间居中，作者与正文落在同一 980 内容列 */
+	.news-container .auth-container {
+		width: 980px;
+		max-width: 100%;
+		margin: 0 auto;
+		padding: 0 10px 14px 10px;
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		border-bottom: 1px solid rgba(255, 160, 160, 0.55);
+		margin-bottom: 8px;
+	}
+	.news-container .auth-container .meta-time {
+		font-size: 14px;
+		color: #999;
+		margin: 0 0 10px 0;
+		text-align: center;
+		width: 100%;
+	}
+	.author-container {
+		width: 100%;
+		margin: 0;
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+	}
+	.author-link {
+		display: flex;
+		align-items: center;
+		text-decoration: none;
+		color: inherit;
+	}
+	.author-avatar {
+		width: 48px;
+		height: 48px;
+		border-radius: 50%;
+		object-fit: cover;
+		border: 1px solid #eee;
+		margin-right: 12px;
+	}
+	.author-name { font-size: 14px; color: #333; }
+	.author-follow-btn {
+		margin-left: 16px;
+		padding: 4px 12px;
+		font-size: 13px;
+		color: red;
+		border: 1px solid red;
+		border-radius: 4px;
+		background: #fff;
+		cursor: pointer;
+	}
+	.author-follow-btn.followed { color: #999; border-color: #ccc; }
+	.layui-laypage .layui-laypage-count { padding: 0 10px; }
+	.layui-laypage .layui-laypage-skip { padding-left: 10px; }
+	/* 正文仅作用于文章主体（排除评论里的 .content） */
+	.news-container > .content {
+		margin: 30px auto;
+		max-width: 980px;
+		padding: 0 10px;
+		box-sizing: border-box;
+		word-break: break-all;
+	}
+	.message-container { width: 100%; }
+	.news-container .btn-container {
+		display: flex;
+		align-items: center;
+		box-sizing: border-box;
+		width: 100%;
+		flex-wrap: wrap;
+		width: 980px !important;
+		margin: 0 auto !important;
+		justify-content: space-between !important;
+	}
+	.news-container .btn-container button i { margin-right: 4px; }
+	.news-container h1.title {
+		text-align: center;
+		color: red;
+		font-size: 22px;
+		font-weight: bold;
+		margin: 20px auto 10px;
+	}
+</style>
+<body style="padding-bottom: 10px;">
+
+	<div id="app">
+		<div class="layui-carousel" id="swiper" :style='{"boxShadow":"0 0 8px rgba(255, 69, 0, 1)","margin":"0px 0 0 0","borderColor":"rgba(0, 0, 0, 0.75)","borderRadius":"20px","borderWidth":"5px 0 0 0","width":"100%","borderStyle":"solid"}'>
+			<div carousel-item id="swiper-item"></div>
+		</div>
+		<div class="index-title" :style='{"padding":"10px","boxShadow":"0 0 5px rgba(255,0,0,.8)","margin":"10px auto","borderColor":"rgba(255, 255, 255, 1)","backgroundColor":"rgba(255, 255, 255, 1)","color":"rgba(255, 0, 0, 1)","borderRadius":"50% 50px","borderWidth":"2px","fontSize":"20px","borderStyle":"solid","height":"auto"}'>
+			<span>FOOD FORUM</span><span>美食论坛</span>
+		</div>
+
+		<div class="news-container">
+			<h1 class="title">{{ detail.title }}</h1>
+			<div class="auth-container">
+				<div class="meta-time">时间：{{ timeText }}</div>
+				<div class="author-container" v-if="detail.yonghuxingming || detail.userid">
+					<a class="author-link" href="javascript:void(0)" v-if="detail.userid" @click="jump('../user/profile.html?id=' + detail.userid)">
+						<img class="author-avatar" :src="detail.touxiang ? (baseurl + detail.touxiang) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'">
+						<span class="author-name">{{ detail.yonghuxingming || '作者' }}</span>
+					</a>
+					<div v-else class="author-link">
+						<img class="author-avatar" :src="detail.touxiang ? (baseurl + detail.touxiang) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'">
+						<span class="author-name">{{ detail.yonghuxingming || '作者' }}</span>
+					</div>
+					<a v-if="detail.userid && !isSelf" href="javascript:void(0)" class="author-follow-btn" :class="{ followed: followFlag }" @click="followClick()">
+						{{ followFlag ? '已关注' : '+ 关注' }}
+					</a>
+				</div>
+			</div>
+			<div class="content" v-html="detail.content"></div>
+
+			<div class="btn-container" :style='{"padding":"0 10px","boxShadow":"0 0 0px rgba(255,0,0,.8)","margin":"10px 0 10px 0","borderColor":"rgba(0,0,0,.3)","backgroundColor":"rgba(0,0,0,1)","borderRadius":"4px","borderWidth":"0","borderStyle":"solid","justifyContent":"flex-end","height":"64px"}'>
+				<div class="tool-container" style="display:flex;align-items:center;color:#fff;">
+					<div v-if='!thumbsupFlag' @click="thumbsupnumClick()" style="display:flex;align-items:center;cursor:pointer;">
+						<i class="layui-icon" style="font-size: 20px;color: red;margin-right: 10px;">&#xe6c6;</i>
+						赞一下({{ detail.thumbsupnum==null?0:detail.thumbsupnum }})
+					</div>
+					<div v-if='thumbsupFlag' @click="thumbsupnumClick()" style="display:flex;align-items:center;cursor:pointer;">
+						<i class="layui-icon" style="font-size: 20px;color: red;margin-right: 10px;">&#xe6c6;</i>
+						取消赞({{ detail.thumbsupnum==null?0:detail.thumbsupnum }})
+					</div>
+					<a v-if='storeupFlag' @click="storeUp()" href="javascript:void(0)" style="display:flex;align-items:center;margin-left: 15px;color:#fff;">
+						<i class="layui-icon" style="font-size: 20px;color: red;margin-right: 6px;">&#xe67a;</i>取消收藏({{ storeupCount }})
+					</a>
+					<a v-if='!storeupFlag' @click="storeUp()" href="javascript:void(0)" style="display:flex;align-items:center;margin-left: 15px;color:#fff;">
+						<i class="layui-icon" style="font-size: 20px;color: red;margin-right: 6px;">&#xe67b;</i>点我收藏({{ storeupCount }})
+					</a>
+				</div>
+				<div class="title" style="font-size: 18px;color:#999;">
+					本篇文章：{{ detail.title }}
+				</div>
+				<button :style='{"padding":"0 15px","boxShadow":"0 0 8px rgba(0,0,0,0)","margin":"0 0 0 10px","borderColor":"#409EFF","backgroundColor":"#409EFF","color":"#fff","borderRadius":"4px","borderWidth":"0","width":"auto","fontSize":"14px","borderStyle":"solid","height":"40px"}' onclick="back()" type="button" class="layui-btn layui-btn-lg btn-theme">
+					<i class="layui-icon">&#xe65c;</i> 返回列表
+				</button>
+			</div>
+
+			<div class="message-container" style="width:980px;margin:0 auto 20px;">
+				<form class="layui-form message-form" :style='{"padding":"20px","boxShadow":"0 0 6px rgba(255,0,0,.3)","margin":"0 0 20px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0","borderStyle":"solid"}'>
+					<div class="layui-form-item layui-form-text" style="display: flex;align-items: center;margin:0">
+						<label style="width: auto;" :style='{"padding":"0","minWidth":"54px","fontSize":"14px","color":"#333","textAlign":"center"}' class="layui-form-label">评论</label>
+						<div class="layui-input-block" style="margin:0;flex:1;">
+							<textarea :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.3)","borderColor":"rgba(0,0,0,.3)","backgroundColor":"#fff","color":"#333","borderRadius":"4px","borderWidth":"0","fontSize":"14px","borderStyle":"solid","height":"120px"}' name="content" required lay-verify="required" placeholder="请输入内容" class="layui-textarea"></textarea>
+						</div>
+					</div>
+					<div class="layui-form-item layui-form-text" style="display: flex;align-items: center;margin-top:10px">
+						<div class="layui-form-item" pane>
+							<label class="layui-form-label" style="width: auto;" :style='{"padding":"0","minWidth":"54px","fontSize":"14px","color":"#333","textAlign":"center"}'>图片</label>
+							<div v-if="cpicture" class="layui-input-block">
+								<img id="cpictureImg" style="width: 100px;height: 100px;border-radius: 50%;border: 2px solid #EEEEEE;" :src="baseurl+cpicture">
+								<input type="hidden" :value="cpicture" id="cpicture" name="cpicture" />
+							</div>
+							<div class="layui-input-block">
+								<button type="button" class="layui-btn btn-theme" id="cpictureUpload">
+									<i class="layui-icon">&#xe67c;</i>上传图片
+								</button>
+							</div>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<div class="layui-input-block">
+							<button :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,.3)","margin":"10px 5px 0","borderColor":"rgba(0,0,0,.3)","backgroundColor":"red","color":"#fff","borderRadius":"4px","borderWidth":"0","width":"auto","lineHeight":"34px","fontSize":"14px","borderStyle":"solid"}' class="layui-btn btn-submit" lay-submit lay-filter="*">立即提交</button>
+							<button :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,.3)","margin":"10px 5px 0","borderColor":"rgba(0,0,0,.3)","backgroundColor":"#fff","color":"red","borderRadius":"4px","borderWidth":"0","width":"auto","lineHeight":"34px","fontSize":"14px","borderStyle":"solid"}' type="reset" class="layui-btn layui-btn-primary">重置</button>
+						</div>
+					</div>
+				</form>
+				<div class="message-list" :style='{"padding":"0 20px 20px","boxShadow":"0 0 6px rgba(255,0,0,.3)","margin":"0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0","borderStyle":"solid"}'>
+					<div :style='{"padding":"20px 0","boxShadow":"0 0 6px rgba(255,0,0,0)","margin":"0","borderColor":"rgba(0,0,0,.3)","backgroundColor":"#fff","borderRadius":"0","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="message-item" v-for="(item,index) in dataList" :key="index">
+						<div class="username-container" style="display:flex;align-items:center;justify-content:space-between;">
+							<div style="display:flex;align-items:center;">
+								<img :style='{"boxShadow":"0 0 6px rgba(255,0,0,.3)","margin":"0 10px 0 0","borderColor":"rgba(0,0,0,.3)","borderRadius":"100%","borderWidth":"0","width":"40px","borderStyle":"solid","height":"40px"}' class="avator" :src="item.touxiang ? (baseurl + item.touxiang) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'">
+								<div>
+									<span style="display: inline-block;" :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,.3)","margin":"0","borderColor":"rgba(0,0,0,.3)","backgroundColor":"#fff","color":"#333","borderRadius":"4px","borderWidth":"0","width":"auto","lineHeight":"28px","fontSize":"14px","borderStyle":"solid"}' class="username">{{ item.nickname || '用户' }}</span>
+									<div style="font-size:12px;color:#999;margin-top:4px;margin-left:10px;">{{ item.createdAt || item.addtime || '' }}</div>
+								</div>
+							</div>
+							<div style="display:flex;gap:8px;align-items:center;">
+								<a v-if="isOwnComment(item)" href="javascript:void(0)" @click="deleteComment(item.id, index, $event)" style="font-size:12px;color:#999;">删除</a>
+								<a href="javascript:void(0)" @click="replyComment(item, index, $event)" style="font-size:12px;color:red;">回复</a>
+							</div>
+						</div>
+						<div class="content" style="margin: 0;flex: 1;">
+							<span style="display: inline-block;" :style='{"padding":"8px","boxShadow":"0 0 6px rgba(255,0,0,.3)","margin":"8px 0 0 50px","borderColor":"rgba(0,0,0,.3)","backgroundColor":"rgba(255,0,0,.3)","color":"#fff","borderRadius":"4px","borderWidth":"0","fontSize":"14px","borderStyle":"solid"}' class="message">
+								{{ item.content }}
+							</span>
+						</div>
+						<div v-if="commentImagePath(item)" class="content" style="margin: 10px 0 0 50px;flex:1;">
+							<img :src="commentImageSrc(item)" alt="评论图片" style="max-width:280px;max-height:280px;border-radius:8px;border:1px solid #eee;display:block;object-fit:contain;background:#fafafa;" @error="$event.target.style.display='none'">
+						</div>
+						<div v-if="item.replyList && item.replyList.length" class="content" style="margin: 0;flex: 1;">
+							<div v-for="(reply, rIndex) in item.replyList" v-show="(reply.content || '').trim()" :key="rIndex" style="display:flex;align-items:flex-start;margin:8px 0 0 50px;">
+								<img :style='{"boxShadow":"0 0 6px rgba(255,0,0,.3)","margin":"0 10px 0 0","borderColor":"rgba(0,0,0,.3)","borderRadius":"100%","borderWidth":"0","width":"32px","borderStyle":"solid","height":"32px"}' class="avator" :src="reply.avatar ? (baseurl + reply.avatar) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'">
+								<div style="flex:1;min-width:0;">
+									<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px;">
+										<div style="font-size:12px;color:#999;">{{ reply.nickname || '管理员' }}</div>
+										<div style="display:flex;gap:8px;align-items:center;">
+											<a v-if="isOwnReply(reply)" href="javascript:void(0)" @click="deleteReplyComment(item, index, rIndex, $event)" style="font-size:12px;color:#999;">删除</a>
+											<a href="javascript:void(0)" @click="replyComment(item, index, $event)" style="font-size:12px;color:red;">回复</a>
+										</div>
+									</div>
+									<span style="display: inline-block;" :style='{"padding":"8px","boxShadow":"0 0 6px rgba(255,0,0,.3)","margin":"0","borderColor":"rgba(0,0,0,.3)","backgroundColor":"rgba(255,0,0,.3)","color":"#fff","borderRadius":"4px","borderWidth":"0","fontSize":"14px","borderStyle":"solid"}' class="message">
+										{{ reply.content }}
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="pager" id="pager" :style="{textAlign:'center'}"></div>
+			</div>
+		</div>
+	</div>
+
+	<script src="../../layui/layui.js"></script>
+	<script src="../../js/vue.js"></script>
+	<script src="../../js/config.js"></script>
+	<script src="../../modules/config.js"></script>
+	<script src="../../js/utils.js"></script>
+	<script>
+		var vue = new Vue({
+			el: '#app',
+			data: {
+				detail: {},
+				title: '',
+				baseurl: '',
+				dataList: [],
+				currentUserId: localStorage.getItem('userid') || '',
+				cpicture: '',
+				storeupFlag: 0,
+				thumbsupFlag: 0,
+				followFlag: 0,
+				storeupCount: 0,
+				detailTable: 'forum_post',
+				commentPrefix: 'forum-post-comment'
+			},
+			computed: {
+				isSelf: function() {
+					var uid = localStorage.getItem('userid');
+					return !uid || (this.detail.userid && String(this.detail.userid) === String(uid));
+				},
+				timeText: function() {
+					if (this.detail.createdAt) return this.detail.createdAt;
+					if (this.detail.addtime) return this.detail.addtime;
+					return '';
+				}
+			},
+			methods: {
+				jump(url) { jump(url); },
+				currentUserDisplayName: function() {
+					return (localStorage.getItem('yonghuxingming') || localStorage.getItem('adminName') || '').trim();
+				},
+				replyRowUserId: function(o) {
+					if (!o || typeof o !== 'object') return '';
+					var v = o.userid != null && o.userid !== '' ? o.userid
+						: (o.userId != null && o.userId !== '' ? o.userId
+						: (o.user_id != null && o.user_id !== '' ? o.user_id
+						: (o.uid != null && o.uid !== '' ? o.uid : '')));
+					return v !== '' && v != null ? String(v) : '';
+				},
+				isOwnReply: function(row) {
+					var uid = (localStorage.getItem('userid') || this.currentUserId || '').trim();
+					if (!uid || !row) return false;
+					var rid = this.replyRowUserId(row);
+					if (rid && String(rid) === String(uid)) return true;
+					var mine = this.currentUserDisplayName();
+					var name = (row.nickname || row.yonghuxingming || row.username || '').trim();
+					return !!(mine && name && mine === name);
+				},
+				isOwnComment: function(item) {
+					var uid = (localStorage.getItem('userid') || this.currentUserId || '').trim();
+					if (!uid || !item) return false;
+					var cid = item.userid != null && item.userid !== '' ? item.userid : item.userId;
+					if (cid != null && cid !== '' && String(cid) === String(uid)) return true;
+					var mine = this.currentUserDisplayName();
+					var name = (item.nickname || '').trim();
+					return !!(mine && name && mine === name);
+				},
+				commentImagePath: function(item) {
+					if (!item) return '';
+					var p = item.commentImage != null && item.commentImage !== '' ? item.commentImage : item.cpicture;
+					if (p == null) return '';
+					p = String(p).trim();
+					return p;
+				},
+				commentImageSrc: function(item) {
+					var p = this.commentImagePath(item);
+					if (!p) return '';
+					if (/^https?:\/\//i.test(p)) return p;
+					var b = this.baseurl || '';
+					if (b && b.charAt(b.length - 1) === '/' && p.charAt(0) === '/') return b + p.slice(1);
+					return b + p;
+				},
+				coverPicture: function() {
+					if (!this.detail.picture) return '';
+					var p = String(this.detail.picture).split(',')[0];
+					return p || '';
+				},
+				thumbsupnumClick: function() {
+					var _this = this;
+					if (!localStorage.getItem('userid')) {
+						layer.msg('请先登录', { icon: 5 });
+						return;
+					}
+					layui.http.request('storeup/list', 'get', {
+						page: 1,
+						limit: 1,
+						type: '21',
+						refid: this.detail.id,
+						tablename: this.detailTable,
+						userid: localStorage.getItem('userid'),
+					}, function(res) {
+						if (res.data.list.length === 1) {
+							layui.http.requestJson('storeup/delete', 'post', [res.data.list[0].id], function() {
+								layer.msg('取消成功', { time: 1000, icon: 5 }, function() { location.reload(); });
+							});
+							return;
+						}
+						layui.http.requestJson('storeup/save', 'post', {
+							userid: localStorage.getItem('userid'),
+							type: '21',
+							name: _this.title,
+							picture: _this.coverPicture(),
+							refid: _this.detail.id,
+							tablename: _this.detailTable
+						}, function() {
+							layer.msg('点赞成功', { time: 1000, icon: 6 }, function() { location.reload(); });
+						});
+					});
+				},
+				storeUp: function() {
+					var _this = this;
+					if (!localStorage.getItem('userid')) {
+						layer.msg('请先登录', { icon: 5 });
+						return;
+					}
+					layui.http.request('storeup/list', 'get', {
+						page: 1,
+						limit: 1,
+						type: 1,
+						refid: this.detail.id,
+						tablename: this.detailTable,
+						userid: localStorage.getItem('userid'),
+					}, function(res) {
+						if (res.data.list.length === 1) {
+							layui.http.requestJson('storeup/delete', 'post', [res.data.list[0].id], function() {
+								layer.msg('取消成功', { time: 1000, icon: 5 }, function() { location.reload(); });
+							});
+							return;
+						}
+						layui.http.requestJson('storeup/save', 'post', {
+							userid: localStorage.getItem('userid'),
+							name: _this.title,
+							type: 1,
+							picture: _this.coverPicture(),
+							refid: _this.detail.id,
+							tablename: _this.detailTable
+						}, function() {
+							layer.msg('收藏成功', { time: 1000, icon: 6 }, function() { location.reload(); });
+						});
+					});
+				},
+				followClick: function() {
+					var uid = localStorage.getItem('userid');
+					if (!uid) {
+						layer.msg('请先登录', { icon: 5 });
+						return;
+					}
+					if (!this.detail.userid) return;
+					var followedId = this.detail.userid;
+					var api = this.followFlag ? 'guanzhu/unfollow' : 'guanzhu/follow';
+					var _this = this;
+					layui.http.request(api, 'get', { followedId: followedId }, function(res) {
+						if (res.code === 0) {
+							_this.followFlag = _this.followFlag ? 0 : 1;
+							layer.msg(res.msg || (_this.followFlag ? '关注成功' : '已取消关注'), { icon: 6 });
+						} else {
+							layer.msg(res.msg || '操作失败', { icon: 5 });
+						}
+					});
+				},
+				deleteComment: function(id, index, evt) {
+					var uid = localStorage.getItem('userid');
+					if (!uid) {
+						layer.msg('请先登录', { icon: 5 });
+						return;
+					}
+					var _this = this;
+					var e = evt || window.event;
+					var clientX = e && e.clientX ? e.clientX : (window.innerWidth || document.documentElement.clientWidth) / 2;
+					var clientY = e && e.clientY ? e.clientY : (window.innerHeight || document.documentElement.clientHeight) / 2;
+					var top = clientY - 40;
+					var left = clientX - 160;
+					if (top < 20) top = 20;
+					if (left < 20) left = 20;
+					layer.confirm('确定要删除这条评论吗？', { icon: 3, title: '提示', offset: [top + 'px', left + 'px'] }, function(confirmIndex) {
+						layer.close(confirmIndex);
+						layui.http.requestJson(_this.commentPrefix + '/delete', 'post', [id], function(res) {
+							if (res.code === 0) {
+								_this.dataList.splice(index, 1);
+								layer.msg('删除成功', { icon: 6 });
+							} else {
+								layer.msg(res.msg || '删除失败', { icon: 5 });
+							}
+						});
+					});
+				},
+				deleteReplyComment: function(item, parentIndex, replyIndex, evt) {
+					var uid = localStorage.getItem('userid');
+					if (!uid) {
+						layer.msg('请先登录', { icon: 5 });
+						return;
+					}
+					var r = item.replyList && item.replyList[replyIndex];
+					if (!r || !this.isOwnReply(r)) {
+						layer.msg('只能删除自己的回复', { icon: 5 });
+						return;
+					}
+					var _this = this;
+					var e = evt || window.event;
+					var clientX = e && e.clientX ? e.clientX : (window.innerWidth || document.documentElement.clientWidth) / 2;
+					var clientY = e && e.clientY ? e.clientY : (window.innerHeight || document.documentElement.clientHeight) / 2;
+					var top = clientY - 40;
+					var left = clientX - 160;
+					if (top < 20) top = 20;
+					if (left < 20) left = 20;
+					layer.confirm('确定要删除这条回复吗？', { icon: 3, title: '提示', offset: [top + 'px', left + 'px'] }, function(confirmIndex) {
+						layer.close(confirmIndex);
+						layui.http.request(_this.commentPrefix + '/detail/' + item.id, 'get', {}, function(res) {
+							var entity = res.data || {};
+							var list = [];
+							var raw = entity.reply != null && entity.reply !== '' ? entity.reply : entity.replyContent;
+							if (raw) {
+								try {
+									var parsed = JSON.parse(raw);
+									if (Array.isArray(parsed)) list = parsed;
+									else if (parsed && typeof parsed === 'object') list = [parsed];
+									else list = [{ nickname: '', touxiang: '', content: String(parsed) }];
+								} catch (err) {
+									list = [{ nickname: '', touxiang: '', content: String(raw) }];
+								}
+							}
+							if (replyIndex < 0 || replyIndex >= list.length) {
+								layer.msg('数据已更新，请刷新页面', { icon: 5 });
+								return;
+							}
+							var entry = list[replyIndex];
+							if (!_this.isOwnReply(entry)) {
+								layer.msg('只能删除自己的回复', { icon: 5 });
+								return;
+							}
+							list.splice(replyIndex, 1);
+							var replyStr = list.length ? JSON.stringify(list) : '';
+							entity.reply = replyStr;
+							entity.replyContent = replyStr;
+							layui.http.requestJson(_this.commentPrefix + '/update', 'post', entity, function(r) {
+								if (r.code === 0) {
+									var row = Object.assign({}, _this.dataList[parentIndex]);
+									row.reply = entity.reply;
+									row.replyContent = entity.replyContent;
+									_this.normalizeReplyItem(row);
+									_this.$set(_this.dataList, parentIndex, row);
+									layer.msg('删除成功', { icon: 6 });
+								} else {
+									layer.msg(r.msg || '删除失败', { icon: 5 });
+								}
+							});
+						});
+					});
+				},
+				normalizeReplyItem: function(item) {
+					if (!item) return;
+					var ownerId = item.userid != null && item.userid !== '' ? item.userid : item.userId;
+					if (ownerId != null && ownerId !== '') item.userid = ownerId;
+					var raw = item.reply != null && item.reply !== '' ? item.reply : item.replyContent;
+					item.replyList = [];
+					if (!raw) {
+						item.replyObj = { nickname: '', avatar: '', content: '', userid: '' };
+						return;
+					}
+					var pick = function(o) {
+						if (!o || typeof o !== 'object') return { nickname: '', avatar: '', content: '', userid: '' };
+						var uid = o.userid != null && o.userid !== '' ? o.userid
+							: (o.userId != null && o.userId !== '' ? o.userId
+							: (o.user_id != null && o.user_id !== '' ? o.user_id
+							: (o.uid != null && o.uid !== '' ? o.uid : '')));
+						return {
+							nickname: o.nickname || o.yonghuxingming || o.username || '',
+							avatar: o.touxiang || o.avatar || o.headimg || '',
+							content: o.content || o.reply || o.value || '',
+							userid: uid !== '' && uid != null ? String(uid) : ''
+						};
+					};
+					var pushReply = function(o) {
+						var r = pick(o);
+						// 必须与存储的 JSON 数组下标一一对应，否则删除回复时 splice 会错位
+						item.replyList.push(r);
+					};
+					if (Array.isArray(raw)) {
+						for (var i = 0; i < raw.length; i++) pushReply(raw[i]);
+					} else if (typeof raw === 'object' && raw !== null) {
+						pushReply(raw);
+					} else if (typeof raw === 'string') {
+						try {
+							var obj = JSON.parse(raw);
+							if (Array.isArray(obj)) {
+								for (var j = 0; j < obj.length; j++) pushReply(obj[j]);
+							} else if (obj && typeof obj === 'object') {
+								pushReply(obj);
+							} else if (obj) {
+								item.replyList.push({ nickname: '', avatar: '', content: String(obj), userid: '' });
+							} else {
+								item.replyList.push({ nickname: '', avatar: '', content: raw, userid: '' });
+							}
+						} catch (e) {
+							item.replyList.push({ nickname: '', avatar: '', content: raw, userid: '' });
+						}
+					} else {
+						item.replyList.push({ nickname: '', avatar: '', content: String(raw), userid: '' });
+					}
+					item.replyObj = item.replyList.length ? item.replyList[item.replyList.length - 1] : { nickname: '', avatar: '', content: '', userid: '' };
+				},
+				normalizeReplyList: function(list) {
+					if (!list || !list.length) return;
+					for (var i = 0; i < list.length; i++) this.normalizeReplyItem(list[i]);
+				},
+				replyComment: function(item, index, evt) {
+					var uid = localStorage.getItem('userid');
+					if (!uid) {
+						layer.msg('请先登录', { icon: 5 });
+						return;
+					}
+					var _this = this;
+					var e = evt || window.event;
+					var clientX = e && e.clientX ? e.clientX : (window.innerWidth || document.documentElement.clientWidth) / 2;
+					var clientY = e && e.clientY ? e.clientY : (window.innerHeight || document.documentElement.clientHeight) / 2;
+					var top = clientY - 40;
+					var left = clientX - 160;
+					if (top < 20) top = 20;
+					if (left < 20) left = 20;
+					layer.prompt({
+						title: '请输入回复内容',
+						formType: 2,
+						value: '',
+						offset: [top + 'px', left + 'px']
+					}, function(value, promptIndex) {
+						layer.close(promptIndex);
+						if (!value || !value.trim()) {
+							layer.msg('回复内容不能为空', { icon: 5 });
+							return;
+						}
+						layui.http.request(_this.commentPrefix + '/detail/' + item.id, 'get', {}, function(res) {
+							var entity = res.data || {};
+							var replyPayload = {
+								userid: uid,
+								nickname: localStorage.getItem('yonghuxingming') || localStorage.getItem('adminName') || '',
+								touxiang: localStorage.getItem('touxiang') || '',
+								content: value
+							};
+							var list = [];
+							var raw = entity.reply != null && entity.reply !== '' ? entity.reply : entity.replyContent;
+							if (raw) {
+								try {
+									var parsed = JSON.parse(raw);
+									if (Array.isArray(parsed)) list = parsed;
+									else if (parsed && typeof parsed === 'object') list = [parsed];
+									else list = [{ nickname: '', touxiang: '', content: String(parsed) }];
+								} catch (err) {
+									list = [{ nickname: '', touxiang: '', content: String(raw) }];
+								}
+							}
+							list.push(replyPayload);
+							var replyStr = JSON.stringify(list);
+							entity.reply = replyStr;
+							entity.replyContent = replyStr;
+							layui.http.requestJson(_this.commentPrefix + '/update', 'post', entity, function(r) {
+								if (r.code === 0) {
+									var newList = (item.replyList && item.replyList.slice()) || [];
+									newList.push({
+										userid: replyPayload.userid,
+										nickname: replyPayload.nickname,
+										avatar: replyPayload.touxiang,
+										content: replyPayload.content
+									});
+									_this.$set(_this.dataList, index, Object.assign({}, _this.dataList[index], {
+										reply: entity.reply,
+										replyList: newList,
+										replyObj: newList[newList.length - 1]
+									}));
+									layer.msg('回复成功', { icon: 6 });
+								} else {
+									layer.msg(r.msg || '回复失败', { icon: 5 });
+								}
+							});
+						});
+					});
+				}
+			}
+		});
+
+		layui.use(['layer', 'element', 'carousel', 'laypage', 'http', 'jquery', 'form', 'upload'], function() {
+			var layer = layui.layer;
+			var carousel = layui.carousel;
+			var laypage = layui.laypage;
+			var http = layui.http;
+			var jquery = layui.jquery;
+			var form = layui.form;
+			var upload = layui.upload;
+			vue.baseurl = http.baseurl;
+			var id = http.getParam('id');
+			var limit = 10;
+
+			http.request('config/list', 'get', { page: 1, limit: 5 }, function(res) {
+				var swiperItemHtml = '';
+				if (res.data && res.data.list && res.data.list.length > 0) {
+					for (var k = 0; k < res.data.list.length; k++) {
+						var it = res.data.list[k];
+						if (it.name && it.name.indexOf('picture') >= 0 && it.value && it.value !== '') {
+							swiperItemHtml += '<div><img style="width: 100%;height: 100%;object-fit:cover;" class="swiper-item" src="' + http.baseurl + it.value + '"></div>';
+						}
+					}
+				}
+				if (!swiperItemHtml) {
+					swiperItemHtml = '<div><img style="width: 100%;height: 100%;object-fit:cover;" class="swiper-item" src="../../img/banner.jpg" onerror="this.style.display=\'none\';this.parentNode.style.height=\'300px\';this.parentNode.style.background=\'#f7f7f7\';"></div>';
+				}
+				jquery('#swiper-item').html(swiperItemHtml);
+				vue.$nextTick(function() {
+					carousel.render({
+						elem: '#swiper',
+						width: '100%',
+						height: '300px',
+						arrow: 'hover',
+						anim: 'default',
+						autoplay: 'true',
+						interval: '3000',
+						indicator: 'inside'
+					});
+				});
+			});
+
+			http.request('forum-post/detail/' + id, 'get', {}, function(res) {
+				vue.detail = res.data || {};
+				vue.title = (vue.detail && vue.detail.title) ? vue.detail.title : '';
+				if (vue.detail.content) {
+					vue.detail.content = vue.detail.content.replace(/<img/g, '<img class="forum-img"');
+				}
+				if (res.data && res.data.userid) {
+					http.request('guanzhu/status', 'get', { followedId: res.data.userid }, function(r) {
+						vue.followFlag = (r.data && r.data.followed) ? 1 : 0;
+					});
+				}
+				http.request('storeup/list', 'get', {
+					page: 1,
+					limit: 1,
+					type: 1,
+					refid: vue.detail.id,
+					tablename: vue.detailTable
+				}, function(rc) {
+					vue.storeupCount = rc.data && typeof rc.data.total === 'number' ? rc.data.total : 0;
+				});
+				if (localStorage.getItem('userid')) {
+					http.request('storeup/list', 'get', {
+						page: 1,
+						limit: 1,
+						type: 1,
+						refid: vue.detail.id,
+						tablename: vue.detailTable,
+						userid: localStorage.getItem('userid'),
+					}, function(r1) {
+						vue.storeupFlag = r1.data.list.length;
+					});
+					http.request('storeup/list', 'get', {
+						page: 1,
+						limit: 1,
+						type: '21',
+						refid: vue.detail.id,
+						tablename: vue.detailTable,
+						userid: localStorage.getItem('userid'),
+					}, function(r2) {
+						if (r2.data.list.length > 0) vue.thumbsupFlag = 1;
+					});
+				}
+			});
+
+			function loadComments(pageNo) {
+				http.request('forum-post-comment/list', 'get', {
+					page: pageNo || 1,
+					limit: limit,
+					postId: id
+				}, function(r) {
+					vue.normalizeReplyList(r.data.list);
+					vue.dataList = r.data.list;
+					laypage.render({
+						elem: 'pager',
+						count: r.data.total,
+						limit: limit,
+						jump: function(obj, first) {
+							if (!first) loadComments(obj.curr);
+						}
+					});
+				});
+			}
+			loadComments(1);
+
+			upload.render({
+				elem: '#cpictureUpload',
+				url: http.baseurl + 'file/upload',
+				headers: { Token: localStorage.getItem('Token') },
+				accept: 'images',
+				before: function() { layer.load(1, { shade: [0.1, '#fff'] }); },
+				done: function(res) {
+					layer.closeAll();
+					if (res.code == 0) {
+						var url = 'upload/' + res.file;
+						jquery('#cpicture').val(url);
+						vue.cpicture = url;
+						layer.msg('上传成功', { time: 2000, icon: 6 });
+					} else {
+						layer.msg(res.msg || '上传失败', { time: 2000, icon: 5 });
+					}
+				},
+				error: function() {
+					layer.closeAll();
+					layer.msg('请求接口异常', { time: 2000, icon: 5 });
+				}
+			});
+
+			form.on('submit(*)', function(data) {
+				data = data.field;
+				if (!localStorage.getItem('userid')) {
+					layer.msg('请先登录', { time: 2000, icon: 5 });
+					return false;
+				}
+				data.userid = localStorage.getItem('userid');
+				data.nickname = localStorage.getItem('yonghuxingming') || localStorage.getItem('adminName') || '';
+				data.postId = id;
+				data.refid = id;
+				http.requestJson('forum-post-comment/save', 'post', data, function(res) {
+					layer.msg('评论成功', { time: 1500, icon: 6 });
+					jquery('.message-form')[0].reset();
+					vue.cpicture = '';
+					jquery('#cpicture').val('');
+					loadComments(1);
+				});
+				return false;
+			});
+		});
+	</script>
+</body>
+</html>

@@ -88,39 +88,39 @@ label {
 }
 
 /* 首页新闻样式（手风琴） */
-.news-home-container {
+.forum-post-home-container {
 	padding-top: 20px;
 	margin-bottom: 20px;
 	padding-bottom: 20px;
 }
 
-.news-home-container .layui-collapse {
+.forum-post-home-container .layui-collapse {
 	border: 0;
 	margin: 0 20px;
 }
 
-.news-home-container .layui-colla-item {
+.forum-post-home-container .layui-colla-item {
 	margin-top: 14px;
 }
 
-.news-home-container .layui-colla-content {
+.forum-post-home-container .layui-colla-content {
 	font-size: 16px;
 	line-height: 40px;
 	height: 115px;
 }
 
-.news-home-container .layui-colla-title {
+.forum-post-home-container .layui-colla-title {
 	height: 50px;
 	line-height: 50px;
 	font-size: 16px;
 	font-weight: 500;
 }
 
-.news-home-container .card-container {
+.forum-post-home-container .card-container {
 	margin-top: 18px;
 }
 
-.news-home-container .layui-card-header {
+.forum-post-home-container .layui-card-header {
 	height: 50px;
 	line-height: 50px;
 }
@@ -513,54 +513,54 @@ label {
 }
 
 /* 新闻列表 */
-.news-container {
+.forum-post-container {
 	text-align: center;
 	margin: 0 auto;
 	margin: 40px 0;
 }
 
-.news-container .pager {
+.forum-post-container .pager {
 	margin: 20px 0;
 }
 
-.news-container .news-list {
+.forum-post-container .forum-post-list {
 	width: 980px;
 	margin: 0 auto;
 	text-align: left;
 }
 
-.news-container .news-list .news-item {
+.forum-post-container .forum-post-list .forum-post-item {
 	display: flex;
 	border-bottom: 1px solid #EEEEEE;
 	padding: 10px;
 }
 
-.news-container .news-list .news-item .cover-container {
+.forum-post-container .forum-post-list .forum-post-item .cover-container {
 	margin: 0 20px;
 }
 
-.news-container .news-list .news-item .cover-container .cover {
+.forum-post-container .forum-post-list .forum-post-item .cover-container .cover {
 	width: 200px;
 	height: 200px;
 	object-fit: cover;
 }
 
-.news-container .news-list .news-item .detail-container .h2 {
+.forum-post-container .forum-post-list .forum-post-item .detail-container .h2 {
 	font-size: 18px;
 	font-weight: bold;
 }
 
-.news-container .news-list .news-item .detail-container .desc {
+.forum-post-container .forum-post-list .forum-post-item .detail-container .desc {
 	height: 140px;
 	padding-top: 20px;
 }
 
-.news-container .title {
+.forum-post-container .title {
 	font-size: 22px;
 	font-weight: bold;
 }
 
-.news-container .content {
+.forum-post-container .content {
 	width: 980px;
 	margin: 0 auto;
 	text-align: left;
@@ -570,7 +570,7 @@ label {
 }
 
 /* 美食论坛正文中的图片统一样式 */
-.news-container .content img.forum-img {
+.forum-post-container .content img.forum-img {
 	display: block;
 	margin: 10px auto;
 	max-width: 700px;   /* 图片最大宽度，按需要调整 */
@@ -580,7 +580,7 @@ label {
 	object-fit: contain;
 }
 
-.news-container .auth-container {
+.forum-post-container .auth-container {
 	margin-top: 20px;
 	color: #888888;
 	border-bottom: 1px dotted #888888;
@@ -588,7 +588,7 @@ label {
 }
 
 
-.news-container .bottom-container {
+.forum-post-container .bottom-container {
 	display: flex;
 	justify-content: space-between;
 	width: 980px;
@@ -599,13 +599,13 @@ label {
 	margin-top: 30px;
 }
 
-.news-container .bottom-container .title {
+.forum-post-container .bottom-container .title {
 	margin-left: 30px;
 	font-size: 20px;
 	color: #515151;
 }
 
-.news-container .bottom-container .btn {
+.forum-post-container .bottom-container .btn {
 	font-size: 20px;
 	padding: 0 20px;
 }

@@ -64,12 +64,6 @@ public class DiscusswaiguomeishiEntity<T> implements Serializable {
 	private Long userid;
 	
 	/**
-	 * 用户名
-	 */
-					
-	private String nickname;
-	
-	/**
 	 * 评论内容
 	 */
 					
@@ -129,19 +123,6 @@ public class DiscusswaiguomeishiEntity<T> implements Serializable {
 	public Long getUserid() {
 		return userid;
 	}
-	/**
-	 * 设置：用户名
-	 */
-	public void setNickname(String nickname) {
-		this.nickname = nickname;
-	}
-	/**
-	 * 获取：用户名
-	 */
-	public String getNickname() {
-		return nickname;
-	}
-	/**
 	 * 设置：评论内容
 	 */
 	public void setContent(String content) {

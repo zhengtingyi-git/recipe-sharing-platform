@@ -115,7 +115,7 @@
 						<li class="layui-this" data-category="">全部</li>
 						<li data-category="waiguomeishi">外国美食</li>
 						<li data-category="zhongshimeishi">中式美食</li>
-						<li data-category="news">美食论坛</li>
+						<li data-category="forum_post">美食论坛</li>
 					</ul>
 				</div>
 				<div class="data-list layui-col-md8 layui-col-md-offset2">
@@ -153,7 +153,7 @@
 					baseurl:''
 				},
 				filters: {
-					newsDesc: function(val) {
+					forumPostDesc: function(val) {
 						if (val) {
 							if (val.length > 200) {
 								return val.substring(0, 200).replace(/<[^>]*>/g).replace(/undefined/g, '');
@@ -171,9 +171,8 @@
 				}
 			})
 
-			layui.use(['layer', 'element', 'carousel', 'laypage', 'http', 'jquery'], function() {
+			layui.use(['layer', 'carousel', 'laypage', 'http', 'jquery'], function() {
 				var layer = layui.layer;
-				var element = layui.element;
 				var carousel = layui.carousel;
 				var laypage = layui.laypage;
 				var http = layui.http;
@@ -215,8 +214,9 @@
 						})
 					}
 				});
-				// Tab 切换分类
-				element.on('tab(categoryTab)', function(data) {
+				// Tab 切换分类（无 layui-tab-content 时 element 的 tab 事件可能不触发，直接绑定标题点击）
+				jquery('.data-container .layui-tab-title li').on('click', function() {
+					jquery(this).addClass('layui-this').siblings().removeClass('layui-this');
 					currentCategory = jquery(this).attr('data-category') || '';
 					pageList();
 				});
@@ -234,7 +234,9 @@
 						page: 1,
 						limit: limit,
 						type: 1,
-						userid: localStorage.getItem('userid')
+						userid: localStorage.getItem('userid'),
+						sort: 'addtime',
+						order: 'desc'
 					}
 					if (jquery('#name').val()) {
 						param['name'] = jquery('#name').val() ? '%' + jquery('#name').val() + '%' : '';
@@ -260,7 +262,9 @@
 										page: obj.curr,
 										limit: limit,
 										type: 1,
-										userid: localStorage.getItem('userid')
+										userid: localStorage.getItem('userid'),
+										sort: 'addtime',
+										order: 'desc'
 									}
 									if (jquery('#name').val()) {
 										pageParam['name'] = jquery('#name').val() ? '%' + jquery('#name').val() + '%' : '';

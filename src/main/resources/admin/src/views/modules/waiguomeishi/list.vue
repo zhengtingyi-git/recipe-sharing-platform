@@ -550,8 +550,6 @@ export default {
           caipinleixing: row.caipinleixing,
           cailiao: row.cailiao,
           pengrenfangfa: row.pengrenfangfa,
-          yonghuzhanghao: row.yonghuzhanghao,
-          yonghuxingming: row.yonghuxingming,
           addtime: row.addtime,
           sfsh: row.sfsh,
           shhf: row.shhf,

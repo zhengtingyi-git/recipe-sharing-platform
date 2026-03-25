@@ -42,10 +42,10 @@ var centerMenu = [{
 	url: '../storeup/list.html'
 }, {
 	name: '我的关注',
-	url: '../guanzhu/my-follow.html'
+	url: '../user-follows/my-follow.html'
 }, {
 	name: '我的粉丝',
-	url: '../guanzhu/my-fans.html'
+	url: '../user-follows/my-fans.html'
 }, {
 	name: '我的消息',
 	url: '../notify/list.html'
@@ -68,7 +68,7 @@ var indexNav = [
 }, 
 {
 	name: '美食论坛',
-	url: './pages/news/list.html'
+	url: './pages/forum-post/list.html'
 },
 {
 	name: '消息中心',
@@ -85,7 +85,7 @@ var chatFlag = false
 
 
 
-var menu = [{"backMenu":[{"child":[{"appFrontIcon":"cuIcon-discover","buttons":["新增","查看","修改","删除"],"menu":"用户","menuJump":"列表","tableName":"user"}],"menu":"用户管理"},{"child":[{"appFrontIcon":"cuIcon-phone","buttons":["新增","查看","修改","删除","审核","查看评论"],"menu":"外国美食","menuJump":"列表","tableName":"waiguomeishi"}],"menu":"外国美食管理"},{"child":[{"appFrontIcon":"cuIcon-clothes","buttons":["新增","查看","修改","删除","审核","查看评论"],"menu":"中式美食","menuJump":"列表","tableName":"zhongshimeishi"}],"menu":"中式美食管理"},{"child":[{"appFrontIcon":"cuIcon-favor","buttons":["新增","查看","修改","删除"],"menu":"我的收藏管理","tableName":"storeup"}],"menu":"我的收藏管理"},{"child":[{"appFrontIcon":"cuIcon-news","buttons":["新增","查看","修改","删除"],"menu":"轮播图管理","tableName":"config"},{"appFrontIcon":"cuIcon-form","buttons":["新增","查看","修改","删除"],"menu":"美食论坛","tableName":"news"}],"menu":"系统管理"}],"frontMenu":[{"child":[{"appFrontIcon":"cuIcon-paint","buttons":["新增","查看","查看评论"],"menu":"外国美食列表","menuJump":"列表","tableName":"waiguomeishi"}],"menu":"外国美食模块"},{"child":[{"appFrontIcon":"cuIcon-list","buttons":["新增","查看","查看评论"],"menu":"中式美食列表","menuJump":"列表","tableName":"zhongshimeishi"}],"menu":"中式美食模块"},{"child":[{"appFrontIcon":"cuIcon-brand","buttons":["查看","查看评论"],"menu":"每日推荐列表","menuJump":"列表","tableName":"remencaipin"}],"menu":"每日推荐模块"}],"hasBackLogin":"是","hasBackRegister":"否","hasFrontLogin":"否","hasFrontRegister":"否","roleName":"管理员","tableName":"admin"},{"backMenu":[{"child":[{"appFrontIcon":"cuIcon-phone","buttons":["新增","查看","查看评论","删除"],"menu":"外国美食","menuJump":"列表","tableName":"waiguomeishi"}],"menu":"外国美食管理"},{"child":[{"appFrontIcon":"cuIcon-clothes","buttons":["新增","查看","删除","查看评论"],"menu":"中式美食","menuJump":"列表","tableName":"zhongshimeishi"}],"menu":"中式美食管理"},{"child":[{"appFrontIcon":"cuIcon-favor","buttons":["查看","删除"],"menu":"我的收藏管理","tableName":"storeup"}],"menu":"我的收藏管理"}],"frontMenu":[{"child":[{"appFrontIcon":"cuIcon-paint","buttons":["新增","查看","查看评论"],"menu":"外国美食列表","menuJump":"列表","tableName":"waiguomeishi"}],"menu":"外国美食模块"},{"child":[{"appFrontIcon":"cuIcon-list","buttons":["新增","查看","查看评论"],"menu":"中式美食列表","menuJump":"列表","tableName":"zhongshimeishi"}],"menu":"中式美食模块"},{"child":[{"appFrontIcon":"cuIcon-brand","buttons":["查看","查看评论"],"menu":"每日推荐列表","menuJump":"列表","tableName":"remencaipin"}],"menu":"每日推荐模块"}],"hasBackLogin":"是","hasBackRegister":"是","hasFrontLogin":"是","hasFrontRegister":"是","roleName":"用户","tableName":"user"}]
+var menu = [{"backMenu":[{"child":[{"appFrontIcon":"cuIcon-discover","buttons":["新增","查看","修改","删除"],"menu":"用户","menuJump":"列表","tableName":"user"}],"menu":"用户管理"},{"child":[{"appFrontIcon":"cuIcon-phone","buttons":["新增","查看","修改","删除","审核","查看评论"],"menu":"外国美食","menuJump":"列表","tableName":"waiguomeishi"}],"menu":"外国美食管理"},{"child":[{"appFrontIcon":"cuIcon-clothes","buttons":["新增","查看","修改","删除","审核","查看评论"],"menu":"中式美食","menuJump":"列表","tableName":"zhongshimeishi"}],"menu":"中式美食管理"},{"child":[{"appFrontIcon":"cuIcon-favor","buttons":["新增","查看","修改","删除"],"menu":"我的收藏管理","tableName":"storeup"}],"menu":"我的收藏管理"},{"child":[{"appFrontIcon":"cuIcon-form","buttons":["新增","查看","修改","删除"],"menu":"轮播图管理","tableName":"config"},{"appFrontIcon":"cuIcon-form","buttons":["新增","查看","修改","删除"],"menu":"美食论坛","tableName":"forum_post"}],"menu":"系统管理"}],"frontMenu":[{"child":[{"appFrontIcon":"cuIcon-paint","buttons":["新增","查看","查看评论"],"menu":"外国美食列表","menuJump":"列表","tableName":"waiguomeishi"}],"menu":"外国美食模块"},{"child":[{"appFrontIcon":"cuIcon-list","buttons":["新增","查看","查看评论"],"menu":"中式美食列表","menuJump":"列表","tableName":"zhongshimeishi"}],"menu":"中式美食模块"},{"child":[{"appFrontIcon":"cuIcon-brand","buttons":["查看","查看评论"],"menu":"每日推荐列表","menuJump":"列表","tableName":"remencaipin"}],"menu":"每日推荐模块"}],"hasBackLogin":"是","hasBackRegister":"否","hasFrontLogin":"否","hasFrontRegister":"否","roleName":"管理员","tableName":"admin"},{"backMenu":[{"child":[{"appFrontIcon":"cuIcon-phone","buttons":["新增","查看","查看评论","删除"],"menu":"外国美食","menuJump":"列表","tableName":"waiguomeishi"}],"menu":"外国美食管理"},{"child":[{"appFrontIcon":"cuIcon-clothes","buttons":["新增","查看","删除","查看评论"],"menu":"中式美食","menuJump":"列表","tableName":"zhongshimeishi"}],"menu":"中式美食管理"},{"child":[{"appFrontIcon":"cuIcon-favor","buttons":["查看","删除"],"menu":"我的收藏管理","tableName":"storeup"}],"menu":"我的收藏管理"}],"frontMenu":[{"child":[{"appFrontIcon":"cuIcon-paint","buttons":["新增","查看","查看评论"],"menu":"外国美食列表","menuJump":"列表","tableName":"waiguomeishi"}],"menu":"外国美食模块"},{"child":[{"appFrontIcon":"cuIcon-list","buttons":["新增","查看","查看评论"],"menu":"中式美食列表","menuJump":"列表","tableName":"zhongshimeishi"}],"menu":"中式美食模块"},{"child":[{"appFrontIcon":"cuIcon-brand","buttons":["查看","查看评论"],"menu":"每日推荐列表","menuJump":"列表","tableName":"remencaipin"}],"menu":"每日推荐模块"}],"hasBackLogin":"是","hasBackRegister":"是","hasFrontLogin":"是","hasFrontRegister":"是","roleName":"用户","tableName":"user"}]
 
 
 var isAuth = function (tableName,key) {

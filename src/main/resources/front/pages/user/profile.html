@@ -82,7 +82,7 @@
 					<div class="profile-section" style="width:100%;">
 						<h3>TA 发布的美食论坛</h3>
 						<div class="profile-list" v-if="listNews.length">
-							<div class="item" v-for="(item,index) in listNews" :key="'n'+index" @click="jump('../news/detail.html?id=' + item.id)">
+							<div class="item" v-for="(item,index) in listNews" :key="'n'+index" @click="jump('../forum-post/detail.html?id=' + item.id)">
 								<img :src="item.picture ? (baseurl + item.picture.split(',')[0]) : '../../img/default.png'" @error="$event.target.src='../../img/default.png'" />
 								<div class="name">{{ item.title }}</div>
 							</div>
@@ -130,15 +130,16 @@
 						}
 						if (!this.user || !this.user.id) return;
 						var followedId = this.user.id;
-						var api = this.followFlag ? 'guanzhu/unfollow' : 'guanzhu/follow';
+						var api = this.followFlag ? 'user-follows/unfollow' : 'user-follows/follow';
 						var _this = this;
 						layui.http.request(api, 'get', { followedId: followedId }, function(res) {
 							if (res.code === 0) {
 								_this.followFlag = _this.followFlag ? 0 : 1;
 								layui.layer.msg(res.msg || (_this.followFlag ? '关注成功' : '已取消关注'), { icon: 6 });
 								// 关注/取关成功后从服务器重新拉取粉丝数，保证显示正确
-								layui.http.request('guanzhu/fansCount', 'get', { userId: followedId }, function(r) {
-									if (r.fansCount != null) _this.fansCount = r.fansCount;
+								layui.http.request('user-follows/followers-count', 'get', { userId: followedId }, function(r) {
+									if (r.followersCount != null) _this.fansCount = r.followersCount;
+									else if (r.fansCount != null) _this.fansCount = r.fansCount;
 								});
 							} else {
 								layui.layer.msg(res.msg || '操作失败', { icon: 5 });
@@ -195,12 +196,12 @@
 					if (res.code === 0 && res.data) {
 						vue.user = res.data;
 						// 粉丝数（接口返回在根级 fansCount）
-						http.request('guanzhu/fansCount', 'get', { userId: id }, function(r) {
-							vue.fansCount = (r.fansCount != null) ? r.fansCount : 0;
+						http.request('user-follows/followers-count', 'get', { userId: id }, function(r) {
+							vue.fansCount = (r.followersCount != null) ? r.followersCount : ((r.fansCount != null) ? r.fansCount : 0);
 						});
 						// 关注状态（当前用户已登录且不是自己时）
 						if (localStorage.getItem('userid') && vue.user.id != localStorage.getItem('userid') && vue.user.id != Number(localStorage.getItem('userid'))) {
-							http.request('guanzhu/status', 'get', { followedId: id }, function(r) {
+							http.request('user-follows/relation-status', 'get', { followedId: id }, function(r) {
 								vue.followFlag = (r.data && r.data.followed) ? 1 : 0;
 							});
 						}
@@ -213,7 +214,7 @@
 							vue.listWai = (r.data && r.data.list) ? r.data.list : [];
 						});
 						// 该用户发布的美食论坛
-						http.request('news/list', 'get', { page: 1, limit: 100, userid: id }, function(r) {
+						http.request('forum-post/list', 'get', { page: 1, limit: 100, userid: id }, function(r) {
 							vue.listNews = (r.data && r.data.list) ? r.data.list : [];
 						});
 					} else {

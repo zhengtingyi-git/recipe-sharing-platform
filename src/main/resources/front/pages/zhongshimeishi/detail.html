@@ -230,7 +230,7 @@ color: #999 !important;
 												<a href="javascript:void(0)" @click="replyComment(item, index, $event)" style="color:#409EFF;cursor:pointer;">
 													回复
 												</a>
-												<a v-if="item.userid == currentUserId" href="javascript:void(0)" @click="deleteComment(item.id, index, $event)" style="color:#f56c6c;cursor:pointer;">
+												<a v-if="isOwnComment(item)" href="javascript:void(0)" @click="deleteComment(item.id, index, $event)" style="color:#f56c6c;cursor:pointer;">
 													删除
 												</a>
 											</div>
@@ -241,10 +241,16 @@ color: #999 !important;
 											</span>
 										</div>
 										<div v-if="item.replyList && item.replyList.length" class="content" style="margin: 0;flex: 1;">
-											<div v-for="(reply, rIndex) in item.replyList" :key="rIndex" style="display:flex;align-items:flex-start;margin:8px 0 0 50px;">
+											<div v-for="(reply, rIndex) in item.replyList" v-show="(reply.content || '').trim()" :key="rIndex" style="display:flex;align-items:flex-start;margin:8px 0 0 50px;">
 												<img :style='{"boxShadow":"0 0 6px rgba(255,0,0,.3)","margin":"0 10px 0 0","borderColor":"rgba(0,0,0,.3)","borderRadius":"100%","borderWidth":"0","width":"32px","borderStyle":"solid","height":"32px"}' class="avator" :src="reply.avatar ? (baseurl + reply.avatar) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'">
-												<div>
-													<div style="font-size:12px;color:#999;margin-bottom:2px;">{{reply.nickname || '管理员'}}</div>
+												<div style="flex:1;min-width:0;">
+													<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px;">
+														<div style="font-size:12px;color:#999;">{{reply.nickname || '管理员'}}</div>
+														<div style="display:flex;align-items:center;gap:12px;font-size:12px;">
+															<a href="javascript:void(0)" @click="replyComment(item, index, $event)" style="color:#409EFF;cursor:pointer;">回复</a>
+															<a v-if="isOwnReply(reply)" href="javascript:void(0)" @click="deleteReplyComment(item, index, rIndex, $event)" style="color:#f56c6c;cursor:pointer;">删除</a>
+														</div>
+													</div>
 													<span style="display: inline-block;" :style='{"padding":"8px","boxShadow":"0 0 6px rgba(255,0,0,.3)","margin":"0","borderColor":"rgba(0,0,0,.3)","backgroundColor":"rgba(255,0,0,.3)","color":"#fff","borderRadius":"4px","borderWidth":"0","fontSize":"14px","borderStyle":"solid"}' class="message">
 														{{reply.content}}
 													</span>
@@ -392,6 +398,35 @@ color: #999 !important;
 				},
 				isAuth(tablename, button) {
 					return isFrontAuth(tablename, button)
+				},
+				currentUserDisplayName() {
+					return (localStorage.getItem('yonghuxingming') || localStorage.getItem('adminName') || '').trim();
+				},
+				replyRowUserId(o) {
+					if (!o || typeof o !== 'object') return '';
+					var v = o.userid != null && o.userid !== '' ? o.userid
+						: (o.userId != null && o.userId !== '' ? o.userId
+						: (o.user_id != null && o.user_id !== '' ? o.user_id
+						: (o.uid != null && o.uid !== '' ? o.uid : '')));
+					return v !== '' && v != null ? String(v) : '';
+				},
+				isOwnReply(row) {
+					var uid = (localStorage.getItem('userid') || this.currentUserId || '').trim();
+					if (!uid || !row) return false;
+					var rid = this.replyRowUserId(row);
+					if (rid && String(rid) === String(uid)) return true;
+					var mine = this.currentUserDisplayName();
+					var name = (row.nickname || row.yonghuxingming || row.username || '').trim();
+					return !!(mine && name && mine === name);
+				},
+				isOwnComment(item) {
+					var uid = (localStorage.getItem('userid') || this.currentUserId || '').trim();
+					if (!uid || !item) return false;
+					var cid = item.userid != null && item.userid !== '' ? item.userid : item.userId;
+					if (cid != null && cid !== '' && String(cid) === String(uid)) return true;
+					var mine = this.currentUserDisplayName();
+					var name = (item.nickname || '').trim();
+					return !!(mine && name && mine === name);
 				},
 				// 倒计时初始化
 				countDown() {
@@ -587,28 +622,100 @@ color: #999 !important;
 						});
 					});
 				},
+				// 删除楼中楼回复（更新父评论的 reply JSON）
+				deleteReplyComment(item, parentIndex, replyIndex, evt) {
+					var uid = localStorage.getItem('userid');
+					if (!uid) {
+						layer.msg('请先登录', { icon: 5 });
+						return;
+					}
+					var r = item.replyList && item.replyList[replyIndex];
+					if (!r || !this.isOwnReply(r)) {
+						layer.msg('只能删除自己的回复', { icon: 5 });
+						return;
+					}
+					var _this = this;
+					var e = evt || window.event;
+					var clientX = e && e.clientX ? e.clientX : (window.innerWidth || document.documentElement.clientWidth) / 2;
+					var clientY = e && e.clientY ? e.clientY : (window.innerHeight || document.documentElement.clientHeight) / 2;
+					var top = clientY - 40;
+					var left = clientX - 160;
+					if (top < 20) top = 20;
+					if (left < 20) left = 20;
+					layer.confirm('确定要删除这条回复吗？', {
+						icon: 3,
+						title: '提示',
+						offset: [top + 'px', left + 'px']
+					}, function(confirmIndex) {
+						layer.close(confirmIndex);
+						layui.http.request('discuss' + _this.detailTable + '/detail/' + item.id, 'get', {}, function(res) {
+							var entity = res.data || {};
+							var list = [];
+							var raw = entity.reply;
+							if (raw) {
+								try {
+									var parsed = JSON.parse(raw);
+									if (Array.isArray(parsed)) {
+										list = parsed;
+									} else if (parsed && typeof parsed === 'object') {
+										list = [parsed];
+									} else {
+										list = [{ nickname: '', touxiang: '', content: String(parsed) }];
+									}
+								} catch (err) {
+									list = [{ nickname: '', touxiang: '', content: String(raw) }];
+								}
+							}
+							if (replyIndex < 0 || replyIndex >= list.length) {
+								layer.msg('数据已更新，请刷新页面', { icon: 5 });
+								return;
+							}
+							var entry = list[replyIndex];
+							if (!_this.isOwnReply(entry)) {
+								layer.msg('只能删除自己的回复', { icon: 5 });
+								return;
+							}
+							list.splice(replyIndex, 1);
+							entity.reply = list.length ? JSON.stringify(list) : '';
+							layui.http.requestJson('discuss' + _this.detailTable + '/update', 'post', entity, function(r) {
+								if (r.code === 0) {
+									var row = Object.assign({}, _this.dataList[parentIndex]);
+									row.reply = entity.reply;
+									_this.normalizeReplyItem(row);
+									_this.$set(_this.dataList, parentIndex, row);
+									layer.msg('删除成功', { icon: 6 });
+								} else {
+									layer.msg(r.msg || '删除失败', { icon: 5 });
+								}
+							});
+						});
+					});
+				},
 				// 解析并标准化一条评论的回复信息（支持多条回复：reply 字段存 JSON 数组）
 				normalizeReplyItem(item) {
 					if (!item) return;
 					var raw = item.reply;
 					item.replyList = [];
 					if (!raw) {
-						item.replyObj = { nickname: '', avatar: '', content: '' };
+						item.replyObj = { nickname: '', avatar: '', content: '', userid: '' };
 						return;
 					}
 					var pick = function(o) {
-						if (!o || typeof o !== 'object') return { nickname: '', avatar: '', content: '' };
+						if (!o || typeof o !== 'object') return { nickname: '', avatar: '', content: '', userid: '' };
+						var u = o.userid != null && o.userid !== '' ? o.userid
+							: (o.userId != null && o.userId !== '' ? o.userId
+							: (o.user_id != null && o.user_id !== '' ? o.user_id
+							: (o.uid != null && o.uid !== '' ? o.uid : '')));
 						return {
 							nickname: o.nickname || o.yonghuxingming || o.username || '',
 							avatar: o.touxiang || o.avatar || o.headimg || '',
-							content: o.content || o.reply || o.value || ''
+							content: o.content || o.reply || o.value || '',
+							userid: u !== '' && u != null ? String(u) : ''
 						};
 					};
 					var pushReply = function(o) {
 						var r = pick(o);
-						if (r.content) {
-							item.replyList.push(r);
-						}
+						item.replyList.push(r);
 					};
 					if (Array.isArray(raw)) {
 						for (var i = 0; i < raw.length; i++) pushReply(raw[i]);
@@ -622,17 +729,17 @@ color: #999 !important;
 							} else if (obj && typeof obj === 'object') {
 								pushReply(obj);
 							} else if (obj) {
-								item.replyList.push({ nickname: '', avatar: '', content: String(obj) });
+								item.replyList.push({ nickname: '', avatar: '', content: String(obj), userid: '' });
 							} else {
-								item.replyList.push({ nickname: '', avatar: '', content: raw });
+								item.replyList.push({ nickname: '', avatar: '', content: raw, userid: '' });
 							}
 						} catch (e) {
-							item.replyList.push({ nickname: '', avatar: '', content: raw });
+							item.replyList.push({ nickname: '', avatar: '', content: raw, userid: '' });
 						}
 					} else {
-						item.replyList.push({ nickname: '', avatar: '', content: String(raw) });
+						item.replyList.push({ nickname: '', avatar: '', content: String(raw), userid: '' });
 					}
-					item.replyObj = item.replyList.length ? item.replyList[item.replyList.length - 1] : { nickname: '', avatar: '', content: '' };
+					item.replyObj = item.replyList.length ? item.replyList[item.replyList.length - 1] : { nickname: '', avatar: '', content: '', userid: '' };
 				},
 				normalizeReplyList(list) {
 					if (!list || !list.length) return;
@@ -670,6 +777,7 @@ color: #999 !important;
 						layui.http.request('discuss' + _this.detailTable + '/detail/' + item.id, 'get', {}, function(res) {
 							var entity = res.data || {};
 							var replyPayload = {
+								userid: uid,
 								nickname: localStorage.getItem('yonghuxingming') || localStorage.getItem('adminName') || '',
 								touxiang: localStorage.getItem('touxiang') || '',
 								content: value
@@ -697,6 +805,7 @@ color: #999 !important;
 								if (r.code === 0) {
 									var newList = (item.replyList && item.replyList.slice()) || [];
 									newList.push({
+										userid: String(replyPayload.userid),
 										nickname: replyPayload.nickname,
 										avatar: replyPayload.touxiang,
 										content: replyPayload.content

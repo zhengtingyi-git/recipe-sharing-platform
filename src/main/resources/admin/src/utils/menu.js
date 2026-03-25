@@ -30,17 +30,6 @@ const menu = {
                     {
                         child: [
                             {
-                                appFrontIcon: "cuIcon-form",
-                                buttons: ["新增", "查看", "修改", "删除"],
-                                menu: "美食论坛",
-                                tableName: "news"
-                            }
-                        ],
-                        menu: "美食论坛管理"
-                    },
-                    {
-                        child: [
-                            {
                                 appFrontIcon: "cuIcon-clothes",
                                 buttons: ["新增", "查看", "修改", "删除", "审核", "查看评论"],
                                 menu: "中式美食",
@@ -53,7 +42,19 @@ const menu = {
                     {
                         child: [
                             {
-                                appFrontIcon: "cuIcon-news",
+                                appFrontIcon: "cuIcon-form",
+                                buttons: ["新增", "查看", "修改", "删除"],
+                                menu: "美食论坛",
+                                tableName: "forum_post",
+                                menuJump: "列表",
+                            }
+                        ],
+                        menu: "美食论坛管理"
+                    },
+                    {
+                        child: [
+                            {
+                                appFrontIcon: "cuIcon-form",
                                 buttons: ["新增", "查看", "修改", "删除"],
                                 menu: "轮播图管理",
                                 tableName: "config"

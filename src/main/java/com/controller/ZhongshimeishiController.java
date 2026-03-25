@@ -55,11 +55,31 @@ public class ZhongshimeishiController {
 
     private int countAction(Long refid, String type) {
         EntityWrapper<StoreupEntity> ew = new EntityWrapper<>();
-        ew.eq("tablename", "zhongshimeishi").eq("refid", refid).eq("type", type);
+        ew.eq("refid", refid).eq("type", type);
         return storeupService.selectCount(ew);
     }
 
-    
+    /** recipe 表不再存用户账号/昵称，按 userid 回填供接口展示 */
+    private void fillRecipeUser(ZhongshimeishiEntity entity) {
+        if (entity == null || entity.getUserid() == null) {
+            return;
+        }
+        UserEntity user = userService.selectById(entity.getUserid());
+        if (user != null) {
+            entity.setYonghuzhanghao(user.getYonghuzhanghao());
+            entity.setYonghuxingming(user.getYonghuxingming());
+            entity.setTouxiang(user.getTouxiang());
+        }
+    }
+
+    private void fillRecipeUser(Iterable<?> list) {
+        for (Object obj : list) {
+            if (obj instanceof ZhongshimeishiEntity) {
+                fillRecipeUser((ZhongshimeishiEntity) obj);
+            }
+        }
+    }
+
 
 
     /**
@@ -80,13 +100,7 @@ public class ZhongshimeishiController {
         for(Object obj : page.getList()) {
             if(obj instanceof ZhongshimeishiEntity) {
                 ZhongshimeishiEntity entity = (ZhongshimeishiEntity)obj;
-                if(entity.getUserid() != null) {
-                    UserEntity user = userService.selectById(entity.getUserid());
-                    if(user != null) {
-                        entity.setYonghuzhanghao(user.getYonghuzhanghao());
-                        entity.setYonghuxingming(user.getYonghuxingming());
-                    }
-                }
+                fillRecipeUser(entity);
                 if (entity.getId() != null) {
                     entity.setThumbsupnum(countAction(entity.getId(), "21"));
                     entity.setStoreupnum(countAction(entity.getId(), "1"));
@@ -128,7 +142,7 @@ public class ZhongshimeishiController {
             if (!all.isEmpty()) {
                 List<Long> ids = all.stream().map(ZhongshimeishiEntity::getId).collect(Collectors.toList());
                 EntityWrapper<StoreupEntity> suEw = new EntityWrapper<>();
-                suEw.eq("tablename", "zhongshimeishi").in("refid", ids).eq("type", "1");
+                suEw.in("refid", ids).eq("type", "1");
                 List<StoreupEntity> suList = storeupService.selectList(suEw);
                 Map<Long, Integer> countMap = new HashMap<>();
                 for (StoreupEntity su : suList) {
@@ -142,6 +156,7 @@ public class ZhongshimeishiController {
             int from = (pageNum - 1) * limitNum;
             int to = Math.min(from + limitNum, all.size());
             List<ZhongshimeishiEntity> pageList = from < all.size() ? all.subList(from, to) : new ArrayList<>();
+            fillRecipeUser(pageList);
             PageUtils page = new PageUtils(pageList, all.size(), limitNum, pageNum);
             return R.ok().put("data", page);
         } else if ("thumbsupnum".equals(sort)) {
@@ -166,7 +181,7 @@ public class ZhongshimeishiController {
             if (!all.isEmpty()) {
                 List<Long> ids = all.stream().map(ZhongshimeishiEntity::getId).collect(Collectors.toList());
                 EntityWrapper<StoreupEntity> suEw = new EntityWrapper<>();
-                suEw.eq("tablename", "zhongshimeishi").in("refid", ids).eq("type", "21");
+                suEw.in("refid", ids).eq("type", "21");
                 List<StoreupEntity> suList = storeupService.selectList(suEw);
                 Map<Long, Integer> countMap = new HashMap<>();
                 for (StoreupEntity su : suList) {
@@ -183,6 +198,7 @@ public class ZhongshimeishiController {
             int from = (pageNum - 1) * limitNum;
             int to = Math.min(from + limitNum, all.size());
             List<ZhongshimeishiEntity> pageList = from < all.size() ? all.subList(from, to) : new ArrayList<>();
+            fillRecipeUser(pageList);
             PageUtils page = new PageUtils(pageList, all.size(), limitNum, pageNum);
             return R.ok().put("data", page);
         }
@@ -204,6 +220,7 @@ public class ZhongshimeishiController {
         for(Object obj : page.getList()) {
             if(obj instanceof ZhongshimeishiEntity) {
                 ZhongshimeishiEntity entity = (ZhongshimeishiEntity)obj;
+                fillRecipeUser(entity);
                 if (entity.getId() != null) {
                     entity.setThumbsupnum(countAction(entity.getId(), "21"));
                     entity.setStoreupnum(countAction(entity.getId(), "1"));
@@ -220,8 +237,10 @@ public class ZhongshimeishiController {
     public R list( ZhongshimeishiEntity zhongshimeishi){
     	zhongshimeishi.setRecipetype("zhongshimeishi");
        	EntityWrapper<ZhongshimeishiEntity> ew = new EntityWrapper<ZhongshimeishiEntity>();
-      	ew.allEq(MPUtil.allEQMapPre( zhongshimeishi, "zhongshimeishi")); 
-        return R.ok().put("data", zhongshimeishiService.selectListView(ew));
+      	ew.allEq(MPUtil.allEQMapPre( zhongshimeishi, "zhongshimeishi"));
+        List<ZhongshimeishiView> vlist = zhongshimeishiService.selectListView(ew);
+        fillRecipeUser(vlist);
+        return R.ok().put("data", vlist);
     }
 
 	 /**
@@ -233,6 +252,7 @@ public class ZhongshimeishiController {
         EntityWrapper< ZhongshimeishiEntity> ew = new EntityWrapper< ZhongshimeishiEntity>();
  		ew.allEq(MPUtil.allEQMapPre( zhongshimeishi, "zhongshimeishi")); 
 		ZhongshimeishiView zhongshimeishiView =  zhongshimeishiService.selectView(ew);
+		fillRecipeUser(zhongshimeishiView);
 		return R.ok("查询中式美食成功").put("data", zhongshimeishiView);
     }
 	
@@ -242,14 +262,7 @@ public class ZhongshimeishiController {
     @RequestMapping("/info/{id}")
     public R info(@PathVariable("id") Long id){
         ZhongshimeishiEntity zhongshimeishi = zhongshimeishiService.selectById(id);
-        if(zhongshimeishi.getUserid() != null) {
-            UserEntity user = userService.selectById(zhongshimeishi.getUserid());
-            if(user != null) {
-                zhongshimeishi.setYonghuzhanghao(user.getYonghuzhanghao());
-                zhongshimeishi.setYonghuxingming(user.getYonghuxingming());
-                zhongshimeishi.setTouxiang(user.getTouxiang());
-            }
-        }
+        fillRecipeUser(zhongshimeishi);
 		zhongshimeishi.setClicknum(zhongshimeishi.getClicknum()+1);
 		zhongshimeishiService.updateById(zhongshimeishi);
         zhongshimeishi.setThumbsupnum(countAction(id, "21"));
@@ -264,14 +277,7 @@ public class ZhongshimeishiController {
     @RequestMapping("/detail/{id}")
     public R detail(@PathVariable("id") Long id){
         ZhongshimeishiEntity zhongshimeishi = zhongshimeishiService.selectById(id);
-        if(zhongshimeishi.getUserid() != null) {
-            UserEntity user = userService.selectById(zhongshimeishi.getUserid());
-            if(user != null) {
-                zhongshimeishi.setYonghuzhanghao(user.getYonghuzhanghao());
-                zhongshimeishi.setYonghuxingming(user.getYonghuxingming());
-                zhongshimeishi.setTouxiang(user.getTouxiang());
-            }
-        }
+        fillRecipeUser(zhongshimeishi);
 		zhongshimeishi.setClicknum(zhongshimeishi.getClicknum()+1);
 		zhongshimeishiService.updateById(zhongshimeishi);
         zhongshimeishi.setThumbsupnum(countAction(id, "21"));

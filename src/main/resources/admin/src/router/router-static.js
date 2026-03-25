@@ -11,7 +11,7 @@ import UpdatePassword from '@/views/update-password'
 import pay from '@/views/pay'
 import register from '@/views/register'
 import center from '@/views/center'
-    import news from '@/views/modules/news/list'
+    import forumPost from '@/views/modules/forum-post/list'
     import zhongshimeishi from '@/views/modules/zhongshimeishi/list'
     import waiguomeishi from '@/views/modules/waiguomeishi/list'
     import yonghu from '@/views/modules/user/list'
@@ -48,9 +48,14 @@ const routes = [{
       meta: {icon:'', title:'center'}
     }
       ,{
-	path: '/news',
+	path: '/forum-post',
         name: '美食论坛',
-        component: news
+        component: forumPost
+      }
+      ,{
+	path: '/forum_post',
+        name: '美食论坛',
+        component: forumPost
       }
       ,{
 	path: '/zhongshimeishi',

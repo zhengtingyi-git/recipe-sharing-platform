@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dao.ForumPostCommentDao">
+
+    <resultMap type="com.entity.ForumPostCommentEntity" id="forumPostCommentMap">
+        <result property="postId" column="post_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="displayName" column="display_name"/>
+        <result property="commentContent" column="comment_content"/>
+        <result property="commentImage" column="comment_image"/>
+        <result property="replyContent" column="reply_content"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="selectListVO" resultType="com.entity.vo.ForumPostCommentVO">
+        SELECT * FROM forum_post_comment forum_post_comment
+        <where> 1=1 ${ew.sqlSegment}</where>
+    </select>
+
+    <select id="selectVO" resultType="com.entity.vo.ForumPostCommentVO">
+        SELECT forum_post_comment.* FROM forum_post_comment forum_post_comment
+        <where> 1=1 ${ew.sqlSegment}</where>
+    </select>
+
+    <select id="selectListView" resultType="com.entity.view.ForumPostCommentView">
+        SELECT forum_post_comment.* FROM forum_post_comment forum_post_comment
+        <where> 1=1 ${ew.sqlSegment}</where>
+    </select>
+
+    <select id="selectView" resultType="com.entity.view.ForumPostCommentView">
+        SELECT * FROM forum_post_comment forum_post_comment
+        <where> 1=1 ${ew.sqlSegment}</where>
+    </select>
+	
+
+</mapper>
+

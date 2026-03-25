@@ -57,6 +57,17 @@ public class DiscusszhongshimeishiController {
     	discusszhongshimeishi.setRecipetype("zhongshimeishi");
         EntityWrapper<DiscusszhongshimeishiEntity> ew = new EntityWrapper<DiscusszhongshimeishiEntity>();
 		PageUtils page = discusszhongshimeishiService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, discusszhongshimeishi), params), params));
+        // 后台已关闭“回复”功能：管理员页不再展示回复内容
+        if ("管理员".equals(String.valueOf(request.getSession().getAttribute("role")))) {
+            List<?> rows = page.getList();
+            if (rows != null) {
+                for (Object row : rows) {
+                    if (row instanceof DiscusszhongshimeishiEntity) {
+                        ((DiscusszhongshimeishiEntity) row).setReply("");
+                    }
+                }
+            }
+        }
 
         return R.ok().put("data", page);
     }

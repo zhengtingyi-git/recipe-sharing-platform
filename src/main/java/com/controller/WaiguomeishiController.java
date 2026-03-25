@@ -55,11 +55,30 @@ public class WaiguomeishiController {
 
     private int countAction(Long refid, String type) {
         EntityWrapper<StoreupEntity> ew = new EntityWrapper<>();
-        ew.eq("tablename", "waiguomeishi").eq("refid", refid).eq("type", type);
+        ew.eq("refid", refid).eq("type", type);
         return storeupService.selectCount(ew);
     }
 
-    
+    private void fillRecipeUser(WaiguomeishiEntity entity) {
+        if (entity == null || entity.getUserid() == null) {
+            return;
+        }
+        UserEntity user = userService.selectById(entity.getUserid());
+        if (user != null) {
+            entity.setYonghuzhanghao(user.getYonghuzhanghao());
+            entity.setYonghuxingming(user.getYonghuxingming());
+            entity.setTouxiang(user.getTouxiang());
+        }
+    }
+
+    private void fillRecipeUser(Iterable<?> list) {
+        for (Object obj : list) {
+            if (obj instanceof WaiguomeishiEntity) {
+                fillRecipeUser((WaiguomeishiEntity) obj);
+            }
+        }
+    }
+
 
 
     /**
@@ -76,17 +95,10 @@ public class WaiguomeishiController {
         EntityWrapper<WaiguomeishiEntity> ew = new EntityWrapper<WaiguomeishiEntity>();
 		PageUtils page = waiguomeishiService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, waiguomeishi), params), params));
 
-        // 根据用户id回填当前账号和昵称，保证显示为最新
         for(Object obj : page.getList()) {
             if(obj instanceof WaiguomeishiEntity) {
                 WaiguomeishiEntity entity = (WaiguomeishiEntity)obj;
-                if(entity.getUserid() != null) {
-                    UserEntity user = userService.selectById(entity.getUserid());
-                    if(user != null) {
-                        entity.setYonghuzhanghao(user.getYonghuzhanghao());
-                        entity.setYonghuxingming(user.getYonghuxingming());
-                    }
-                }
+                fillRecipeUser(entity);
                 if (entity.getId() != null) {
                     entity.setThumbsupnum(countAction(entity.getId(), "21"));
                     entity.setStoreupnum(countAction(entity.getId(), "1"));
@@ -128,7 +140,7 @@ public class WaiguomeishiController {
             if (!all.isEmpty()) {
                 List<Long> ids = all.stream().map(WaiguomeishiEntity::getId).collect(Collectors.toList());
                 EntityWrapper<StoreupEntity> suEw = new EntityWrapper<>();
-                suEw.eq("tablename", "waiguomeishi").in("refid", ids).eq("type", "1");
+                suEw.in("refid", ids).eq("type", "1");
                 List<StoreupEntity> suList = storeupService.selectList(suEw);
                 Map<Long, Integer> countMap = new HashMap<>();
                 for (StoreupEntity su : suList) {
@@ -142,6 +154,7 @@ public class WaiguomeishiController {
             int from = (pageNum - 1) * limitNum;
             int to = Math.min(from + limitNum, all.size());
             List<WaiguomeishiEntity> pageList = from < all.size() ? all.subList(from, to) : new ArrayList<>();
+            fillRecipeUser(pageList);
             PageUtils page = new PageUtils(pageList, all.size(), limitNum, pageNum);
             return R.ok().put("data", page);
         } else if ("thumbsupnum".equals(sort)) {
@@ -166,7 +179,7 @@ public class WaiguomeishiController {
             if (!all.isEmpty()) {
                 List<Long> ids = all.stream().map(WaiguomeishiEntity::getId).collect(Collectors.toList());
                 EntityWrapper<StoreupEntity> suEw = new EntityWrapper<>();
-                suEw.eq("tablename", "waiguomeishi").in("refid", ids).eq("type", "21");
+                suEw.in("refid", ids).eq("type", "21");
                 List<StoreupEntity> suList = storeupService.selectList(suEw);
                 Map<Long, Integer> countMap = new HashMap<>();
                 for (StoreupEntity su : suList) {
@@ -183,6 +196,7 @@ public class WaiguomeishiController {
             int from = (pageNum - 1) * limitNum;
             int to = Math.min(from + limitNum, all.size());
             List<WaiguomeishiEntity> pageList = from < all.size() ? all.subList(from, to) : new ArrayList<>();
+            fillRecipeUser(pageList);
             PageUtils page = new PageUtils(pageList, all.size(), limitNum, pageNum);
             return R.ok().put("data", page);
         }
@@ -204,6 +218,7 @@ public class WaiguomeishiController {
         for(Object obj : page.getList()) {
             if(obj instanceof WaiguomeishiEntity) {
                 WaiguomeishiEntity entity = (WaiguomeishiEntity)obj;
+                fillRecipeUser(entity);
                 if (entity.getId() != null) {
                     entity.setThumbsupnum(countAction(entity.getId(), "21"));
                     entity.setStoreupnum(countAction(entity.getId(), "1"));
@@ -220,8 +235,10 @@ public class WaiguomeishiController {
     public R list( WaiguomeishiEntity waiguomeishi){
     	waiguomeishi.setRecipetype("waiguomeishi");
        	EntityWrapper<WaiguomeishiEntity> ew = new EntityWrapper<WaiguomeishiEntity>();
-      	ew.allEq(MPUtil.allEQMapPre( waiguomeishi, "waiguomeishi")); 
-        return R.ok().put("data", waiguomeishiService.selectListView(ew));
+      	ew.allEq(MPUtil.allEQMapPre( waiguomeishi, "waiguomeishi"));
+        List<WaiguomeishiView> vlist = waiguomeishiService.selectListView(ew);
+        fillRecipeUser(vlist);
+        return R.ok().put("data", vlist);
     }
 
 	 /**
@@ -233,6 +250,7 @@ public class WaiguomeishiController {
         EntityWrapper< WaiguomeishiEntity> ew = new EntityWrapper< WaiguomeishiEntity>();
  		ew.allEq(MPUtil.allEQMapPre( waiguomeishi, "waiguomeishi")); 
 		WaiguomeishiView waiguomeishiView =  waiguomeishiService.selectView(ew);
+		fillRecipeUser(waiguomeishiView);
 		return R.ok("查询外国美食成功").put("data", waiguomeishiView);
     }
 	
@@ -242,14 +260,7 @@ public class WaiguomeishiController {
     @RequestMapping("/info/{id}")
     public R info(@PathVariable("id") Long id){
         WaiguomeishiEntity waiguomeishi = waiguomeishiService.selectById(id);
-        if(waiguomeishi.getUserid() != null) {
-            UserEntity user = userService.selectById(waiguomeishi.getUserid());
-            if(user != null) {
-                waiguomeishi.setYonghuzhanghao(user.getYonghuzhanghao());
-                waiguomeishi.setYonghuxingming(user.getYonghuxingming());
-                waiguomeishi.setTouxiang(user.getTouxiang());
-            }
-        }
+        fillRecipeUser(waiguomeishi);
 		waiguomeishi.setClicknum(waiguomeishi.getClicknum()+1);
 		waiguomeishiService.updateById(waiguomeishi);
         waiguomeishi.setThumbsupnum(countAction(id, "21"));
@@ -264,14 +275,7 @@ public class WaiguomeishiController {
     @RequestMapping("/detail/{id}")
     public R detail(@PathVariable("id") Long id){
         WaiguomeishiEntity waiguomeishi = waiguomeishiService.selectById(id);
-        if(waiguomeishi.getUserid() != null) {
-            UserEntity user = userService.selectById(waiguomeishi.getUserid());
-            if(user != null) {
-                waiguomeishi.setYonghuzhanghao(user.getYonghuzhanghao());
-                waiguomeishi.setYonghuxingming(user.getYonghuxingming());
-                waiguomeishi.setTouxiang(user.getTouxiang());
-            }
-        }
+        fillRecipeUser(waiguomeishi);
 		waiguomeishi.setClicknum(waiguomeishi.getClicknum()+1);
 		waiguomeishiService.updateById(waiguomeishi);
         waiguomeishi.setThumbsupnum(countAction(id, "21"));

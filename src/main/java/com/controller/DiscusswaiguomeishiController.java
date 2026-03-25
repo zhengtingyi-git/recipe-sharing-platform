@@ -57,6 +57,17 @@ public class DiscusswaiguomeishiController {
     	discusswaiguomeishi.setRecipetype("waiguomeishi");
         EntityWrapper<DiscusswaiguomeishiEntity> ew = new EntityWrapper<DiscusswaiguomeishiEntity>();
 		PageUtils page = discusswaiguomeishiService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, discusswaiguomeishi), params), params));
+        // 后台已关闭“回复”功能：管理员页不再展示回复内容
+        if ("管理员".equals(String.valueOf(request.getSession().getAttribute("role")))) {
+            List<?> rows = page.getList();
+            if (rows != null) {
+                for (Object row : rows) {
+                    if (row instanceof DiscusswaiguomeishiEntity) {
+                        ((DiscusswaiguomeishiEntity) row).setReply("");
+                    }
+                }
+            }
+        }
 
         return R.ok().put("data", page);
     }

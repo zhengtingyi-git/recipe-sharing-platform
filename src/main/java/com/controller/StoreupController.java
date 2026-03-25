@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import com.utils.ValidatorUtils;
@@ -25,9 +26,15 @@ import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.annotation.IgnoreAuth;
 
 import com.entity.StoreupEntity;
+import com.entity.ForumPostEntity;
+import com.entity.ZhongshimeishiEntity;
+import com.entity.WaiguomeishiEntity;
 import com.entity.view.StoreupView;
 
 import com.service.StoreupService;
+import com.service.ForumPostService;
+import com.service.ZhongshimeishiService;
+import com.service.WaiguomeishiService;
 import com.utils.PageUtils;
 import com.utils.R;
 import com.utils.MD5Util;
@@ -47,6 +54,12 @@ import java.io.IOException;
 public class StoreupController {
     @Autowired
     private StoreupService storeupService;
+    @Autowired
+    private ForumPostService forumPostService;
+    @Autowired
+    private ZhongshimeishiService zhongshimeishiService;
+    @Autowired
+    private WaiguomeishiService waiguomeishiService;
 
 
     
@@ -61,8 +74,19 @@ public class StoreupController {
     	if(!request.getSession().getAttribute("role").toString().equals("管理员")) {
     		storeup.setUserid((Long)request.getSession().getAttribute("userId"));
     	}
+        // 注意：storeup 表已经删除了 tablename/name/picture 等列，
+        // 这些字段在实体里仍然存在（exist=false），如果直接参与 likeOrEq，会生成不存在的 where 条件。
+        storeup.setTablename(null);
+        storeup.setName(null);
+        storeup.setPicture(null);
+        String categoryTablename = params.get("tablename") != null ? params.get("tablename").toString().trim() : "";
+        params.remove("name");
+        params.remove("tablename");
         EntityWrapper<StoreupEntity> ew = new EntityWrapper<StoreupEntity>();
-		PageUtils page = storeupService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, storeup), params), params));
+		ew = (EntityWrapper<StoreupEntity>) MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, storeup), params), params);
+		applyStoreupCategoryFilter(ew, categoryTablename);
+		PageUtils page = storeupService.queryPage(params, ew);
+        enrichStoreupPage(page);
 
         return R.ok().put("data", page);
     }
@@ -76,8 +100,18 @@ public class StoreupController {
     	if(!request.getSession().getAttribute("role").toString().equals("管理员")) {
     		storeup.setUserid((Long)request.getSession().getAttribute("userId"));
     	}
+        // 同 page：避免生成不存在的 where(tablename/name/picture)
+        storeup.setTablename(null);
+        storeup.setName(null);
+        storeup.setPicture(null);
+        String categoryTablename = params.get("tablename") != null ? params.get("tablename").toString().trim() : "";
+        params.remove("name");
+        params.remove("tablename");
         EntityWrapper<StoreupEntity> ew = new EntityWrapper<StoreupEntity>();
-		PageUtils page = storeupService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, storeup), params), params));
+		ew = (EntityWrapper<StoreupEntity>) MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, storeup), params), params);
+		applyStoreupCategoryFilter(ew, categoryTablename);
+		PageUtils page = storeupService.queryPage(params, ew);
+        enrichStoreupPage(page);
         return R.ok().put("data", page);
     }
 
@@ -118,6 +152,9 @@ public class StoreupController {
     @RequestMapping("/detail/{id}")
     public R detail(@PathVariable("id") Long id){
         StoreupEntity storeup = storeupService.selectById(id);
+        if (storeup != null) {
+            fillTargetFields(storeup);
+        }
         return R.ok().put("data", storeup);
     }
     
@@ -218,6 +255,77 @@ public class StoreupController {
 
 
 
+
+
+
+    /**
+     * 个人中心「我的收藏/我的点赞」按分类筛选：库表无 tablename 列，通过 refid 与 recipe / forum_post 关联。
+     * 中式/外国美食共用 recipe 表，以 recipetype 区分。
+     */
+    private void applyStoreupCategoryFilter(EntityWrapper<StoreupEntity> ew, String tablename) {
+        if (ew == null || StringUtils.isBlank(tablename)) {
+            return;
+        }
+        switch (tablename) {
+            case "waiguomeishi":
+                ew.andNew().where("refid IN (SELECT id FROM recipe WHERE recipetype = {0})", "waiguomeishi");
+                break;
+            case "zhongshimeishi":
+                ew.andNew().where("refid IN (SELECT id FROM recipe WHERE recipetype = {0})", "zhongshimeishi");
+                break;
+            case "forum_post":
+                ew.andNew().where("refid IN (SELECT id FROM forum_post)");
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void enrichStoreupPage(PageUtils page) {
+        if (page == null || page.getList() == null) {
+            return;
+        }
+        List<?> records = page.getList();
+        List<Object> enriched = records.stream().map(item -> {
+            if (item instanceof StoreupEntity) {
+                StoreupEntity storeup = (StoreupEntity) item;
+                fillTargetFields(storeup);
+                return storeup;
+            }
+            return item;
+        }).collect(Collectors.toList());
+        page.setList(enriched);
+    }
+
+    private void fillTargetFields(StoreupEntity storeup) {
+        if (storeup == null || storeup.getRefid() == null) {
+            return;
+        }
+        Long refId = storeup.getRefid();
+
+        ForumPostEntity post = forumPostService.selectById(refId);
+        if (post != null) {
+            storeup.setTablename("forum_post");
+            storeup.setName(post.getTitle());
+            storeup.setPicture(post.getPicture());
+            return;
+        }
+
+        ZhongshimeishiEntity zhongshi = zhongshimeishiService.selectById(refId);
+        if (zhongshi != null) {
+            storeup.setTablename("zhongshimeishi");
+            storeup.setName(zhongshi.getCaipinmingcheng());
+            storeup.setPicture(zhongshi.getTupian());
+            return;
+        }
+
+        WaiguomeishiEntity waiguo = waiguomeishiService.selectById(refId);
+        if (waiguo != null) {
+            storeup.setTablename("waiguomeishi");
+            storeup.setName(waiguo.getCaipinmingcheng());
+            storeup.setPicture(waiguo.getTupian());
+        }
+    }
 
 
 

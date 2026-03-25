@@ -162,19 +162,19 @@
 		flex: 0 0 20%;
 	}
 
-	.recommend .box .news {
+	.recommend .box .forum-post {
 		display: flex;
 		flex-wrap: wrap;
 		padding: 0;
 width: 100%;
 	}
 
-	.recommend .box .news .list-item {
+	.recommend .box .forum-post .list-item {
 		flex: 0 0 50%;
 		padding: 0 10px;
 		box-sizing: border-box;
 	}
-	.recommend .box .news .list-item .list-item-body {
+	.recommend .box .forum-post .list-item .list-item-body {
 		cursor: pointer;
 		border: 1px solid rgba(0, 0, 0, 3);
 		padding: 10px;
@@ -182,14 +182,14 @@ width: 100%;
 		display: flex;
 	}
 
-	.recommend .box .news .list-item .list-item-body img {
+	.recommend .box .forum-post .list-item .list-item-body img {
 		width: 120px;
 		height: 100%;
 		display: block;
 		margin: 0 auto;
 	}
 
-	.recommend .box .news .list-item .list-item-body .item-info {
+	.recommend .box .forum-post .list-item .list-item-body .item-info {
 		flex: 1;
 		display: flex;
 		justify-content: space-between;
@@ -198,7 +198,7 @@ width: 100%;
 		box-sizing: border-box;
 	}
 
-	.recommend .box .news .list-item .list-item-body .item-info .name {
+	.recommend .box .forum-post .list-item .list-item-body .item-info .name {
 		padding-top: 5px;
 		color: red;
 		font-size: 14px;
@@ -210,7 +210,7 @@ width: 100%;
 		-webkit-box-orient: vertical;
 	}
 
-	.recommend .box .news .list-item .list-item-body .item-info .time {
+	.recommend .box .forum-post .list-item .list-item-body .item-info .time {
 		padding-top: 5px;
 		color: red;
 		font-size: 14px;
@@ -222,11 +222,11 @@ width: 100%;
 		box-sizing: border-box;
 	}
 
-	.recommend .box .news .list-item1 {
+	.recommend .box .forum-post .list-item1 {
 		flex: 0 0 100%;
 	}
 
-	.recommend .box .news .list-item3 {
+	.recommend .box .forum-post .list-item3 {
 		flex: 0 0 33.33%;
 	}
 
@@ -312,7 +312,7 @@ width: 100%;
 	swiperIndex: '-1'
       },
       filters: {
-        newsDesc: function(val) {
+        forumPostDesc: function(val) {
           if (val) {
             if (val.length > 60) {
               return val.substring(0, 60).replace(/<[^>]*>/g).replace(/undefined/g, '');

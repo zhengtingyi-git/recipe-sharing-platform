@@ -502,8 +502,8 @@
 					jquery("#touxiangImg").attr("src", http.baseurl+data.data.touxiang);
 					// 粉丝数
 					if (data.data && data.data.id) {
-						http.request('guanzhu/fansCount', 'get', { userId: data.data.id }, function(r) {
-							vue.fansCount = (r.fansCount != null) ? r.fansCount : 0;
+						http.request('user-follows/followers-count', 'get', { userId: data.data.id }, function(r) {
+							vue.fansCount = (r.followersCount != null) ? r.followersCount : ((r.fansCount != null) ? r.fansCount : 0);
 						});
 					}
 				});

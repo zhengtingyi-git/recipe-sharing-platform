@@ -96,7 +96,6 @@ public class RemencaipinController {
         if (!zhongshiList.isEmpty()) {
             List<Long> zhongshiIds = zhongshiList.stream().map(ZhongshimeishiEntity::getId).collect(Collectors.toList());
             EntityWrapper<StoreupEntity> storeupWrapper1 = new EntityWrapper<>();
-            storeupWrapper1.eq("tablename", "zhongshimeishi");
             storeupWrapper1.in("refid", zhongshiIds);
             storeupWrapper1.eq("type", "1");
             List<StoreupEntity> storeupList = storeupService.selectList(storeupWrapper1);
@@ -104,7 +103,6 @@ public class RemencaipinController {
                 zhongshiStoreupMap.put(storeup.getRefid(), zhongshiStoreupMap.getOrDefault(storeup.getRefid(), 0) + 1);
             }
             EntityWrapper<StoreupEntity> storeupWrapper21 = new EntityWrapper<>();
-            storeupWrapper21.eq("tablename", "zhongshimeishi");
             storeupWrapper21.in("refid", zhongshiIds);
             storeupWrapper21.eq("type", "21");
             List<StoreupEntity> thumbsList = storeupService.selectList(storeupWrapper21);
@@ -148,7 +146,6 @@ public class RemencaipinController {
         if (!waiguoList.isEmpty()) {
             List<Long> waiguoIds = waiguoList.stream().map(WaiguomeishiEntity::getId).collect(Collectors.toList());
             EntityWrapper<StoreupEntity> storeupWrapper1 = new EntityWrapper<>();
-            storeupWrapper1.eq("tablename", "waiguomeishi");
             storeupWrapper1.in("refid", waiguoIds);
             storeupWrapper1.eq("type", "1");
             List<StoreupEntity> storeupList = storeupService.selectList(storeupWrapper1);
@@ -156,7 +153,6 @@ public class RemencaipinController {
                 waiguoStoreupMap.put(storeup.getRefid(), waiguoStoreupMap.getOrDefault(storeup.getRefid(), 0) + 1);
             }
             EntityWrapper<StoreupEntity> storeupWrapper21 = new EntityWrapper<>();
-            storeupWrapper21.eq("tablename", "waiguomeishi");
             storeupWrapper21.in("refid", waiguoIds);
             storeupWrapper21.eq("type", "21");
             List<StoreupEntity> thumbsList = storeupService.selectList(storeupWrapper21);
@@ -212,9 +208,12 @@ public class RemencaipinController {
                     EntityWrapper<StoreupEntity> userEw = new EntityWrapper<>();
                     userEw.eq("userid", te.getUserid());
                     userEw.in(true, "type", Arrays.asList("1", "21"));
-                    userEw.in(true, "tablename", Arrays.asList("zhongshimeishi", "waiguomeishi"));
                     for (StoreupEntity s : storeupService.selectList(userEw)) {
-                        String key = s.getTablename() + "_" + s.getRefid();
+                        String resolvedType = resolveRecipeType(s.getRefid(), dishMap);
+                        if (resolvedType == null) {
+                            continue;
+                        }
+                        String key = resolvedType + "_" + s.getRefid();
                         userActionKeys.add(key);
                         DishInfo di = dishMap.get(key);
                         if (di != null && di.cuisine != null && !di.cuisine.trim().isEmpty()) {
@@ -262,5 +261,18 @@ public class RemencaipinController {
 
         PageUtils page = new PageUtils(resultList, allDishes.size(), limitNum, pageNum);
         return R.ok().put("data", page);
+    }
+
+    private String resolveRecipeType(Long refId, Map<String, ?> dishMap) {
+        if (refId == null) {
+            return null;
+        }
+        if (dishMap.containsKey("zhongshimeishi_" + refId)) {
+            return "zhongshimeishi";
+        }
+        if (dishMap.containsKey("waiguomeishi_" + refId)) {
+            return "waiguomeishi";
+        }
+        return null;
     }
 }

@@ -1,0 +1,137 @@
+<!-- 我的粉丝 -->
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<title>我的粉丝</title>
+		<link rel="stylesheet" href="../../layui/css/layui.css">
+		<link rel="stylesheet" href="../../css/style.css" />
+		<link rel="stylesheet" href="../../css/theme.css" />
+		<link rel="stylesheet" href="../../css/common.css" />
+	</head>
+	<style>
+		#swiper { overflow: hidden; }
+		#swiper .layui-carousel-ind li { width: 16px; height: 10px; border-width: 0; border-style: solid; border-color: rgba(255, 69, 0, 1); border-radius: 5px; background-color: rgba(0, 0, 0, 0.99); box-shadow: 0 0 6px rgba(255,0,0,.8); }
+		#swiper .layui-carousel-ind li.layui-this { width: 24px; height: 10px; border-width: 0; border-style: solid; border-color: rgba(0,0,0,.3); border-radius: 5px; background-color: red; box-shadow: 0 0 6px rgba(255,0,0,.8); }
+		.index-title { text-align: center; box-sizing: border-box; width: 980px; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+		.user-list-container { max-width: 900px; margin: 0 auto 20px; padding: 0 15px; }
+		.user-card { padding: 20px; box-shadow: 0 0 6px rgba(255,0,0,.2); border-radius: 8px; background: #fff; margin-bottom: 15px; display: flex; align-items: center; cursor: pointer; transition: all 0.3s; }
+		.user-card:hover { box-shadow: 0 0 10px rgba(255,0,0,.4); }
+		.user-avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-right: 15px; border: 2px solid #eee; }
+		.user-info { flex: 1; min-width: 0; }
+		.user-name { font-size: 16px; color: #333; margin-bottom: 5px; font-weight: 500; }
+		.user-detail { font-size: 14px; color: #666; }
+		.user-btn-follow { padding: 6px 16px; font-size: 14px; color: red; border: 1px solid red; border-radius: 6px; background: #fff; cursor: pointer; transition: all 0.3s; }
+		.user-btn-follow:hover { background: red; color: #fff; }
+		.user-btn-follow.followed { color: #999; border-color: #ccc; }
+		.user-btn-follow.followed:hover { background: #fff; color: #999; }
+		.empty-tip { text-align: center; padding: 40px; color: #999; font-size: 14px; }
+	</style>
+	<body>
+		<div id="app">
+			<div class="layui-carousel" id="swiper" :style='{"boxShadow":"0 0 8px rgba(255, 69, 0, 1)","margin":"0px 0 0 0","borderColor":"rgba(0, 0, 0, 0.75)","borderRadius":"20px","borderWidth":"5px 0 0 0","width":"100%","borderStyle":"solid"}'>
+			  <div carousel-item id="swiper-item">
+				<div v-for="(item,index) in swiperList" :key="index">
+					<img style="width: 100%;height: 100%;object-fit:cover;" :src="item.img" />
+				</div>
+			  </div>
+			</div>
+			<div class="index-title" :style='{"padding":"10px","boxShadow":"0 0 5px rgba(255,0,0,.8)","margin":"10px auto","borderColor":"rgba(255, 255, 255, 1)","backgroundColor":"rgba(255, 255, 255, 1)","color":"rgba(255, 0, 0, 1)","borderRadius":"50% 50px","borderWidth":"2px","fontSize":"20px","borderStyle":"solid","height":"auto"}'>
+			  <span>MY FANS</span><span>我的粉丝</span>
+			</div>
+			<div class="user-list-container">
+				<div v-if="dataList.length > 0">
+					<div class="user-card" v-for="(item,index) in dataList" :key="index" @click="jump('../user/profile.html?id=' + (item.followerId || item.follower_id))">
+						<img class="user-avatar" :src="(item.avatarUrl || item.touxiang) ? (baseurl + (item.avatarUrl || item.touxiang)) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'" alt="头像" />
+						<div class="user-info">
+							<div class="user-name">{{ item.displayName || item.yonghuxingming || '用户' }}</div>
+							<div class="user-detail">
+								<span v-if="item.gender || item.xingbie">性别：{{ item.gender || item.xingbie }}</span>
+								<span v-if="item.phone" style="margin-left: 15px;">联系方式：{{ item.phone }}</span>
+							</div>
+						</div>
+						<button class="user-btn-follow" :class="{ followed: item.isFollowed }" @click.stop="toggleFollow((item.followerId || item.follower_id), index)">
+							{{ item.isFollowed ? '已关注' : '+ 关注' }}
+						</button>
+					</div>
+				</div>
+				<div v-else class="empty-tip">暂无粉丝</div>
+			</div>
+		</div>
+		<script src="../../layui/layui.js"></script>
+		<script src="../../js/vue.js"></script>
+		<script src="../../js/config.js"></script>
+		<script src="../../modules/config.js"></script>
+		<script src="../../js/utils.js"></script>
+		<script>
+			var vue = new Vue({
+				el: '#app',
+				data: { swiperList: [{ img: '../../img/banner.jpg' }], dataList: [], baseurl: '' },
+				methods: {
+					jump(url) { jump(url) },
+					toggleFollow(followerId, index) {
+						var _this = this;
+						var item = _this.dataList[index];
+						var isFollowed = item.isFollowed;
+						var api = isFollowed ? 'user-follows/unfollow' : 'user-follows/follow';
+						layui.http.request(api, 'get', { followedId: followerId }, function(res) {
+							if (res.code === 0) {
+								item.isFollowed = !isFollowed;
+								layui.layer.msg(res.msg || (isFollowed ? '已取消关注' : '关注成功'), { icon: 6 });
+							} else {
+								layui.layer.msg(res.msg || '操作失败', { icon: 5 });
+							}
+						});
+					},
+					checkFollowStatus() {
+						var _this = this;
+						var userIds = _this.dataList.map(function(item) { return item.followerId; });
+						if (userIds.length === 0) return;
+						_this.dataList.forEach(function(item, index) {
+							layui.http.request('user-follows/relation-status', 'get', { followedId: (item.followerId || item.follower_id) }, function(res) {
+								if (res.code === 0 && res.data && res.data.followed) _this.$set(_this.dataList[index], 'isFollowed', true);
+								else _this.$set(_this.dataList[index], 'isFollowed', false);
+							});
+						});
+					}
+				}
+			})
+			layui.use(['layer', 'element', 'carousel', 'http', 'jquery'], function() {
+				var layer = layui.layer;
+				var carousel = layui.carousel;
+				var http = layui.http;
+				var jquery = layui.jquery;
+				vue.baseurl = http.baseurl;
+				if (!localStorage.getItem('userid')) {
+					layer.msg('请先登录', { icon: 5 }, function() { window.parent.location.href = '../login/login.html'; });
+					return;
+				}
+				http.request('config/list', 'get', { page: 1, limit: 5 }, function(res) {
+					if (res.data.list.length > 0) {
+						var swiperItemHtml = '';
+						for (let item of res.data.list) {
+							if (item.name.indexOf('picture') >= 0 && item.value) {
+								swiperItemHtml += '<div><img class="swiper-item" style="width: 100%;height: 100%;object-fit:cover;" src="' + http.baseurl+item.value + '"></div>';
+							}
+						}
+						if (swiperItemHtml) {
+							jquery('#swiper-item').html(swiperItemHtml);
+							vue.$nextTick(() => {
+							  carousel.render({ elem: '#swiper', width: '100%', height: '300px', arrow: 'hover', anim: 'default', autoplay: 'true', interval: '3000', indicator: 'inside' });
+							})
+						}
+					}
+				});
+				http.request('user-follows/my-followers', 'get', {}, function(res) {
+					if (res.code === 0 && res.data) {
+						vue.dataList = res.data;
+						vue.$nextTick(function() { vue.checkFollowStatus(); });
+					} else {
+						layer.msg(res.msg || '获取数据失败', { icon: 5 });
+					}
+				});
+			});
+		</script>
+	</body>
+</html>

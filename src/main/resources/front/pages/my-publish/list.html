@@ -91,7 +91,7 @@
 						} else if (item.type === '中式美食') {
 							jump('../zhongshimeishi/detail.html?id=' + item.id);
 						} else if (item.type === '美食论坛') {
-							jump('../news/detail.html?id=' + item.id);
+							jump('../forum-post/detail.html?id=' + item.id);
 						}
 					},
 					deleteItem(item, index) {
@@ -109,7 +109,7 @@
 							} else if (item.type === '中式美食') {
 								deleteUrl = 'zhongshimeishi/delete';
 							} else if (item.type === '美食论坛') {
-								deleteUrl = 'news/delete';
+								deleteUrl = 'forum-post/delete';
 							}
 							
 							http.requestJson(deleteUrl, 'post', [item.id], function(res) {
@@ -186,26 +186,28 @@
 						}
 
 						// 加载美食论坛（新闻）
-						http.request('news/page?sort=addtime&order=desc', 'get', {
+						http.request('forum-post/page?sort=created_at&order=desc', 'get', {
 							page: 1,
 							limit: 1000
 						}, function(res3) {
-							var newsList = [];
+							var forumPostList = [];
 							if (res3.data && res3.data.list) {
-								newsList = res3.data.list.map(function(item) {
+								forumPostList = res3.data.list.map(function(item) {
+									// 论坛帖时间为 created_at，接口 JSON 字段为 createdAt
+									var t = item.createdAt || item.created_at || item.addtime;
 									return {
 										id: item.id,
 										caipinmingcheng: item.title,
 										caixi: '-',
-									addtime: item.addtime,
+										addtime: t,
 										type: '美食论坛',
-										tableName: 'news'
+										tableName: 'forum_post'
 									};
 								});
 							}
 
 							// 合并所有数据并按时间排序
-							var allData = waiguoList.concat(zhongshiList).concat(newsList);
+							var allData = waiguoList.concat(zhongshiList).concat(forumPostList);
 							allData.sort(function(a, b) {
 								var timeA = new Date(a.addtime || 0).getTime();
 								var timeB = new Date(b.addtime || 0).getTime();

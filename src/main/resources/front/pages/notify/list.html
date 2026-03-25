@@ -103,7 +103,7 @@
 							<img class="notify-avatar" :src="item.touxiang ? (baseurl + item.touxiang) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'" />
 							<div class="notify-body">
 								<div class="notify-title">{{ item.username || '用户' }} 回复了您的留言</div>
-								<div class="notify-desc" v-if="item.messageContent">您的留言：{{ item.messageContent | newsDesc }}</div>
+								<div class="notify-desc" v-if="item.messageContent">您的留言：{{ item.messageContent | forumPostDesc }}</div>
 								<div class="notify-desc" v-if="item.content">回复内容：{{ item.content | replyText }}</div>
 								<img v-if="item.picture" class="notify-pic" :src="baseurl + item.picture" />
 								<div class="notify-time">{{ item.addtime }}</div>
@@ -181,7 +181,7 @@
 					followMeList: []
 				},
 				filters: {
-					newsDesc: function(val) {
+					forumPostDesc: function(val) {
 						if (!val) return '';
 						var s = String(val).replace(/<[^>]*>/g, '');
 						return s.length > 80 ? s.substring(0, 80) + '...' : s;
