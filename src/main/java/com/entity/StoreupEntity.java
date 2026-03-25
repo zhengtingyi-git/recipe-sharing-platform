@@ -82,7 +82,7 @@ public class StoreupEntity<T> implements Serializable {
 	private String picture;
 	
 	/**
-	 * 类型(1:收藏,21:赞,22:踩)
+	 * 类型(1:收藏,21:赞)
 	 */
 					
 	private String type;
@@ -166,13 +166,13 @@ public class StoreupEntity<T> implements Serializable {
 		return picture;
 	}
 	/**
-	 * 设置：类型(1:收藏,21:赞,22:踩)
+	 * 设置：类型(1:收藏,21:赞)
 	 */
 	public void setType(String type) {
 		this.type = type;
 	}
 	/**
-	 * 获取：类型(1:收藏,21:赞,22:踩)
+	 * 获取：类型(1:收藏,21:赞)
 	 */
 	public String getType() {
 		return type;

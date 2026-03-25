@@ -169,6 +169,9 @@ public class StoreupController {
     	storeup.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
     	//ValidatorUtils.validateEntity(storeup);
     	storeup.setUserid((Long)request.getSession().getAttribute("userId"));
+    	if (storeup.getType() != null && !("1".equals(storeup.getType()) || "21".equals(storeup.getType()))) {
+    		return R.error("storeup.type 只允许 1(收藏) 或 21(赞)");
+    	}
         storeupService.insert(storeup);
         return R.ok();
     }
@@ -181,6 +184,9 @@ public class StoreupController {
     	storeup.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
     	//ValidatorUtils.validateEntity(storeup);
     	storeup.setUserid((Long)request.getSession().getAttribute("userId"));
+    	if (storeup.getType() != null && !("1".equals(storeup.getType()) || "21".equals(storeup.getType()))) {
+    		return R.error("storeup.type 只允许 1(收藏) 或 21(赞)");
+    	}
         storeupService.insert(storeup);
         return R.ok();
     }
@@ -191,6 +197,9 @@ public class StoreupController {
     @RequestMapping("/update")
     public R update(@RequestBody StoreupEntity storeup, HttpServletRequest request){
         //ValidatorUtils.validateEntity(storeup);
+    	if (storeup.getType() != null && !("1".equals(storeup.getType()) || "21".equals(storeup.getType()))) {
+    		return R.error("storeup.type 只允许 1(收藏) 或 21(赞)");
+    	}
         storeupService.updateById(storeup);//全部更新
         return R.ok();
     }

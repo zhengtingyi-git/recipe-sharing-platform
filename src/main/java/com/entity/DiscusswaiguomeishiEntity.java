@@ -85,11 +85,25 @@ public class DiscusswaiguomeishiEntity<T> implements Serializable {
 	@DateTimeFormat
 	private Date addtime;
 
+	/**
+	 * 兼容字段：评论发布者昵称（不存库，运行时/接口组装使用）
+	 */
+	@TableField(exist = false)
+	private String nickname;
+
 	public Date getAddtime() {
 		return addtime;
 	}
 	public void setAddtime(Date addtime) {
 		this.addtime = addtime;
+	}
+
+	public String getNickname() {
+		return nickname;
+	}
+
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
 	}
 
 	public Long getId() {
@@ -123,6 +137,7 @@ public class DiscusswaiguomeishiEntity<T> implements Serializable {
 	public Long getUserid() {
 		return userid;
 	}
+	/**
 	 * 设置：评论内容
 	 */
 	public void setContent(String content) {
