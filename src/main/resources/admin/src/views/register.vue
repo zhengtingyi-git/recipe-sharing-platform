@@ -19,16 +19,16 @@
 			</el-form-item>
 			<!-- 用户(user)注册表单 -->
 			<el-form-item label="用户账号" class="input" v-if="tableName==='user'">
-			  <el-input v-model="ruleForm.yonghuzhanghao" autocomplete="off" placeholder="用户账号"  />
+			  <el-input v-model="ruleForm.username" autocomplete="off" placeholder="用户账号"  />
 			</el-form-item>
 			<el-form-item label="用户昵称" class="input" v-if="tableName==='user'">
-			  <el-input v-model="ruleForm.yonghuxingming" autocomplete="off" placeholder="用户昵称"  />
+			  <el-input v-model="ruleForm.nickname" autocomplete="off" placeholder="用户昵称"  />
 			</el-form-item>
 			<el-form-item label="密码" class="input" v-if="tableName==='user'">
-			  <el-input v-model="ruleForm.mima" autocomplete="off" placeholder="密码" type="password" />
+			  <el-input v-model="ruleForm.password" autocomplete="off" placeholder="密码" type="password" />
 			</el-form-item>
 			<el-form-item label="确认密码" class="input" v-if="tableName==='user'">
-			  <el-input v-model="ruleForm.mima2" autocomplete="off" placeholder="确认密码" type="password"/>
+			  <el-input v-model="ruleForm.password2" autocomplete="off" placeholder="确认密码" type="password"/>
 			</el-form-item>
 			<el-form-item label="联系方式" class="input" v-if="tableName==='user'">
 			  <el-input v-model="ruleForm.phone" autocomplete="off" placeholder="联系方式"  />
@@ -105,19 +105,19 @@ export default {
         }
       }
       // 用户(user)注册校验
-      if((!this.ruleForm.yonghuzhanghao) && this.tableName === 'user'){
+      if((!this.ruleForm.username) && this.tableName === 'user'){
         this.$message.error(`用户账号不能为空`);
         return
       }
-      if((!this.ruleForm.mima) && this.tableName === 'user'){
+      if((!this.ruleForm.password) && this.tableName === 'user'){
         this.$message.error(`密码不能为空`);
         return
       }
-      if((!this.ruleForm.mima2) && this.tableName === 'user'){
+      if((!this.ruleForm.password2) && this.tableName === 'user'){
         this.$message.error(`确认密码不能为空`);
         return
       }
-      if((this.ruleForm.mima !== this.ruleForm.mima2) && this.tableName === 'user'){
+      if((this.ruleForm.password !== this.ruleForm.password2) && this.tableName === 'user'){
 	    this.$message.error(`两次密码输入不一致`);
 	    return
       }

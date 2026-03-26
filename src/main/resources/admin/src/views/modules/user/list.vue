@@ -5,14 +5,14 @@
       <el-form :inline="true" :model="searchForm" class="form-content">
         <el-row  :gutter="20" class="slt" :style="{justifyContent:contents.searchBoxPosition=='1'?'flex-start':contents.searchBoxPosition=='2'?'center':'flex-end'}">
                 <el-form-item :label="contents.inputTitle == 1 ? '用户账号' : ''">
-                  <el-input v-if="contents.inputIcon == 1 && contents.inputIconPosition == 1" prefix-icon="el-icon-search" v-model="searchForm.yonghuzhanghao" placeholder="用户账号" clearable></el-input>
-                  <el-input v-if="contents.inputIcon == 1 && contents.inputIconPosition == 2" suffix-icon="el-icon-search" v-model="searchForm.yonghuzhanghao" placeholder="用户账号" clearable></el-input>
-                  <el-input v-if="contents.inputIcon == 0" v-model="searchForm.yonghuzhanghao" placeholder="用户账号" clearable></el-input>
+                  <el-input v-if="contents.inputIcon == 1 && contents.inputIconPosition == 1" prefix-icon="el-icon-search" v-model="searchForm.username" placeholder="用户账号" clearable></el-input>
+                  <el-input v-if="contents.inputIcon == 1 && contents.inputIconPosition == 2" suffix-icon="el-icon-search" v-model="searchForm.username" placeholder="用户账号" clearable></el-input>
+                  <el-input v-if="contents.inputIcon == 0" v-model="searchForm.username" placeholder="用户账号" clearable></el-input>
                 </el-form-item>
                 <el-form-item :label="contents.inputTitle == 1 ? '用户昵称' : ''">
-                  <el-input v-if="contents.inputIcon == 1 && contents.inputIconPosition == 1" prefix-icon="el-icon-search" v-model="searchForm.yonghuxingming" placeholder="用户昵称" clearable></el-input>
-                  <el-input v-if="contents.inputIcon == 1 && contents.inputIconPosition == 2" suffix-icon="el-icon-search" v-model="searchForm.yonghuxingming" placeholder="用户昵称" clearable></el-input>
-                  <el-input v-if="contents.inputIcon == 0" v-model="searchForm.yonghuxingming" placeholder="用户昵称" clearable></el-input>
+                  <el-input v-if="contents.inputIcon == 1 && contents.inputIconPosition == 1" prefix-icon="el-icon-search" v-model="searchForm.nickname" placeholder="用户昵称" clearable></el-input>
+                  <el-input v-if="contents.inputIcon == 1 && contents.inputIconPosition == 2" suffix-icon="el-icon-search" v-model="searchForm.nickname" placeholder="用户昵称" clearable></el-input>
+                  <el-input v-if="contents.inputIcon == 0" v-model="searchForm.nickname" placeholder="用户昵称" clearable></el-input>
                 </el-form-item>
           <el-form-item>
             <el-button v-if="contents.searchBtnIcon == 1 && contents.searchBtnIconPosition == 1" icon="el-icon-search" type="success" @click="search()">{{ contents.searchBtnFont == 1?'查询':'' }}</el-button>
@@ -85,27 +85,27 @@
             </el-table-column>
             <el-table-column label="索引" :align="contents.tableAlign"  v-if="contents.tableIndex" type="index" width="50" />
                 <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign" 
-                    prop="yonghuzhanghao"
+                    prop="username"
                    :header-align="contents.tableAlign"
 		    label="用户账号">
 		     <template slot-scope="scope">
-                       {{scope.row.yonghuzhanghao}}
+                       {{scope.row.username}}
                      </template>
                 </el-table-column>
                 <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign" 
-                    prop="yonghuxingming"
+                    prop="nickname"
                    :header-align="contents.tableAlign"
 		    label="用户昵称">
 		     <template slot-scope="scope">
-                       {{scope.row.yonghuxingming}}
+                       {{scope.row.nickname}}
                      </template>
                 </el-table-column>
                 <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign" 
-                    prop="xingbie"
+                    prop="gender"
                    :header-align="contents.tableAlign"
 		    label="性别">
 		     <template slot-scope="scope">
-                       {{scope.row.xingbie}}
+                       {{scope.row.gender}}
                      </template>
                 </el-table-column>
                 <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign" 
@@ -116,13 +116,13 @@
                        {{scope.row.phone}}
                      </template>
                 </el-table-column>
-                  <el-table-column :sortable="contents.tableSortable" :align="contents.tableAlign"  prop="touxiang"
+                  <el-table-column :sortable="contents.tableSortable" :align="contents.tableAlign"  prop="avatar"
                    :header-align="contents.tableAlign"
                     width="200"
                     label="头像">
                     <template slot-scope="scope">
-                      <div v-if="scope.row.touxiang">
-                        <img :src="$base.url+scope.row.touxiang.split(',')[0]" width="100" height="100">
+                      <div v-if="scope.row.avatar">
+                        <img :src="$base.url+scope.row.avatar.split(',')[0]" width="100" height="100">
                       </div>
                       <div v-else>无图片</div>
                     </template>
@@ -408,11 +408,11 @@ export default {
         limit: this.pageSize,
         sort: 'id',
       }
-          if(this.searchForm.yonghuzhanghao!='' && this.searchForm.yonghuzhanghao!=undefined){
-            params['yonghuzhanghao'] = '%' + this.searchForm.yonghuzhanghao + '%'
+          if(this.searchForm.username!='' && this.searchForm.username!=undefined){
+            params['username'] = '%' + this.searchForm.username + '%'
           }
-          if(this.searchForm.yonghuxingming!='' && this.searchForm.yonghuxingming!=undefined){
-            params['yonghuxingming'] = '%' + this.searchForm.yonghuxingming + '%'
+          if(this.searchForm.nickname!='' && this.searchForm.nickname!=undefined){
+            params['nickname'] = '%' + this.searchForm.nickname + '%'
           }
       this.$http({
         url: "user/page",

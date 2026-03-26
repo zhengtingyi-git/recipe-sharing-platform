@@ -9,18 +9,18 @@
     >  
      <el-row>
       <el-col :span="12">
-        <el-form-item   v-if="flag=='user'"  label="用户账号" prop="yonghuzhanghao">
-          <el-input v-model="ruleForm.yonghuzhanghao" readonly              placeholder="用户账号" clearable></el-input>
+        <el-form-item   v-if="flag=='user'"  label="用户账号" prop="username">
+          <el-input v-model="ruleForm.username" readonly              placeholder="用户账号" clearable></el-input>
         </el-form-item>
       </el-col>
       <el-col :span="12">
-        <el-form-item   v-if="flag=='user'"  label="用户昵称" prop="yonghuxingming">
-          <el-input v-model="ruleForm.yonghuxingming"               placeholder="用户昵称" clearable></el-input>
+        <el-form-item   v-if="flag=='user'"  label="用户昵称" prop="nickname">
+          <el-input v-model="ruleForm.nickname"               placeholder="用户昵称" clearable></el-input>
         </el-form-item>
       </el-col>
       <el-col :span="12">
-        <el-form-item v-if="flag=='user'"  label="性别" prop="xingbie">
-          <el-select v-model="ruleForm.xingbie"  placeholder="请选择性别">
+        <el-form-item v-if="flag=='user'"  label="性别" prop="gender">
+          <el-select v-model="ruleForm.gender"  placeholder="请选择性别">
             <el-option
                 v-for="(item,index) in yonghuxingbieOptions"
                 v-bind:key="index"
@@ -36,14 +36,14 @@
         </el-form-item>
       </el-col>
       <el-col :span="24">  
-        <el-form-item v-if="flag=='user'" label="头像" prop="touxiang">
+        <el-form-item v-if="flag=='user'" label="头像" prop="avatar">
           <file-upload
           tip="点击上传头像"
           action="file/upload"
           :limit="3"
           :multiple="true"
-          :fileUrls="ruleForm.touxiang?ruleForm.touxiang:''"
-          @change="yonghutouxiangUploadChange"
+          :fileUrls="ruleForm.avatar?ruleForm.avatar:''"
+          @change="userAvatarUploadChange"
           ></file-upload>
         </el-form-item>
       </el-col>
@@ -89,11 +89,11 @@ export default {
     this.yonghuxingbieOptions = "男,女".split(',')
   },
   methods: {
-    yonghutouxiangUploadChange(fileUrls) {
-        this.ruleForm.touxiang = fileUrls;
+    userAvatarUploadChange(fileUrls) {
+        this.ruleForm.avatar = fileUrls;
     },
     onUpdateHandler() {
-      if((!this.ruleForm.yonghuzhanghao)&& 'user'==this.flag){
+      if((!this.ruleForm.username)&& 'user'==this.flag){
         this.$message.error('用户账号不能为空');
         return
       }
@@ -101,8 +101,8 @@ export default {
         this.$message.error(`联系方式应输入手机格式`);
         return
       }
-        if(this.ruleForm.touxiang!=null) {
-                this.ruleForm.touxiang = this.ruleForm.touxiang.replace(new RegExp(this.$base.url,"g"),"");
+        if(this.ruleForm.avatar!=null) {
+                this.ruleForm.avatar = this.ruleForm.avatar.replace(new RegExp(this.$base.url,"g"),"");
         }
       if('admin'==this.flag && this.ruleForm.username.trim().length<1) {
 	this.$message.error(`用户名不能为空`);
