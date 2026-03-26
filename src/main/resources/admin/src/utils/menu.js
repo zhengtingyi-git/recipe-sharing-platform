@@ -1,4 +1,4 @@
-const menu = {
+﻿const menu = {
     list() {
         return [
             {
@@ -22,7 +22,7 @@ const menu = {
                                 buttons: ["新增", "查看", "修改", "删除", "审核", "查看评论"],
                                 menu: "外国美食",
                                 menuJump: "列表",
-                                tableName: "waiguomeishi"
+                                tableName: "foreign_recipe"
                             }
                         ],
                         menu: "外国美食管理"
@@ -34,7 +34,7 @@ const menu = {
                                 buttons: ["新增", "查看", "修改", "删除", "审核", "查看评论"],
                                 menu: "中式美食",
                                 menuJump: "列表",
-                                tableName: "zhongshimeishi"
+                                tableName: "chinese_recipe"
                             }
                         ],
                         menu: "中式美食管理"
@@ -71,7 +71,7 @@ const menu = {
                                 buttons: ["查看", "查看评论"],
                                 menu: "外国美食列表",
                                 menuJump: "列表",
-                                tableName: "waiguomeishi"
+                                tableName: "foreign_recipe"
                             }
                         ],
                         menu: "外国美食模块"
@@ -83,7 +83,7 @@ const menu = {
                                 buttons: ["查看", "查看评论"],
                                 menu: "中式美食列表",
                                 menuJump: "列表",
-                                tableName: "zhongshimeishi"
+                                tableName: "chinese_recipe"
                             }
                         ],
                         menu: "中式美食模块"
@@ -113,3 +113,4 @@ const menu = {
 };
 
 export default menu;
+

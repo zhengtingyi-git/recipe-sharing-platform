@@ -1,4 +1,4 @@
-import Vue from 'vue';
+﻿import Vue from 'vue';
 //配置路由
 import VueRouter from 'vue-router'
 Vue.use(VueRouter);
@@ -12,11 +12,11 @@ import pay from '@/views/pay'
 import register from '@/views/register'
 import center from '@/views/center'
     import forumPost from '@/views/modules/forum-post/list'
-    import zhongshimeishi from '@/views/modules/zhongshimeishi/list'
-    import waiguomeishi from '@/views/modules/waiguomeishi/list'
+    import chinese_recipe from '@/views/modules/chinese_recipe/list'
+    import foreign_recipe from '@/views/modules/foreign_recipe/list'
     import yonghu from '@/views/modules/user/list'
-    import discusszhongshimeishi from '@/views/modules/discusszhongshimeishi/list'
-    import discusswaiguomeishi from '@/views/modules/discusswaiguomeishi/list'
+    import chinese_recipe_comment from '@/views/modules/chinese_recipe_comment/list'
+    import foreign_recipe_comment from '@/views/modules/foreign_recipe_comment/list'
     import config from '@/views/modules/config/list'
 
 
@@ -58,14 +58,14 @@ const routes = [{
         component: forumPost
       }
       ,{
-	path: '/zhongshimeishi',
+	path: '/chinese_recipe',
         name: '中式美食',
-        component: zhongshimeishi
+        component: chinese_recipe
       }
       ,{
-	path: '/waiguomeishi',
+	path: '/foreign_recipe',
         name: '外国美食',
-        component: waiguomeishi
+        component: foreign_recipe
       }
       ,{
 	path: '/user',
@@ -73,14 +73,14 @@ const routes = [{
         component: yonghu
       }
       ,{
-	path: '/discusszhongshimeishi',
+	path: '/chinese_recipe_comment',
         name: '中式美食评论',
-        component: discusszhongshimeishi
+        component: chinese_recipe_comment
       }
       ,{
-	path: '/discusswaiguomeishi',
+	path: '/foreign_recipe_comment',
         name: '外国美食评论',
-        component: discusswaiguomeishi
+        component: foreign_recipe_comment
       }
       ,{
 	path: '/config',
@@ -159,3 +159,4 @@ router.beforeEach((to, from, next) => {
 });
 
 export default router;
+
