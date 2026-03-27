@@ -292,8 +292,8 @@
                         // 用户昵称、头像（部分前台模块需要显示）
                         if (res.data.nickname != null) localStorage.setItem('nickname', res.data.nickname);
                         if (res.data.avatar != null) localStorage.setItem('avatar', res.data.avatar);
-                        // 路径访问设置
-                        window.location.href = '../../index.html';
+                        // 路径访问设置：如果当前在 iframe 内登录，跳转顶层，避免 index 嵌套导致双重导航
+                        (window.top || window).location.href = '../../index.html';
                     })
                     
                 });

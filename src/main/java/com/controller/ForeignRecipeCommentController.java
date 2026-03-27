@@ -93,11 +93,7 @@ public class ForeignRecipeCommentController {
             m.put("content", e.getContent());
             m.put("reply", e.getReply());
             m.put("createdAt", e.getCreatedAt());
-            // 兼容旧前端字段
-            m.put("refid", e.getRecipeId());
-            m.put("userid", e.getUserId());
-            m.put("addtime", e.getCreatedAt());
-            m.put("touxiang", "");
+            m.put("avatar", "");
             if (e.getUserId() != null) {
                 UserEntity y = userService.selectById(e.getUserId());
                 if (y != null) {
@@ -105,7 +101,7 @@ public class ForeignRecipeCommentController {
                         m.put("nickname", y.getYonghuxingming());
                     }
                     if (y.getTouxiang() != null) {
-                        m.put("touxiang", y.getTouxiang());
+                        m.put("avatar", y.getTouxiang());
                     }
                 }
             }

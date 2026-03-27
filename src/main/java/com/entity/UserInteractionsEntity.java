@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import org.apache.commons.beanutils.BeanUtils;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.enums.FieldFill;
@@ -54,12 +55,14 @@ public class UserInteractionsEntity<T> implements Serializable {
 	/**
 	 * 用户id
 	 */
+	@JsonAlias("userId")
 	@TableField("user_id")
 	private Long userid;
 	
 	/**
 	 * 被交互资源id（forum_post / recipe 等多态资源）
 	 */
+	@JsonAlias("resourceId")
 	@TableField("resource_id")
 	private Long refid;
 	
@@ -89,6 +92,7 @@ public class UserInteractionsEntity<T> implements Serializable {
 	
 	@JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
 	@DateTimeFormat
+	@JsonAlias("createdAt")
 	@TableField("created_at")
 	private Date addtime;
 
@@ -97,6 +101,12 @@ public class UserInteractionsEntity<T> implements Serializable {
 	}
 	public void setAddtime(Date addtime) {
 		this.addtime = addtime;
+	}
+	public Date getCreatedAt() {
+		return addtime;
+	}
+	public void setCreatedAt(Date createdAt) {
+		this.addtime = createdAt;
 	}
 
 	public Long getId() {
@@ -118,6 +128,12 @@ public class UserInteractionsEntity<T> implements Serializable {
 	public Long getUserid() {
 		return userid;
 	}
+	public void setUserId(Long userId) {
+		this.userid = userId;
+	}
+	public Long getUserId() {
+		return userid;
+	}
 	/**
 	 * 设置：收藏id
 	 */
@@ -128,6 +144,12 @@ public class UserInteractionsEntity<T> implements Serializable {
 	 * 获取：收藏id
 	 */
 	public Long getRefid() {
+		return refid;
+	}
+	public void setResourceId(Long resourceId) {
+		this.refid = resourceId;
+	}
+	public Long getResourceId() {
 		return refid;
 	}
 	/**

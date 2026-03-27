@@ -216,7 +216,7 @@
 								<img :style='{"boxShadow":"0 0 6px rgba(255,0,0,.3)","margin":"0 10px 0 0","borderColor":"rgba(0,0,0,.3)","borderRadius":"100%","borderWidth":"0","width":"40px","borderStyle":"solid","height":"40px"}' class="avator" :src="item.touxiang ? (baseurl + item.touxiang) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'">
 								<div>
 									<span style="display: inline-block;" :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,.3)","margin":"0","borderColor":"rgba(0,0,0,.3)","backgroundColor":"#fff","color":"#333","borderRadius":"4px","borderWidth":"0","width":"auto","lineHeight":"28px","fontSize":"14px","borderStyle":"solid"}' class="username">{{ item.nickname || '用户' }}</span>
-									<div style="font-size:12px;color:#999;margin-top:4px;margin-left:10px;">{{ item.createdAt || item.addtime || '' }}</div>
+									<div style="font-size:12px;color:#999;margin-top:4px;margin-left:10px;">{{ item.createdAt || '' }}</div>
 								</div>
 							</div>
 							<div style="display:flex;gap:8px;align-items:center;">
@@ -288,7 +288,6 @@
 				},
 				timeText: function() {
 					if (this.detail.createdAt) return this.detail.createdAt;
-					if (this.detail.addtime) return this.detail.addtime;
 					return '';
 				}
 			},
@@ -299,11 +298,8 @@
 				},
 				replyRowUserId: function(o) {
 					if (!o || typeof o !== 'object') return '';
-					var v = o.userid != null && o.userid !== '' ? o.userid
-						: (o.userId != null && o.userId !== '' ? o.userId
-						: (o.user_id != null && o.user_id !== '' ? o.user_id
-						: (o.uid != null && o.uid !== '' ? o.uid : '')));
-					return v !== '' && v != null ? String(v) : '';
+					if (o.userId != null && o.userId !== '') return String(o.userId);
+					return '';
 				},
 				isOwnReply: function(row) {
 					var uid = (localStorage.getItem('userid') || this.currentUserId || '').trim();
@@ -317,7 +313,7 @@
 				isOwnComment: function(item) {
 					var uid = (localStorage.getItem('userid') || this.currentUserId || '').trim();
 					if (!uid || !item) return false;
-					var cid = item.userid != null && item.userid !== '' ? item.userid : item.userId;
+					var cid = item.userId != null && item.userId !== '' ? item.userId : '';
 					if (cid != null && cid !== '' && String(cid) === String(uid)) return true;
 					var mine = this.currentUserDisplayName();
 					var name = (item.nickname || '').trim();
@@ -353,9 +349,9 @@
 						page: 1,
 						limit: 1,
 						type: '21',
-						refid: this.detail.id,
+						resourceId: this.detail.id,
 						tablename: this.detailTable,
-						userid: localStorage.getItem('userid'),
+						userId: localStorage.getItem('userid'),
 					}, function(res) {
 						if (res.data.list.length === 1) {
 							layui.http.requestJson('user-interactions/delete', 'post', [res.data.list[0].id], function() {
@@ -364,11 +360,11 @@
 							return;
 						}
 						layui.http.requestJson('user-interactions/save', 'post', {
-							userid: localStorage.getItem('userid'),
+							userId: localStorage.getItem('userid'),
 							type: '21',
 							name: _this.title,
 							picture: _this.coverPicture(),
-							refid: _this.detail.id,
+							resourceId: _this.detail.id,
 							tablename: _this.detailTable
 						}, function() {
 							layer.msg('点赞成功', { time: 1000, icon: 6 }, function() { location.reload(); });
@@ -385,9 +381,9 @@
 						page: 1,
 						limit: 1,
 						type: 1,
-						refid: this.detail.id,
+						resourceId: this.detail.id,
 						tablename: this.detailTable,
-						userid: localStorage.getItem('userid'),
+						userId: localStorage.getItem('userid'),
 					}, function(res) {
 						if (res.data.list.length === 1) {
 							layui.http.requestJson('user-interactions/delete', 'post', [res.data.list[0].id], function() {
@@ -396,11 +392,11 @@
 							return;
 						}
 						layui.http.requestJson('user-interactions/save', 'post', {
-							userid: localStorage.getItem('userid'),
+							userId: localStorage.getItem('userid'),
 							name: _this.title,
 							type: 1,
 							picture: _this.coverPicture(),
-							refid: _this.detail.id,
+							resourceId: _this.detail.id,
 							tablename: _this.detailTable
 						}, function() {
 							layer.msg('收藏成功', { time: 1000, icon: 6 }, function() { location.reload(); });
@@ -517,25 +513,20 @@
 				},
 				normalizeReplyItem: function(item) {
 					if (!item) return;
-					var ownerId = item.userid != null && item.userid !== '' ? item.userid : item.userId;
-					if (ownerId != null && ownerId !== '') item.userid = ownerId;
 					var raw = item.reply != null && item.reply !== '' ? item.reply : item.replyContent;
 					item.replyList = [];
 					if (!raw) {
-						item.replyObj = { nickname: '', avatar: '', content: '', userid: '' };
+						item.replyObj = { nickname: '', avatar: '', content: '', userId: '' };
 						return;
 					}
 					var pick = function(o) {
-						if (!o || typeof o !== 'object') return { nickname: '', avatar: '', content: '', userid: '' };
-						var uid = o.userid != null && o.userid !== '' ? o.userid
-							: (o.userId != null && o.userId !== '' ? o.userId
-							: (o.user_id != null && o.user_id !== '' ? o.user_id
-							: (o.uid != null && o.uid !== '' ? o.uid : '')));
+						if (!o || typeof o !== 'object') return { nickname: '', avatar: '', content: '', userId: '' };
+						var uid = o.userId != null && o.userId !== '' ? o.userId : '';
 						return {
 							nickname: o.nickname || o.yonghuxingming || o.username || '',
 							avatar: o.touxiang || o.avatar || o.headimg || '',
 							content: o.content || o.reply || o.value || '',
-							userid: uid !== '' && uid != null ? String(uid) : ''
+							userId: uid !== '' && uid != null ? String(uid) : ''
 						};
 					};
 					var pushReply = function(o) {
@@ -555,17 +546,17 @@
 							} else if (obj && typeof obj === 'object') {
 								pushReply(obj);
 							} else if (obj) {
-								item.replyList.push({ nickname: '', avatar: '', content: String(obj), userid: '' });
+								item.replyList.push({ nickname: '', avatar: '', content: String(obj), userId: '' });
 							} else {
-								item.replyList.push({ nickname: '', avatar: '', content: raw, userid: '' });
+								item.replyList.push({ nickname: '', avatar: '', content: raw, userId: '' });
 							}
 						} catch (e) {
-							item.replyList.push({ nickname: '', avatar: '', content: raw, userid: '' });
+							item.replyList.push({ nickname: '', avatar: '', content: raw, userId: '' });
 						}
 					} else {
-						item.replyList.push({ nickname: '', avatar: '', content: String(raw), userid: '' });
+						item.replyList.push({ nickname: '', avatar: '', content: String(raw), userId: '' });
 					}
-					item.replyObj = item.replyList.length ? item.replyList[item.replyList.length - 1] : { nickname: '', avatar: '', content: '', userid: '' };
+					item.replyObj = item.replyList.length ? item.replyList[item.replyList.length - 1] : { nickname: '', avatar: '', content: '', userId: '' };
 				},
 				normalizeReplyList: function(list) {
 					if (!list || !list.length) return;
@@ -599,9 +590,10 @@
 						layui.http.request(_this.commentPrefix + '/detail/' + item.id, 'get', {}, function(res) {
 							var entity = res.data || {};
 							var replyPayload = {
-								userid: uid,
-								nickname: localStorage.getItem('yonghuxingming') || localStorage.getItem('adminName') || '',
-								touxiang: localStorage.getItem('touxiang') || '',
+								userId: uid,
+								// 兼容：登录页存的是 nickname/avatar，历史模板可能用 yonghuxingming/touxiang
+								nickname: localStorage.getItem('nickname') || localStorage.getItem('yonghuxingming') || localStorage.getItem('adminName') || '',
+								touxiang: localStorage.getItem('avatar') || localStorage.getItem('touxiang') || '',
 								content: value
 							};
 							var list = [];
@@ -624,7 +616,7 @@
 								if (r.code === 0) {
 									var newList = (item.replyList && item.replyList.slice()) || [];
 									newList.push({
-										userid: replyPayload.userid,
+										userId: replyPayload.userId,
 										nickname: replyPayload.nickname,
 										avatar: replyPayload.touxiang,
 										content: replyPayload.content
@@ -701,7 +693,7 @@
 					page: 1,
 					limit: 1,
 					type: 1,
-					refid: vue.detail.id,
+						resourceId: vue.detail.id,
 					tablename: vue.detailTable
 				}, function(rc) {
 					vue.userInteractionsCount = rc.data && typeof rc.data.total === 'number' ? rc.data.total : 0;
@@ -711,9 +703,9 @@
 						page: 1,
 						limit: 1,
 						type: 1,
-						refid: vue.detail.id,
+						resourceId: vue.detail.id,
 						tablename: vue.detailTable,
-						userid: localStorage.getItem('userid'),
+						userId: localStorage.getItem('userid'),
 					}, function(r1) {
 						vue.userInteractionsFlag = r1.data.list.length;
 					});
@@ -721,9 +713,9 @@
 						page: 1,
 						limit: 1,
 						type: '21',
-						refid: vue.detail.id,
+						resourceId: vue.detail.id,
 						tablename: vue.detailTable,
-						userid: localStorage.getItem('userid'),
+						userId: localStorage.getItem('userid'),
 					}, function(r2) {
 						if (r2.data.list.length > 0) vue.thumbsupFlag = 1;
 					});
@@ -779,10 +771,9 @@
 					layer.msg('请先登录', { time: 2000, icon: 5 });
 					return false;
 				}
-				data.userid = localStorage.getItem('userid');
+				data.userId = localStorage.getItem('userid');
 				data.nickname = localStorage.getItem('yonghuxingming') || localStorage.getItem('adminName') || '';
 				data.postId = id;
-				data.refid = id;
 				http.requestJson('forum-post-comment/save', 'post', data, function(res) {
 					layer.msg('评论成功', { time: 1500, icon: 6 });
 					jquery('.message-form')[0].reset();

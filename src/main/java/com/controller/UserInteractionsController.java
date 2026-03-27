@@ -72,7 +72,7 @@ public class UserInteractionsController {
     public R page(@RequestParam Map<String, Object> params,UserInteractionsEntity userInteractions,
 		HttpServletRequest request){
     	if(!request.getSession().getAttribute("role").toString().equals("管理员")) {
-    		userInteractions.setUserid((Long)request.getSession().getAttribute("userId"));
+    		userInteractions.setUserId((Long)request.getSession().getAttribute("userId"));
     	}
         // 注意：user_interactions 表已经删除了 tablename/name/picture 等列，
         // 这些字段在实体里仍然存在（exist=false），如果直接参与 likeOrEq，会生成不存在的 where 条件。
@@ -89,17 +89,17 @@ public class UserInteractionsController {
         if (userInteractions.getId() != null) {
             ew.eq("id", userInteractions.getId());
         }
-        if (userInteractions.getUserid() != null) {
-            ew.eq("user_id", userInteractions.getUserid());
+        if (userInteractions.getUserId() != null) {
+            ew.eq("user_id", userInteractions.getUserId());
         }
-        if (userInteractions.getRefid() != null) {
-            ew.eq("resource_id", userInteractions.getRefid());
+        if (userInteractions.getResourceId() != null) {
+            ew.eq("resource_id", userInteractions.getResourceId());
         }
         if (userInteractions.getType() != null) {
             ew.eq("interaction_type", userInteractions.getType());
         }
-        if (userInteractions.getAddtime() != null) {
-            ew.eq("created_at", userInteractions.getAddtime());
+        if (userInteractions.getCreatedAt() != null) {
+            ew.eq("created_at", userInteractions.getCreatedAt());
         }
 
         // Between 条件（_start/_end）+ 排序（sort）
@@ -119,7 +119,7 @@ public class UserInteractionsController {
     public R list(@RequestParam Map<String, Object> params,UserInteractionsEntity userInteractions, 
 		HttpServletRequest request){
     	if(!request.getSession().getAttribute("role").toString().equals("管理员")) {
-    		userInteractions.setUserid((Long)request.getSession().getAttribute("userId"));
+    		userInteractions.setUserId((Long)request.getSession().getAttribute("userId"));
     	}
         // 同 page：避免生成不存在的 where(tablename/name/picture)
         userInteractions.setTablename(null);
@@ -134,17 +134,17 @@ public class UserInteractionsController {
         if (userInteractions.getId() != null) {
             ew.eq("id", userInteractions.getId());
         }
-        if (userInteractions.getUserid() != null) {
-            ew.eq("user_id", userInteractions.getUserid());
+        if (userInteractions.getUserId() != null) {
+            ew.eq("user_id", userInteractions.getUserId());
         }
-        if (userInteractions.getRefid() != null) {
-            ew.eq("resource_id", userInteractions.getRefid());
+        if (userInteractions.getResourceId() != null) {
+            ew.eq("resource_id", userInteractions.getResourceId());
         }
         if (userInteractions.getType() != null) {
             ew.eq("interaction_type", userInteractions.getType());
         }
-        if (userInteractions.getAddtime() != null) {
-            ew.eq("created_at", userInteractions.getAddtime());
+        if (userInteractions.getCreatedAt() != null) {
+            ew.eq("created_at", userInteractions.getCreatedAt());
         }
 
         ew = (EntityWrapper<UserInteractionsEntity>) MPUtil.between(ew, params);
@@ -164,17 +164,17 @@ public class UserInteractionsController {
         if (userInteractions.getId() != null) {
             ew.eq("id", userInteractions.getId());
         }
-        if (userInteractions.getUserid() != null) {
-            ew.eq("user_id", userInteractions.getUserid());
+        if (userInteractions.getUserId() != null) {
+            ew.eq("user_id", userInteractions.getUserId());
         }
-        if (userInteractions.getRefid() != null) {
-            ew.eq("resource_id", userInteractions.getRefid());
+        if (userInteractions.getResourceId() != null) {
+            ew.eq("resource_id", userInteractions.getResourceId());
         }
         if (userInteractions.getType() != null) {
             ew.eq("interaction_type", userInteractions.getType());
         }
-        if (userInteractions.getAddtime() != null) {
-            ew.eq("created_at", userInteractions.getAddtime());
+        if (userInteractions.getCreatedAt() != null) {
+            ew.eq("created_at", userInteractions.getCreatedAt());
         }
         return R.ok().put("data", userInteractionsService.selectListView(ew));
     }
@@ -188,17 +188,17 @@ public class UserInteractionsController {
         if (userInteractions.getId() != null) {
             ew.eq("id", userInteractions.getId());
         }
-        if (userInteractions.getUserid() != null) {
-            ew.eq("user_id", userInteractions.getUserid());
+        if (userInteractions.getUserId() != null) {
+            ew.eq("user_id", userInteractions.getUserId());
         }
-        if (userInteractions.getRefid() != null) {
-            ew.eq("resource_id", userInteractions.getRefid());
+        if (userInteractions.getResourceId() != null) {
+            ew.eq("resource_id", userInteractions.getResourceId());
         }
         if (userInteractions.getType() != null) {
             ew.eq("interaction_type", userInteractions.getType());
         }
-        if (userInteractions.getAddtime() != null) {
-            ew.eq("created_at", userInteractions.getAddtime());
+        if (userInteractions.getCreatedAt() != null) {
+            ew.eq("created_at", userInteractions.getCreatedAt());
         }
 		UserInteractionsView userInteractionsView = userInteractionsService.selectView(ew);
 		return R.ok("查询收藏表成功").put("data", userInteractionsView);
@@ -236,7 +236,7 @@ public class UserInteractionsController {
     public R save(@RequestBody UserInteractionsEntity userInteractions, HttpServletRequest request){
     	userInteractions.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
     	//ValidatorUtils.validateEntity(userInteractions);
-    	userInteractions.setUserid((Long)request.getSession().getAttribute("userId"));
+    	userInteractions.setUserId((Long)request.getSession().getAttribute("userId"));
     	if (userInteractions.getType() != null && !("1".equals(userInteractions.getType()) || "21".equals(userInteractions.getType()))) {
     		return R.error("user-interactions.type 只允许 1(收藏) 或 21(赞)");
     	}
@@ -251,7 +251,7 @@ public class UserInteractionsController {
     public R add(@RequestBody UserInteractionsEntity userInteractions, HttpServletRequest request){
     	userInteractions.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
     	//ValidatorUtils.validateEntity(userInteractions);
-    	userInteractions.setUserid((Long)request.getSession().getAttribute("userId"));
+    	userInteractions.setUserId((Long)request.getSession().getAttribute("userId"));
     	if (userInteractions.getType() != null && !("1".equals(userInteractions.getType()) || "21".equals(userInteractions.getType()))) {
     		return R.error("user-interactions.type 只允许 1(收藏) 或 21(赞)");
     	}
@@ -376,10 +376,10 @@ public class UserInteractionsController {
     }
 
     private void fillTargetFields(UserInteractionsEntity userInteractions) {
-        if (userInteractions == null || userInteractions.getRefid() == null) {
+        if (userInteractions == null || userInteractions.getResourceId() == null) {
             return;
         }
-        Long refId = userInteractions.getRefid();
+        Long refId = userInteractions.getResourceId();
 
         ForumPostEntity post = forumPostService.selectById(refId);
         if (post != null) {
@@ -450,12 +450,15 @@ public class UserInteractionsController {
         String c = columnName.trim();
         switch (c) {
             case "userid":
+            case "userId":
                 return "user_id";
             case "refid":
+            case "resourceId":
                 return "resource_id";
             case "type":
                 return "interaction_type";
             case "addtime":
+            case "createdAt":
                 return "created_at";
             default:
                 return c;

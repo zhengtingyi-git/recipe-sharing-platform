@@ -60,9 +60,9 @@ public class ForumPostController {
     @Autowired
     private UserInteractionsService userInteractionsService;
 
-    private int countAction(Long refid, String type) {
+    private int countAction(Long resourceId, String type) {
         EntityWrapper<UserInteractionsEntity> ew = new EntityWrapper<>();
-        ew.eq("resource_id", refid).eq("interaction_type", type);
+        ew.eq("resource_id", resourceId).eq("interaction_type", type);
         return userInteractionsService.selectCount(ew);
     }
 
@@ -120,7 +120,7 @@ public class ForumPostController {
                 List<UserInteractionsEntity> suList = userInteractionsService.selectList(suEw);
                 Map<Long, Integer> countMap = new HashMap<>();
                 for (UserInteractionsEntity su : suList) {
-                    Long refId = su.getRefid();
+                    Long refId = su.getResourceId();
                     if (refId != null) {
                         countMap.put(refId, countMap.getOrDefault(refId, 0) + 1);
                     }
@@ -136,7 +136,7 @@ public class ForumPostController {
                 List<UserInteractionsEntity> thumbsList = userInteractionsService.selectList(thumbsEw);
                 Map<Long, Integer> thumbsMap = new HashMap<>();
                 for (UserInteractionsEntity thumbs : thumbsList) {
-                    Long refId = thumbs.getRefid();
+                    Long refId = thumbs.getResourceId();
                     if (refId != null) {
                         thumbsMap.put(refId, thumbsMap.getOrDefault(refId, 0) + 1);
                     }

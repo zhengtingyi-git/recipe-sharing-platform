@@ -216,6 +216,12 @@ public class ForumPostCommentEntity<T> implements Serializable {
 			this.refid = postId;
 		}
 	}
+	public Long getResourceId() {
+		return getPostId();
+	}
+	public void setResourceId(Long resourceId) {
+		setPostId(resourceId);
+	}
 
 	public Long getUserId() {
 		return userId != null ? userId : userid;

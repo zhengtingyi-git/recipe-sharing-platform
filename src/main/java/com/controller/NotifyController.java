@@ -92,24 +92,24 @@ public class NotifyController {
             List<ForumPostCommentEntity> comments = forumPostCommentService.selectList(discussEw);
             for (ForumPostCommentEntity c : comments) {
                 // ???????????????????????????????
-                if (c.getUserid() != null && c.getUserid().longValue() == userId.longValue()) {
+                if (c.getUserId() != null && c.getUserId().longValue() == userId.longValue()) {
                     continue;
                 }
                 Map<String, Object> item = new HashMap<>();
                 item.put("id", c.getId());
-                item.put("refid", c.getRefid());
-                item.put("addtime", c.getAddtime());
+                item.put("resourceId", c.getResourceId());
+                item.put("createdAt", c.getCreatedAt());
                 item.put("content", c.getContent());
-                ForumPostEntity post = forumPostService.selectById(c.getRefid());
+                ForumPostEntity post = forumPostService.selectById(c.getResourceId());
                 if (post != null) {
                     item.put("messageContent", post.getTitle());
                     item.put("picture", post.getPicture());
                 }
-                UserEntity commenter = c.getUserid() != null ? userService.selectById(c.getUserid()) : null;
+                UserEntity commenter = c.getUserId() != null ? userService.selectById(c.getUserId()) : null;
                 item.put("username", commenter != null && commenter.getYonghuxingming() != null
                         ? commenter.getYonghuxingming()
                         : (c.getNickname() != null ? c.getNickname() : "??"));
-                item.put("touxiang", commenter != null && commenter.getTouxiang() != null ? commenter.getTouxiang() : "");
+                item.put("avatar", commenter != null && commenter.getTouxiang() != null ? commenter.getTouxiang() : "");
                 replyList.add(item);
             }
         }
@@ -129,24 +129,24 @@ public class NotifyController {
             List<ChineseRecipeCommentEntity> commentsZhongshi = chinese_recipe_commentService.selectList(discussZhongshiEw);
             for (ChineseRecipeCommentEntity c : commentsZhongshi) {
                 // ??????????????
-                if (c.getUserid() != null && c.getUserid().longValue() == userId.longValue()) {
+                if (c.getUserId() != null && c.getUserId().longValue() == userId.longValue()) {
                     continue;
                 }
                 Map<String, Object> item = new HashMap<>();
                 item.put("id", c.getId());
-                item.put("refid", c.getRefid());
-                item.put("addtime", c.getAddtime());
+                item.put("resourceId", c.getResourceId());
+                item.put("createdAt", c.getCreatedAt());
                 item.put("content", c.getContent());
-                ChineseRecipeEntity dish = chinese_recipeService.selectById(c.getRefid());
+                ChineseRecipeEntity dish = chinese_recipeService.selectById(c.getResourceId());
                 if (dish != null) {
                     item.put("messageContent", dish.getCaipinmingcheng());
                     item.put("picture", dish.getTupian());
                 }
-                UserEntity commenter = c.getUserid() != null ? userService.selectById(c.getUserid()) : null;
+                UserEntity commenter = c.getUserId() != null ? userService.selectById(c.getUserId()) : null;
                 item.put("username", commenter != null && commenter.getYonghuxingming() != null
                         ? commenter.getYonghuxingming()
                         : (c.getNickname() != null ? c.getNickname() : "??"));
-                item.put("touxiang", commenter != null && commenter.getTouxiang() != null ? commenter.getTouxiang() : "");
+                item.put("avatar", commenter != null && commenter.getTouxiang() != null ? commenter.getTouxiang() : "");
                 replyList.add(item);
             }
         }
@@ -165,24 +165,24 @@ public class NotifyController {
             List<ForeignRecipeCommentEntity> commentsWaiguo = foreign_recipe_commentService.selectList(discussWaiguoEw);
             for (ForeignRecipeCommentEntity c : commentsWaiguo) {
                 // ??????????????
-                if (c.getUserid() != null && c.getUserid().longValue() == userId.longValue()) {
+                if (c.getUserId() != null && c.getUserId().longValue() == userId.longValue()) {
                     continue;
                 }
                 Map<String, Object> item = new HashMap<>();
                 item.put("id", c.getId());
-                item.put("refid", c.getRefid());
-                item.put("addtime", c.getAddtime());
+                item.put("resourceId", c.getResourceId());
+                item.put("createdAt", c.getCreatedAt());
                 item.put("content", c.getContent());
-                ForeignRecipeEntity dish = foreign_recipeService.selectById(c.getRefid());
+                ForeignRecipeEntity dish = foreign_recipeService.selectById(c.getResourceId());
                 if (dish != null) {
                     item.put("messageContent", dish.getCaipinmingcheng());
                     item.put("picture", dish.getTupian());
                 }
-                UserEntity commenter = c.getUserid() != null ? userService.selectById(c.getUserid()) : null;
+                UserEntity commenter = c.getUserId() != null ? userService.selectById(c.getUserId()) : null;
                 item.put("username", commenter != null && commenter.getYonghuxingming() != null
                         ? commenter.getYonghuxingming()
                         : (c.getNickname() != null ? c.getNickname() : "??"));
-                item.put("touxiang", commenter != null && commenter.getTouxiang() != null ? commenter.getTouxiang() : "");
+                item.put("avatar", commenter != null && commenter.getTouxiang() != null ? commenter.getTouxiang() : "");
                 replyList.add(item);
             }
         }
@@ -200,7 +200,7 @@ public class NotifyController {
             if (replyStr == null || replyStr.trim().isEmpty()) {
                 continue;
             }
-            ForumPostEntity post = forumPostService.selectById(c.getRefid());
+            ForumPostEntity post = forumPostService.selectById(c.getResourceId());
             String picture = post != null ? post.getPicture() : null;
             String defaultName = "??";
             String defaultTouxiang = "";
@@ -215,7 +215,7 @@ public class NotifyController {
                     }
                 }
             }
-            addReplyItemsFromJson(replyList, replyStr, c.getId(), c.getRefid(), c.getAddtime(),
+            addReplyItemsFromJson(replyList, replyStr, c.getId(), c.getResourceId(), c.getCreatedAt(),
                     c.getContent(), picture, defaultName, defaultTouxiang, selfName, selfTouxiang);
         }
 
@@ -232,7 +232,7 @@ public class NotifyController {
             if (replyStr == null || replyStr.trim().isEmpty()) {
                 continue;
             }
-            ChineseRecipeEntity dish = chinese_recipeService.selectById(c.getRefid());
+            ChineseRecipeEntity dish = chinese_recipeService.selectById(c.getResourceId());
             String picture = dish != null ? dish.getTupian() : null;
             String defaultName = "??";
             String defaultTouxiang = "";
@@ -247,7 +247,7 @@ public class NotifyController {
                     }
                 }
             }
-            addReplyItemsFromJson(replyList, replyStr, c.getId(), c.getRefid(), c.getAddtime(),
+            addReplyItemsFromJson(replyList, replyStr, c.getId(), c.getResourceId(), c.getCreatedAt(),
                     c.getContent(), picture, defaultName, defaultTouxiang, selfName, selfTouxiang);
         }
 
@@ -264,7 +264,7 @@ public class NotifyController {
             if (replyStr == null || replyStr.trim().isEmpty()) {
                 continue;
             }
-            ForeignRecipeEntity dish = foreign_recipeService.selectById(c.getRefid());
+            ForeignRecipeEntity dish = foreign_recipeService.selectById(c.getResourceId());
             String picture = dish != null ? dish.getTupian() : null;
             String defaultName = "??";
             String defaultTouxiang = "";
@@ -279,14 +279,14 @@ public class NotifyController {
                     }
                 }
             }
-            addReplyItemsFromJson(replyList, replyStr, c.getId(), c.getRefid(), c.getAddtime(),
+            addReplyItemsFromJson(replyList, replyStr, c.getId(), c.getResourceId(), c.getCreatedAt(),
                     c.getContent(), picture, defaultName, defaultTouxiang, selfName, selfTouxiang);
         }
 
         // ??????????????????????????? + ???????????
         replyList.sort((a, b) -> {
-            String t1 = a.get("addtime") != null ? a.get("addtime").toString() : "";
-            String t2 = b.get("addtime") != null ? b.get("addtime").toString() : "";
+            String t1 = a.get("createdAt") != null ? a.get("createdAt").toString() : "";
+            String t2 = b.get("createdAt") != null ? b.get("createdAt").toString() : "";
             return t2.compareTo(t1);
         });
         result.put("replyList", replyList);
@@ -337,8 +337,8 @@ public class NotifyController {
             }
         }
         thumbsupList.sort((a, b) -> {
-            String t1 = a.get("addtime") != null ? a.get("addtime").toString() : "";
-            String t2 = b.get("addtime") != null ? b.get("addtime").toString() : "";
+            String t1 = a.get("createdAt") != null ? a.get("createdAt").toString() : "";
+            String t2 = b.get("createdAt") != null ? b.get("createdAt").toString() : "";
             return t2.compareTo(t1);
         });
         result.put("thumbsupList", thumbsupList);
@@ -370,8 +370,8 @@ public class NotifyController {
             }
         }
         userInteractionsList.sort((a, b) -> {
-            String t1 = a.get("addtime") != null ? a.get("addtime").toString() : "";
-            String t2 = b.get("addtime") != null ? b.get("addtime").toString() : "";
+            String t1 = a.get("createdAt") != null ? a.get("createdAt").toString() : "";
+            String t2 = b.get("createdAt") != null ? b.get("createdAt").toString() : "";
             return t2.compareTo(t1);
         });
         result.put("userInteractionsList", userInteractionsList);
@@ -384,11 +384,11 @@ public class NotifyController {
         for (UserFollowEntity g : guanzhuList) {
             Map<String, Object> item = new HashMap<>();
             item.put("id", g.getId());
-            item.put("addtime", g.getAddtime());
+            item.put("createdAt", g.getCreatedAt());
             item.put("followerId", g.getFollowerId());
             UserEntity u = userService.selectById(g.getFollowerId());
             item.put("operatorName", u != null && u.getYonghuxingming() != null ? u.getYonghuxingming() : "??");
-            item.put("operatorTouxiang", u != null && u.getTouxiang() != null ? u.getTouxiang() : "");
+            item.put("operatorAvatar", u != null && u.getTouxiang() != null ? u.getTouxiang() : "");
             followMeList.add(item);
         }
         result.put("followMeList", followMeList);
@@ -399,18 +399,18 @@ public class NotifyController {
     private Map<String, Object> buildUserInteractionsItem(UserInteractionsEntity s, String type) {
         Map<String, Object> item = new HashMap<>();
         item.put("id", s.getId());
-        item.put("refid", s.getRefid());
-        fillUserInteractionsTargetInfo(item, s.getRefid());
-        item.put("addtime", s.getAddtime());
+        item.put("resourceId", s.getResourceId());
+        fillUserInteractionsTargetInfo(item, s.getResourceId());
+        item.put("createdAt", s.getCreatedAt());
         item.put("type", type);
-        Long uid = s.getUserid();
+        Long uid = s.getUserId();
         if (uid != null) {
             UserEntity u = userService.selectById(uid);
             item.put("operatorName", u != null && u.getYonghuxingming() != null ? u.getYonghuxingming() : "??");
-            item.put("operatorTouxiang", u != null && u.getTouxiang() != null ? u.getTouxiang() : "");
+            item.put("operatorAvatar", u != null && u.getTouxiang() != null ? u.getTouxiang() : "");
         } else {
             item.put("operatorName", "??");
-            item.put("operatorTouxiang", "");
+            item.put("operatorAvatar", "");
         }
         return item;
     }
@@ -528,15 +528,15 @@ public class NotifyController {
         }
         Map<String, Object> item = new HashMap<>();
         item.put("id", commentId);
-        item.put("refid", refId);
-        item.put("addtime", addtime);
+        item.put("resourceId", refId);
+        item.put("createdAt", addtime);
         item.put("messageContent", messageContent);
         item.put("content", content);
         if (picture != null) {
             item.put("picture", picture);
         }
         item.put("username", username != null && !username.isEmpty() ? username : "??");
-        item.put("touxiang", touxiang != null ? touxiang : "");
+        item.put("avatar", touxiang != null ? touxiang : "");
         replyList.add(item);
     }
 

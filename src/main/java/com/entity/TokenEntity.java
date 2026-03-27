@@ -31,6 +31,14 @@ public class TokenEntity implements Serializable {
 		this.userid = userid;
 	}
 
+	public Long getUserId() {
+		return userid;
+	}
+
+	public void setUserId(Long userId) {
+		this.userid = userId;
+	}
+
 	public String getRole() {
 		return role;
 	}

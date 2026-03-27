@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import org.apache.commons.beanutils.BeanUtils;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.enums.FieldFill;
@@ -91,7 +91,7 @@ public class ForeignRecipeEntity<T> implements Serializable {
 	/**
 	 * 用户id
 	 */
-	@JsonProperty("userid")
+	@JsonAlias("userid")
 	@TableField("user_id")
 	private Long userId;
 	
@@ -116,14 +116,14 @@ public class ForeignRecipeEntity<T> implements Serializable {
 	/**
 	 * 是否审核
 	 */
-	@JsonProperty("sfsh")
+	@JsonAlias("sfsh")
 	@TableField("audit_status")
 	private String auditStatus;
 	
 	/**
 	 * 审核回复
 	 */
-	@JsonProperty("shhf")
+	@JsonAlias("shhf")
 	@TableField("audit_reply")
 	private String auditReply;
 	
@@ -136,7 +136,7 @@ public class ForeignRecipeEntity<T> implements Serializable {
 	/**
 	 * 点击次数
 	 */
-	@JsonProperty("clicknum")
+	@JsonAlias("clicknum")
 	@TableField("view_count")
 	private Integer viewCount;
 
@@ -149,18 +149,17 @@ public class ForeignRecipeEntity<T> implements Serializable {
 	/**
 	 * 来源类型（用于兼容合并前的分类：foreign_recipe/chinese_recipe）
 	 */
-	@JsonProperty("recipetype")
+	@JsonAlias("recipetype")
 	@TableField("source_type")
 	private String sourceType;
 	
 	
 	@JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
 	@DateTimeFormat
-	@JsonProperty("addtime")
+	@JsonAlias("addtime")
 	@TableField("created_at")
 	private Date createdAt;
 
-	@com.fasterxml.jackson.annotation.JsonProperty("addtime")
 	public Date getCreatedAt() {
 		return createdAt;
 	}
@@ -256,7 +255,6 @@ public class ForeignRecipeEntity<T> implements Serializable {
 	/**
 	 * 获取：用户id
 	 */
-	@JsonProperty("userid")
 	public Long getUserId() {
 		return userId;
 	}
@@ -296,6 +294,12 @@ public class ForeignRecipeEntity<T> implements Serializable {
 	public String getTouxiang() {
 		return touxiang;
 	}
+	public void setAvatar(String avatar) {
+		this.touxiang = avatar;
+	}
+	public String getAvatar() {
+		return touxiang;
+	}
 	/**
 	 * 设置：是否审核
 	 */
@@ -305,7 +309,6 @@ public class ForeignRecipeEntity<T> implements Serializable {
 	/**
 	 * 获取：是否审核
 	 */
-	@JsonProperty("sfsh")
 	public String getAuditStatus() {
 		return auditStatus;
 	}
@@ -318,7 +321,6 @@ public class ForeignRecipeEntity<T> implements Serializable {
 	/**
 	 * 获取：审核回复
 	 */
-	@JsonProperty("shhf")
 	public String getAuditReply() {
 		return auditReply;
 	}
@@ -343,7 +345,6 @@ public class ForeignRecipeEntity<T> implements Serializable {
 	/**
 	 * 获取：点击次数
 	 */
-	@JsonProperty("clicknum")
 	public Integer getViewCount() {
 		return viewCount;
 	}
@@ -365,7 +366,6 @@ public class ForeignRecipeEntity<T> implements Serializable {
 	/**
 	 * 获取：来源类型
 	 */
-	@JsonProperty("recipetype")
 	public String getSourceType() {
 		return sourceType;
 	}

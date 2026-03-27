@@ -127,6 +127,12 @@ public class ForeignRecipeCommentEntity<T> implements Serializable {
 	public Long getRecipeId() {
 		return recipeId;
 	}
+	public Long getResourceId() {
+		return recipeId;
+	}
+	public void setResourceId(Long resourceId) {
+		this.recipeId = resourceId;
+	}
 	/**
 	 * 设置：用户id
 	 */

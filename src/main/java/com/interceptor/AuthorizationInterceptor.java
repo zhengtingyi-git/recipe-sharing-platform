@@ -71,7 +71,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         }
         
         if(tokenEntity != null) {
-        	request.getSession().setAttribute("userId", tokenEntity.getUserid());
+        	request.getSession().setAttribute("userId", tokenEntity.getUserId());
         	request.getSession().setAttribute("role", tokenEntity.getRole());
         	request.getSession().setAttribute("tableName", tokenEntity.getTablename());
         	request.getSession().setAttribute("username", tokenEntity.getUsername());

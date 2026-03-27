@@ -61,9 +61,7 @@ public class ForumPostCommentController {
         for (ForumPostCommentEntity e : records) {
             Map<String, Object> m = new HashMap<>();
             m.put("id", e.getId());
-            m.put("refid", e.getRefid());
             m.put("postId", e.getPostId());
-            m.put("userid", e.getUserid());
             m.put("userId", e.getUserId());
             m.put("nickname", e.getNickname());
             // displayName 统一由 user_id 查询获得，不依赖冗余列
@@ -74,11 +72,10 @@ public class ForumPostCommentController {
             m.put("commentContent", e.getCommentContent());
             m.put("reply", e.getReply());
             m.put("replyContent", e.getReplyContent());
-            m.put("addtime", e.getAddtime());
             m.put("createdAt", e.getCreatedAt());
             m.put("touxiang", "");
-            if (e.getUserid() != null) {
-                UserEntity y = userService.selectById(e.getUserid());
+            if (e.getUserId() != null) {
+                UserEntity y = userService.selectById(e.getUserId());
                 if (y != null) {
                     if (y.getYonghuxingming() != null && !y.getYonghuxingming().isEmpty()) {
                         m.put("nickname", y.getYonghuxingming());
@@ -126,8 +123,8 @@ public class ForumPostCommentController {
     @RequestMapping("/save")
     public R save(@RequestBody ForumPostCommentEntity forumPostComment, HttpServletRequest request){
         forumPostComment.setId(new Date().getTime() + new Double(Math.floor(Math.random() * 1000)).longValue());
-        if (forumPostComment.getUserid() != null) {
-            UserEntity y = userService.selectById(forumPostComment.getUserid());
+        if (forumPostComment.getUserId() != null) {
+            UserEntity y = userService.selectById(forumPostComment.getUserId());
             if (y != null && y.getYonghuxingming() != null && !y.getYonghuxingming().isEmpty()) {
                 forumPostComment.setNickname(y.getYonghuxingming());
             }
@@ -139,8 +136,8 @@ public class ForumPostCommentController {
     @RequestMapping("/add")
     public R add(@RequestBody ForumPostCommentEntity forumPostComment, HttpServletRequest request){
         forumPostComment.setId(new Date().getTime() + new Double(Math.floor(Math.random() * 1000)).longValue());
-        if (forumPostComment.getUserid() != null) {
-            UserEntity y = userService.selectById(forumPostComment.getUserid());
+        if (forumPostComment.getUserId() != null) {
+            UserEntity y = userService.selectById(forumPostComment.getUserId());
             if (y != null && y.getYonghuxingming() != null && !y.getYonghuxingming().isEmpty()) {
                 forumPostComment.setNickname(y.getYonghuxingming());
             }
@@ -176,7 +173,7 @@ public class ForumPostCommentController {
         List<Long> canDeleteIds = new ArrayList<>();
         for (Long id : ids) {
             ForumPostCommentEntity entity = forumPostCommentService.selectById(id);
-            if (entity != null && entity.getUserid() != null && entity.getUserid().longValue() == userId.longValue()) {
+            if (entity != null && entity.getUserId() != null && entity.getUserId().longValue() == userId.longValue()) {
                 canDeleteIds.add(id);
             }
         }

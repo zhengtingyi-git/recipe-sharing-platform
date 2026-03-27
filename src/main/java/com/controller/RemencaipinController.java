@@ -104,14 +104,14 @@ public class RemencaipinController {
             userInteractionsWrapper1.eq("interaction_type", "1");
             List<UserInteractionsEntity> userInteractionsList = userInteractionsService.selectList(userInteractionsWrapper1);
             for (UserInteractionsEntity userInteraction : userInteractionsList) {
-                zhongshiUserInteractionsMap.put(userInteraction.getRefid(), zhongshiUserInteractionsMap.getOrDefault(userInteraction.getRefid(), 0) + 1);
+                zhongshiUserInteractionsMap.put(userInteraction.getResourceId(), zhongshiUserInteractionsMap.getOrDefault(userInteraction.getResourceId(), 0) + 1);
             }
             EntityWrapper<UserInteractionsEntity> userInteractionsWrapper21 = new EntityWrapper<>();
             userInteractionsWrapper21.in("resource_id", zhongshiIds);
             userInteractionsWrapper21.eq("interaction_type", "21");
             List<UserInteractionsEntity> thumbsList = userInteractionsService.selectList(userInteractionsWrapper21);
             for (UserInteractionsEntity thumbs : thumbsList) {
-                zhongshiThumbsMap.put(thumbs.getRefid(), zhongshiThumbsMap.getOrDefault(thumbs.getRefid(), 0) + 1);
+                zhongshiThumbsMap.put(thumbs.getResourceId(), zhongshiThumbsMap.getOrDefault(thumbs.getResourceId(), 0) + 1);
             }
         }
         for (ChineseRecipeEntity dish : zhongshiList) {
@@ -154,14 +154,14 @@ public class RemencaipinController {
             userInteractionsWrapper1.eq("interaction_type", "1");
             List<UserInteractionsEntity> userInteractionsList = userInteractionsService.selectList(userInteractionsWrapper1);
             for (UserInteractionsEntity userInteraction : userInteractionsList) {
-                waiguoUserInteractionsMap.put(userInteraction.getRefid(), waiguoUserInteractionsMap.getOrDefault(userInteraction.getRefid(), 0) + 1);
+                waiguoUserInteractionsMap.put(userInteraction.getResourceId(), waiguoUserInteractionsMap.getOrDefault(userInteraction.getResourceId(), 0) + 1);
             }
             EntityWrapper<UserInteractionsEntity> userInteractionsWrapper21 = new EntityWrapper<>();
             userInteractionsWrapper21.in("resource_id", waiguoIds);
             userInteractionsWrapper21.eq("interaction_type", "21");
             List<UserInteractionsEntity> thumbsList = userInteractionsService.selectList(userInteractionsWrapper21);
             for (UserInteractionsEntity thumbs : thumbsList) {
-                waiguoThumbsMap.put(thumbs.getRefid(), waiguoThumbsMap.getOrDefault(thumbs.getRefid(), 0) + 1);
+                waiguoThumbsMap.put(thumbs.getResourceId(), waiguoThumbsMap.getOrDefault(thumbs.getResourceId(), 0) + 1);
             }
         }
         for (ForeignRecipeEntity dish : waiguoList) {
@@ -208,16 +208,16 @@ public class RemencaipinController {
             String token = request.getHeader("Token");
             if (token != null && !token.trim().isEmpty()) {
                 TokenEntity te = tokenService.getTokenEntity(token.trim());
-                if (te != null && te.getUserid() != null) {
+                if (te != null && te.getUserId() != null) {
                     EntityWrapper<UserInteractionsEntity> userEw = new EntityWrapper<>();
-                    userEw.eq("user_id", te.getUserid());
+                    userEw.eq("user_id", te.getUserId());
                     userEw.in(true, "interaction_type", Arrays.asList("1", "21"));
                     for (UserInteractionsEntity s : userInteractionsService.selectList(userEw)) {
-                        String resolvedType = resolveRecipeType(s.getRefid(), dishMap);
+                        String resolvedType = resolveRecipeType(s.getResourceId(), dishMap);
                         if (resolvedType == null) {
                             continue;
                         }
-                        String key = resolvedType + "_" + s.getRefid();
+                        String key = resolvedType + "_" + s.getResourceId();
                         userActionKeys.add(key);
                         DishInfo di = dishMap.get(key);
                         if (di != null && di.cuisine != null && !di.cuisine.trim().isEmpty()) {

@@ -185,7 +185,7 @@ public class DiscussremencaipinController {
         List<Long> canDeleteIds = new ArrayList<>();
         for (Long id : ids) {
             DiscussremencaipinEntity entity = discussremencaipinService.selectById(id);
-            if (entity != null && entity.getUserid() != null && entity.getUserid().longValue() == userId.longValue()) {
+            if (entity != null && entity.getUserId() != null && entity.getUserId().longValue() == userId.longValue()) {
                 canDeleteIds.add(id);
             }
         }

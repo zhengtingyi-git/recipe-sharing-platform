@@ -205,16 +205,16 @@
 								vue.followFlag = (r.data && r.data.followed) ? 1 : 0;
 							});
 						}
-						// 该用户发布的中式美食
-						http.request('chinese_recipe/list', 'get', { page: 1, limit: 100, userid: id, sfsh: '是' }, function(r) {
+						// 该用户发布的中式美食（语义化参数：authorId / approved）
+						http.request('chinese_recipe/list', 'get', { page: 1, limit: 100, authorId: id, approved: true }, function(r) {
 							vue.listZhong = (r.data && r.data.list) ? r.data.list : [];
 						});
 						// 该用户发布的外国美食
-						http.request('foreign_recipe/list', 'get', { page: 1, limit: 100, userid: id, sfsh: '是' }, function(r) {
+						http.request('foreign_recipe/list', 'get', { page: 1, limit: 100, authorId: id, approved: true }, function(r) {
 							vue.listWai = (r.data && r.data.list) ? r.data.list : [];
 						});
 						// 该用户发布的美食论坛
-						http.request('forum-post/list', 'get', { page: 1, limit: 100, userid: id }, function(r) {
+						http.request('forum-post/list', 'get', { page: 1, limit: 100, userId: id }, function(r) {
 							vue.listNews = (r.data && r.data.list) ? r.data.list : [];
 						});
 					} else {

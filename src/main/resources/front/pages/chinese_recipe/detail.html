@@ -139,12 +139,12 @@ color: #999 !important;
 				</div>
 				<div class="layui-col-md7 detail-right-col" style="padding-left: 20px;flex: 1;" :style='{"padding":"0","boxShadow":"0 0 6px rgba(255,0,0,0)","margin":"0 0 0 20px","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"0","borderWidth":"1px","borderStyle":"solid"}'>
 					<div :style='{"padding":"10px 15px","boxShadow":"0 0 6px rgba(255,0,0,0)","margin":"0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"0","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="detail-item detail-item-user">
-						<a v-if="detail.userid" @click="jump('../user/profile.html?id=' + detail.userid)" href="javascript:void(0)" style="display: flex; align-items: center; margin-right: 12px; text-decoration: none; color: inherit;">
-							<img class="user-avatar" :src="detail.touxiang ? (baseurl + detail.touxiang) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'" alt="头像" />
+						<a v-if="detail.userId" @click="jump('../user/profile.html?id=' + detail.userId)" href="javascript:void(0)" style="display: flex; align-items: center; margin-right: 12px; text-decoration: none; color: inherit;">
+							<img class="user-avatar" :src="detail.avatar ? (baseurl + detail.avatar) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'" alt="头像" />
 							<span class="user-nickname">{{detail.yonghuxingming || '—'}}</span>
 						</a>
-						<template v-if="!detail.userid"><img class="user-avatar" :src="detail.touxiang ? (baseurl + detail.touxiang) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'" alt="头像" /><span class="user-nickname">{{detail.yonghuxingming || '—'}}</span></template>
-						<a v-if="detail.userid && !isSelf" @click="followClick()" href="javascript:void(0)" class="btn-follow" :class="{ followed: followFlag }">{{ followFlag ? '已关注' : '+ 关注' }}</a>
+						<template v-if="!detail.userId"><img class="user-avatar" :src="detail.avatar ? (baseurl + detail.avatar) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'" alt="头像" /><span class="user-nickname">{{detail.yonghuxingming || '—'}}</span></template>
+						<a v-if="detail.userId && !isSelf" @click="followClick()" href="javascript:void(0)" class="btn-follow" :class="{ followed: followFlag }">{{ followFlag ? '已关注' : '+ 关注' }}</a>
 					</div>
 					<div :style='{"padding":"10px 15px","boxShadow":"0 0 6px rgba(255,0,0,0)","margin":"0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"0","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="detail-item">
 						<span :style='{"padding":"0 12px 0 0","minWidth":"94px","fontSize":"14px","color":"#333","textAlign":"right"}'>菜品名称：</span>
@@ -164,11 +164,11 @@ color: #999 !important;
 					</div>
 					<div :style='{"padding":"10px 15px","boxShadow":"0 0 6px rgba(255,0,0,0)","margin":"0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"0","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="detail-item">
 						<span :style='{"padding":"0 12px 0 0","minWidth":"94px","fontSize":"14px","color":"#333","textAlign":"right"}'>时间：</span>
-						<span  style="word-break: break-all" :style='{"padding":"4px 10px","boxShadow":"0 0 6px rgba(255,0,0,.3)","borderColor":"rgba(0,0,0,.3)","backgroundColor":"#fff","color":"#333","borderRadius":"4px","textAlign":"left","borderWidth":"0","width":"auto","lineHeight":"24px","fontSize":"14px","borderStyle":"solid"}' class="desc">{{detail.addtime}}</span>
+						<span  style="word-break: break-all" :style='{"padding":"4px 10px","boxShadow":"0 0 6px rgba(255,0,0,.3)","borderColor":"rgba(0,0,0,.3)","backgroundColor":"#fff","color":"#333","borderRadius":"4px","textAlign":"left","borderWidth":"0","width":"auto","lineHeight":"24px","fontSize":"14px","borderStyle":"solid"}' class="desc">{{detail.createdAt}}</span>
 					</div>
 					<div :style='{"padding":"10px 15px","boxShadow":"0 0 6px rgba(255,0,0,0)","margin":"0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"0","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="detail-item">
 						<span :style='{"padding":"0 12px 0 0","minWidth":"94px","fontSize":"14px","color":"#333","textAlign":"right"}'>点击次数：</span>
-						<span  style="word-break: break-all" :style='{"padding":"4px 10px","boxShadow":"0 0 6px rgba(255,0,0,.3)","borderColor":"rgba(0,0,0,.3)","backgroundColor":"#fff","color":"#333","borderRadius":"4px","textAlign":"left","borderWidth":"0","width":"auto","lineHeight":"24px","fontSize":"14px","borderStyle":"solid"}' class="desc">{{detail.clicknum}}</span>
+						<span  style="word-break: break-all" :style='{"padding":"4px 10px","boxShadow":"0 0 6px rgba(255,0,0,.3)","borderColor":"rgba(0,0,0,.3)","backgroundColor":"#fff","color":"#333","borderRadius":"4px","textAlign":"left","borderWidth":"0","width":"auto","lineHeight":"24px","fontSize":"14px","borderStyle":"solid"}' class="desc">{{detail.viewCount}}</span>
 					</div>
 				</div>
 			</div>
@@ -224,7 +224,7 @@ color: #999 !important;
 								<div class="message-list" :style='{"padding":"0 20px 20px","boxShadow":"0 0 6px rgba(255,0,0,.3)","margin":"0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0","borderStyle":"solid"}'>
 									<div :style='{"padding":"20px 0","boxShadow":"0 0 6px rgba(255,0,0,0)","margin":"0","borderColor":"rgba(0,0,0,.3)","backgroundColor":"#fff","borderRadius":"0","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="message-item" v-for="(item,index) in dataList" v-bind:key="index">
 										<div class="username-container" style="display:flex;align-items:center;">
-											<img :style='{"boxShadow":"0 0 6px rgba(255,0,0,.3)","margin":"0 10px 0 0","borderColor":"rgba(0,0,0,.3)","borderRadius":"100%","borderWidth":"0","width":"40px","borderStyle":"solid","height":"40px"}' class="avator" :src="item.touxiang ? (baseurl + item.touxiang) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'">
+											<img :style='{"boxShadow":"0 0 6px rgba(255,0,0,.3)","margin":"0 10px 0 0","borderColor":"rgba(0,0,0,.3)","borderRadius":"100%","borderWidth":"0","width":"40px","borderStyle":"solid","height":"40px"}' class="avator" :src="item.avatar ? (baseurl + item.avatar) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'">
 											<span style="display: inline-block;" :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,.3)","margin":"0","borderColor":"rgba(0,0,0,.3)","backgroundColor":"#fff","color":"#333","borderRadius":"4px","borderWidth":"0","width":"auto","lineHeight":"28px","fontSize":"14px","borderStyle":"solid"}' class="username">{{item.nickname || '用户'}}</span>
 											<div style="margin-left:auto;display:flex;align-items:center;gap:12px;font-size:12px;">
 												<a href="javascript:void(0)" @click="replyComment(item, index, $event)" style="color:#409EFF;cursor:pointer;">
@@ -322,7 +322,7 @@ color: #999 !important;
 			computed: {
 				isSelf: function() {
 					var uid = localStorage.getItem('userid');
-					return !uid || (this.detail.userid && String(this.detail.userid) === String(uid));
+					return !uid || (this.detail.userId && String(this.detail.userId) === String(uid));
 				},
 				SecondToDate: function() {
 					var time = this.count;
@@ -456,9 +456,9 @@ color: #999 !important;
 						page: 1,
 						limit: 1,
 						type:'21',
-						refid : this.detail.id,
+						resourceId : this.detail.id,
 						tablename : this.detailTable,
-						userid: localStorage.getItem('userid'),
+						userId: localStorage.getItem('userid'),
 					}, (res) => {
 						vue.dataList = res.data.list
 						if(res.data.list.length==1) {
@@ -474,11 +474,11 @@ color: #999 !important;
 							return;
 						}
 						layui.http.requestJson('user-interactions/save', 'post', {
-							userid: localStorage.getItem('userid'),
+							userId: localStorage.getItem('userid'),
 							type:'21',
 							name: this.title,
 							picture:vue.detail.tupian,
-							refid: this.detail.id,
+							resourceId: this.detail.id,
 							tablename: this.detailTable
 						}, function(res) {
 							_this.detail.thumbsupnum = parseInt(_this.detail.thumbsupnum==null?0:_this.detail.thumbsupnum) + 1
@@ -501,7 +501,7 @@ color: #999 !important;
 				},
 				// 跨表
 				onAcrossTap(acrossTable,crossOptAudit,statusColumnName,tips,statusColumnValue){
-					if(crossOptAudit=='是'&&this.detail.sfsh!='是') {
+					if(crossOptAudit=='是'&&this.detail.auditStatus!='是') {
 						layer.msg('请审核通过后再操作', {
 							time: 2000,
 							icon: 3 
@@ -539,9 +539,9 @@ color: #999 !important;
 						page: 1,
 						limit: 1,
 						type:1,
-						refid : this.detail.id,
+						resourceId : this.detail.id,
 						tablename : this.detailTable,
-						userid: localStorage.getItem('userid'),
+						userId: localStorage.getItem('userid'),
 					}, (res) => {
 						vue.dataList = res.data.list
 						if(res.data.list.length==1) {
@@ -556,11 +556,11 @@ color: #999 !important;
 							return;
 						}
 						layui.http.requestJson('user-interactions/save', 'post', {
-							userid: localStorage.getItem('userid'),
+							userId: localStorage.getItem('userid'),
 							name: this.title,
 						    type:1,
 							picture:vue.detail.tupian,
-							refid: this.detail.id,
+							resourceId: this.detail.id,
 							tablename: this.detailTable
 						}, function(res) {
 							layer.msg('收藏成功', {
@@ -578,8 +578,8 @@ color: #999 !important;
 						layer.msg('请先登录', { icon: 5 });
 						return;
 					}
-					if (!this.detail.userid) return;
-					var followedId = this.detail.userid;
+					if (!this.detail.userId) return;
+					var followedId = this.detail.userId;
 					var api = this.followFlag ? 'guanzhu/unfollow' : 'guanzhu/follow';
 					var _this = this;
 					layui.http.request(api, 'get', { followedId: followedId }, function(res) {
@@ -778,8 +778,9 @@ color: #999 !important;
 							var entity = res.data || {};
 							var replyPayload = {
 								userid: uid,
-								nickname: localStorage.getItem('yonghuxingming') || localStorage.getItem('adminName') || '',
-								touxiang: localStorage.getItem('touxiang') || '',
+								// 兼容：登录页存的是 nickname/avatar，历史模板可能用 yonghuxingming/touxiang
+								nickname: localStorage.getItem('nickname') || localStorage.getItem('yonghuxingming') || localStorage.getItem('adminName') || '',
+								touxiang: localStorage.getItem('avatar') || localStorage.getItem('touxiang') || '',
 								content: value
 							};
 							// 兼容历史数据：reply 可能是字符串 / 对象 / 数组
@@ -850,8 +851,8 @@ color: #999 !important;
 				vue.title = vue.detail.caipinmingcheng;
 				vue.userInteractionsCount = vue.detail.userInteractionsNum == null ? 0 : vue.detail.userInteractionsNum;
 				// 关注状态
-				if (res.data.userid) {
-					http.request('guanzhu/status', 'get', { followedId: res.data.userid }, function(r) {
+				if (res.data.userId) {
+					http.request('guanzhu/status', 'get', { followedId: res.data.userId }, function(r) {
 						vue.followFlag = (r.data && r.data.followed) ? 1 : 0;
 					});
 				}
@@ -893,9 +894,9 @@ color: #999 !important;
 					page: 1,
 					limit: 1,
 					type:1,
-					refid : vue.detail.id,
+					resourceId : vue.detail.id,
 					tablename : vue.detailTable,
-					userid: localStorage.getItem('userid'),
+					userId: localStorage.getItem('userid'),
 				}, function(res) {
 					vue.userInteractionsFlag = res.data.list.length;
 				})
@@ -906,9 +907,9 @@ color: #999 !important;
 					page: 1,
 					limit: 1,
 					type:'21',
-					refid : vue.detail.id,
+					resourceId : vue.detail.id,
 					tablename : vue.detailTable,
-					userid: localStorage.getItem('userid'),
+					userId: localStorage.getItem('userid'),
 				}, function(res) {
 					if(res.data.list.length>0) {
 						vue.thumbsupFlag = 1;

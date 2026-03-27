@@ -60,7 +60,7 @@ public class TokenServiceImpl implements TokenService {
 			}
 			long userId = uid instanceof Number ? ((Number) uid).longValue() : Long.parseLong(uid.toString());
 			TokenEntity te = new TokenEntity();
-			te.setUserid(userId);
+			te.setUserId(userId);
 			te.setUsername(claims.get("username", String.class));
 			te.setTablename(claims.get("tablename", String.class));
 			te.setRole(claims.get("role", String.class));

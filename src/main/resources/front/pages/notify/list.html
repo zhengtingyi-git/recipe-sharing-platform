@@ -100,13 +100,13 @@
 				<template v-if="currentTab === 'reply'">
 					<template v-if="replyList.length">
 						<div v-for="(item,index) in replyList" :key="'r'+index" class="notify-item">
-							<img class="notify-avatar" :src="item.touxiang ? (baseurl + item.touxiang) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'" />
+							<img class="notify-avatar" :src="item.avatar ? (baseurl + item.avatar) : defaultAvatar" @error="$event.target.src=defaultAvatar" />
 							<div class="notify-body">
 								<div class="notify-title">{{ item.username || '用户' }} 回复了您的留言</div>
 								<div class="notify-desc" v-if="item.messageContent">您的留言：{{ item.messageContent | forumPostDesc }}</div>
 								<div class="notify-desc" v-if="item.content">回复内容：{{ item.content | replyText }}</div>
 								<img v-if="item.picture" class="notify-pic" :src="baseurl + item.picture" />
-								<div class="notify-time">{{ item.addtime }}</div>
+								<div class="notify-time">{{ item.createdAt }}</div>
 							</div>
 						</div>
 					</template>
@@ -117,13 +117,13 @@
 				<template v-if="currentTab === 'thumbsup'">
 					<template v-if="thumbsupList.length">
 						<div v-for="(item,index) in thumbsupList" :key="'t'+index" class="notify-item" @click="jumpToDetail(item)">
-							<img class="notify-avatar" :src="item.operatorTouxiang ? (baseurl + item.operatorTouxiang) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'" />
+							<img class="notify-avatar" :src="item.operatorAvatar ? (baseurl + item.operatorAvatar) : defaultAvatar" @error="$event.target.src=defaultAvatar" />
 							<div class="notify-body">
 								<div class="notify-title">{{ item.operatorName }} 赞了您的《{{ item.name }}》</div>
 								<div class="notify-desc" v-if="item.picture">
 									<img class="notify-pic" :src="baseurl + item.picture" />
 								</div>
-								<div class="notify-time">{{ item.addtime }}</div>
+								<div class="notify-time">{{ item.createdAt }}</div>
 							</div>
 						</div>
 					</template>
@@ -134,13 +134,13 @@
 				<template v-if="currentTab === 'user-interactions'">
 					<template v-if="userInteractionsList.length">
 						<div v-for="(item,index) in userInteractionsList" :key="'s'+index" class="notify-item" @click="jumpToDetail(item)">
-							<img class="notify-avatar" :src="item.operatorTouxiang ? (baseurl + item.operatorTouxiang) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'" />
+							<img class="notify-avatar" :src="item.operatorAvatar ? (baseurl + item.operatorAvatar) : defaultAvatar" @error="$event.target.src=defaultAvatar" />
 							<div class="notify-body">
 								<div class="notify-title">{{ item.operatorName }} 收藏了您的《{{ item.name }}》</div>
 								<div class="notify-desc" v-if="item.picture">
 									<img class="notify-pic" :src="baseurl + (item.picture ? item.picture.split(',')[0] : '')" />
 								</div>
-								<div class="notify-time">{{ item.addtime }}</div>
+								<div class="notify-time">{{ item.createdAt }}</div>
 							</div>
 						</div>
 					</template>
@@ -151,10 +151,10 @@
 				<template v-if="currentTab === 'followMe'">
 					<template v-if="followMeList.length">
 						<div v-for="(item,index) in followMeList" :key="'f'+index" class="notify-item" @click="jump('../user/profile.html?id=' + (item.followerId || item.follower_id))">
-							<img class="notify-avatar" :src="(item.operatorTouxiang || item.touxiang) ? (baseurl + (item.operatorTouxiang || item.touxiang)) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'" />
+							<img class="notify-avatar" :src="item.operatorAvatar ? (baseurl + item.operatorAvatar) : defaultAvatar" @error="$event.target.src=defaultAvatar" />
 							<div class="notify-body">
 								<div class="notify-title">{{ item.operatorName || item.operator_name || '用户' }} 关注了您</div>
-								<div class="notify-time">{{ item.addtime }}</div>
+								<div class="notify-time">{{ item.createdAt }}</div>
 							</div>
 						</div>
 					</template>
@@ -174,6 +174,7 @@
 				data: {
 					swiperList: [{ img: '../../img/banner.jpg' }],
 					baseurl: '',
+					defaultAvatar: '',
 					currentTab: 'reply',
 					replyList: [],
 					thumbsupList: [],
@@ -220,8 +221,8 @@
 				methods: {
 					jump(url) { jump(url); },
 					jumpToDetail(item) {
-						if (item.tablename && item.refid) {
-							jump('../' + item.tablename + '/detail.html?id=' + item.refid);
+						if (item.tablename && item.resourceId) {
+							jump('../' + item.tablename + '/detail.html?id=' + item.resourceId);
 						}
 					}
 				}
@@ -235,11 +236,12 @@
 				var jquery = layui.jquery;
 
 				vue.baseurl = http.baseurl;
+				vue.defaultAvatar = http.baseurl + 'img/avator.png';
 
-				// 未登录跳转登录
+				// 未登录跳转登录（若在 iframe 内，跳转顶层避免后续嵌套）
 				if (!localStorage.getItem('Token') || !localStorage.getItem('userid')) {
 					layer.msg('请先登录', { icon: 0 }, function() {
-						window.location.href = '../login/login.html';
+						(window.top || window).location.href = '../login/login.html';
 					});
 					return;
 				}
@@ -280,7 +282,7 @@
 					} else {
 						layer.msg(res.msg || '加载失败', { icon: 5 });
 						if (res.code === 401 || (res.msg && res.msg.indexOf('登录') >= 0)) {
-							setTimeout(function() { window.location.href = '../login/login.html'; }, 1500);
+							setTimeout(function() { (window.top || window).location.href = '../login/login.html'; }, 1500);
 						}
 					}
 				});

@@ -124,6 +124,12 @@ public class DiscussremencaipinEntity<T> implements Serializable {
 	public Long getUserid() {
 		return userid;
 	}
+	public void setUserId(Long userId) {
+		this.userid = userId;
+	}
+	public Long getUserId() {
+		return userid;
+	}
 	/**
 	 * 设置：用户名
 	 */

@@ -53,9 +53,9 @@ public class ForeignRecipeController {
     @Autowired
     private UserService userService;
 
-    private int countAction(Long refid, String type) {
+    private int countAction(Long resourceId, String type) {
         EntityWrapper<UserInteractionsEntity> ew = new EntityWrapper<>();
-        ew.eq("resource_id", refid).eq("interaction_type", type);
+        ew.eq("resource_id", resourceId).eq("interaction_type", type);
         return userInteractionsService.selectCount(ew);
     }
 
@@ -92,8 +92,11 @@ public class ForeignRecipeController {
 		if(tableName.equals("user")) {
 			foreign_recipe.setUserId((Long)request.getSession().getAttribute("userId"));
 		}
-		// 后端查询排序列名映射（前端仍传 addtime）
+		// 排序列名映射（兼容旧前端键）
 		if (params.get("sort") != null && "addtime".equals(params.get("sort").toString())) {
+			params.put("sort", "created_at");
+		}
+		if (params.get("sort") != null && "createdAt".equals(params.get("sort").toString())) {
 			params.put("sort", "created_at");
 		}
 		if (params.get("sort") != null && "clicknum".equals(params.get("sort").toString())) {
@@ -124,9 +127,29 @@ public class ForeignRecipeController {
     public R list(@RequestParam Map<String, Object> params, ForeignRecipeEntity foreign_recipe,
 		HttpServletRequest request){
 		foreign_recipe.setSourceType("foreign_recipe");
+		// 语义化查询参数：authorId / approved
+		Object authorId = params.get("authorId");
+		if (authorId != null && foreign_recipe.getUserId() == null) {
+			try {
+				foreign_recipe.setUserId(Long.valueOf(authorId.toString()));
+			} catch (Exception ignore) {}
+		}
+		Object approved = params.get("approved");
+		if (approved != null && foreign_recipe.getAuditStatus() == null) {
+			String v = approved.toString().trim().toLowerCase();
+			if ("true".equals(v) || "1".equals(v) || "yes".equals(v) || "y".equals(v)) {
+				foreign_recipe.setAuditStatus("是");
+			}
+		}
+		params.remove("authorId");
+		params.remove("approved");
         String sort = params.get("sort") != null ? params.get("sort").toString() : "";
-        // 后端查询排序列名映射（前端仍传 addtime）
+        // 排序列名映射（兼容旧前端键）
         if ("addtime".equals(sort)) {
+            params.put("sort", "created_at");
+            sort = "created_at";
+        }
+        if ("createdAt".equals(sort)) {
             params.put("sort", "created_at");
             sort = "created_at";
         }
@@ -160,7 +183,7 @@ public class ForeignRecipeController {
                 List<UserInteractionsEntity> suList = userInteractionsService.selectList(suEw);
                 Map<Long, Integer> countMap = new HashMap<>();
                 for (UserInteractionsEntity su : suList) {
-                    countMap.put(su.getRefid(), countMap.getOrDefault(su.getRefid(), 0) + 1);
+                    countMap.put(su.getResourceId(), countMap.getOrDefault(su.getResourceId(), 0) + 1);
                 }
                 final Map<Long, Integer> userInteractionsCount = countMap;
                 all.sort(Comparator.comparing((ForeignRecipeEntity d) -> userInteractionsCount.getOrDefault(d.getId(), 0)).reversed());
@@ -199,7 +222,7 @@ public class ForeignRecipeController {
                 List<UserInteractionsEntity> suList = userInteractionsService.selectList(suEw);
                 Map<Long, Integer> countMap = new HashMap<>();
                 for (UserInteractionsEntity su : suList) {
-                    countMap.put(su.getRefid(), countMap.getOrDefault(su.getRefid(), 0) + 1);
+                    countMap.put(su.getResourceId(), countMap.getOrDefault(su.getResourceId(), 0) + 1);
                 }
                 final Map<Long, Integer> thumbsCount = countMap;
                 all.sort(Comparator.comparing((ForeignRecipeEntity d) -> thumbsCount.getOrDefault(d.getId(), 0)).reversed());
