@@ -52,10 +52,15 @@ public class ForumPostEntity<T> implements Serializable {
 	@TableId
 	private Long id;
 	/**
-	 * id
+	 * user_id (normalized)
 	 */
-					
-	private Long userid;
+	@TableField("user_id")
+	private Long userId;
+
+	/**
+	 * 保持旧前端字段名兼容：getUserid/setUserid 仅代理到 userId
+	 * （不再为旧列 `userid` 保留任何可用于 SQL 的字段映射）。
+	 */
 	/**
 	 * 
 	 */
@@ -119,17 +124,19 @@ public class ForumPostEntity<T> implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}
+
 	/**
-	 * d
+	 * user_id setter
 	 */
-	public void setUserid(Long userid) {
-		this.userid = userid;
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
+
 	/**
-	 * d
+	 * user_id getter
 	 */
-	public Long getUserid() {
-		return userid;
+	public Long getUserId() {
+		return userId;
 	}
 	/**
 	 * ?	 */

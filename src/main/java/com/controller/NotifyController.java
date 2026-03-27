@@ -17,22 +17,22 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.entity.UserFollowEntity;
 import com.entity.UserInteractionsEntity;
-import com.entity.WaiguomeishiEntity;
+import com.entity.ForeignRecipeEntity;
 import com.entity.UserEntity;
-import com.entity.ZhongshimeishiEntity;
+import com.entity.ChineseRecipeEntity;
 import com.entity.ForumPostEntity;
 import com.entity.ForumPostCommentEntity;
-import com.entity.DiscusszhongshimeishiEntity;
-import com.entity.DiscusswaiguomeishiEntity;
+import com.entity.ChineseRecipeCommentEntity;
+import com.entity.ForeignRecipeCommentEntity;
 import com.service.UserFollowService;
 import com.service.UserInteractionsService;
 import com.service.UserService;
-import com.service.ZhongshimeishiService;
-import com.service.WaiguomeishiService;
+import com.service.ChineseRecipeService;
+import com.service.ForeignRecipeService;
 import com.service.ForumPostService;
 import com.service.ForumPostCommentService;
-import com.service.DiscusszhongshimeishiService;
-import com.service.DiscusswaiguomeishiService;
+import com.service.ChineseRecipeCommentService;
+import com.service.ForeignRecipeCommentService;
 import com.utils.R;
 
 /**
@@ -49,17 +49,17 @@ public class NotifyController {
     @Autowired
     private UserService userService;
     @Autowired
-    private ZhongshimeishiService zhongshimeishiService;
+    private ChineseRecipeService chinese_recipeService;
     @Autowired
-    private WaiguomeishiService waiguomeishiService;
+    private ForeignRecipeService foreign_recipeService;
     @Autowired
     private ForumPostService forumPostService;
     @Autowired
     private ForumPostCommentService forumPostCommentService;
     @Autowired
-    private DiscusszhongshimeishiService discusszhongshimeishiService;
+    private ChineseRecipeCommentService chinese_recipe_commentService;
     @Autowired
-    private DiscusswaiguomeishiService discusswaiguomeishiService;
+    private ForeignRecipeCommentService foreign_recipe_commentService;
 
     /**
      * ??????? ?????????????? ???????
@@ -82,7 +82,7 @@ public class NotifyController {
 
         // 1.1 ?????????????????/???????
         EntityWrapper<ForumPostEntity> forumPostEw = new EntityWrapper<>();
-        forumPostEw.eq("userid", userId);
+        forumPostEw.eq("user_id", userId);
         List<ForumPostEntity> myForumPosts = forumPostService.selectList(forumPostEw);
         if (!myForumPosts.isEmpty()) {
             List<Long> myForumPostIds = myForumPosts.stream().map(ForumPostEntity::getId).collect(Collectors.toList());
@@ -115,18 +115,19 @@ public class NotifyController {
         }
 
         // 1.2 ???????????
-        EntityWrapper<ZhongshimeishiEntity> zhongshiEw = new EntityWrapper<>();
-        zhongshiEw.eq("userid", userId);
-        zhongshiEw.eq("recipetype", "zhongshimeishi");
-        List<ZhongshimeishiEntity> myZhongshi = zhongshimeishiService.selectList(zhongshiEw);
+        EntityWrapper<ChineseRecipeEntity> zhongshiEw = new EntityWrapper<>();
+        zhongshiEw.eq("user_id", userId);
+        zhongshiEw.eq("source_type", "chinese_recipe");
+        List<ChineseRecipeEntity> myZhongshi = chinese_recipeService.selectList(zhongshiEw);
         if (!myZhongshi.isEmpty()) {
-            List<Long> myZhongshiIds = myZhongshi.stream().map(ZhongshimeishiEntity::getId).collect(Collectors.toList());
-            EntityWrapper<DiscusszhongshimeishiEntity> discussZhongshiEw = new EntityWrapper<>();
-            discussZhongshiEw.in("refid", myZhongshiIds);
-            discussZhongshiEw.eq("recipetype", "zhongshimeishi");
-            discussZhongshiEw.orderBy("addtime", false);
-            List<DiscusszhongshimeishiEntity> commentsZhongshi = discusszhongshimeishiService.selectList(discussZhongshiEw);
-            for (DiscusszhongshimeishiEntity c : commentsZhongshi) {
+            List<Long> myZhongshiIds = myZhongshi.stream().map(ChineseRecipeEntity::getId).collect(Collectors.toList());
+            EntityWrapper<ChineseRecipeCommentEntity> discussZhongshiEw = new EntityWrapper<>();
+            // recipe_comment 字段语义化：refid -> recipe_id, recipetype -> source_type, addtime -> created_at
+            discussZhongshiEw.in("recipe_id", myZhongshiIds);
+            discussZhongshiEw.eq("source_type", "chinese_recipe");
+            discussZhongshiEw.orderBy("created_at", false);
+            List<ChineseRecipeCommentEntity> commentsZhongshi = chinese_recipe_commentService.selectList(discussZhongshiEw);
+            for (ChineseRecipeCommentEntity c : commentsZhongshi) {
                 // ??????????????
                 if (c.getUserid() != null && c.getUserid().longValue() == userId.longValue()) {
                     continue;
@@ -136,7 +137,7 @@ public class NotifyController {
                 item.put("refid", c.getRefid());
                 item.put("addtime", c.getAddtime());
                 item.put("content", c.getContent());
-                ZhongshimeishiEntity dish = zhongshimeishiService.selectById(c.getRefid());
+                ChineseRecipeEntity dish = chinese_recipeService.selectById(c.getRefid());
                 if (dish != null) {
                     item.put("messageContent", dish.getCaipinmingcheng());
                     item.put("picture", dish.getTupian());
@@ -151,18 +152,18 @@ public class NotifyController {
         }
 
         // 1.3 ???????????
-        EntityWrapper<WaiguomeishiEntity> waiguoEw = new EntityWrapper<>();
-        waiguoEw.eq("userid", userId);
-        waiguoEw.eq("recipetype", "waiguomeishi");
-        List<WaiguomeishiEntity> myWaiguo = waiguomeishiService.selectList(waiguoEw);
+        EntityWrapper<ForeignRecipeEntity> waiguoEw = new EntityWrapper<>();
+        waiguoEw.eq("user_id", userId);
+        waiguoEw.eq("source_type", "foreign_recipe");
+        List<ForeignRecipeEntity> myWaiguo = foreign_recipeService.selectList(waiguoEw);
         if (!myWaiguo.isEmpty()) {
-            List<Long> myWaiguoIdsForReply = myWaiguo.stream().map(WaiguomeishiEntity::getId).collect(Collectors.toList());
-            EntityWrapper<DiscusswaiguomeishiEntity> discussWaiguoEw = new EntityWrapper<>();
-            discussWaiguoEw.in("refid", myWaiguoIdsForReply);
-            discussWaiguoEw.eq("recipetype", "waiguomeishi");
-            discussWaiguoEw.orderBy("addtime", false);
-            List<DiscusswaiguomeishiEntity> commentsWaiguo = discusswaiguomeishiService.selectList(discussWaiguoEw);
-            for (DiscusswaiguomeishiEntity c : commentsWaiguo) {
+            List<Long> myWaiguoIdsForReply = myWaiguo.stream().map(ForeignRecipeEntity::getId).collect(Collectors.toList());
+            EntityWrapper<ForeignRecipeCommentEntity> discussWaiguoEw = new EntityWrapper<>();
+            discussWaiguoEw.in("recipe_id", myWaiguoIdsForReply);
+            discussWaiguoEw.eq("source_type", "foreign_recipe");
+            discussWaiguoEw.orderBy("created_at", false);
+            List<ForeignRecipeCommentEntity> commentsWaiguo = foreign_recipe_commentService.selectList(discussWaiguoEw);
+            for (ForeignRecipeCommentEntity c : commentsWaiguo) {
                 // ??????????????
                 if (c.getUserid() != null && c.getUserid().longValue() == userId.longValue()) {
                     continue;
@@ -172,7 +173,7 @@ public class NotifyController {
                 item.put("refid", c.getRefid());
                 item.put("addtime", c.getAddtime());
                 item.put("content", c.getContent());
-                WaiguomeishiEntity dish = waiguomeishiService.selectById(c.getRefid());
+                ForeignRecipeEntity dish = foreign_recipeService.selectById(c.getRefid());
                 if (dish != null) {
                     item.put("messageContent", dish.getCaipinmingcheng());
                     item.put("picture", dish.getTupian());
@@ -203,8 +204,8 @@ public class NotifyController {
             String picture = post != null ? post.getPicture() : null;
             String defaultName = "??";
             String defaultTouxiang = "";
-            if (post != null && post.getUserid() != null) {
-                UserEntity author = userService.selectById(post.getUserid());
+            if (post != null && post.getUserId() != null) {
+                UserEntity author = userService.selectById(post.getUserId());
                 if (author != null) {
                     if (author.getYonghuxingming() != null) {
                         defaultName = author.getYonghuxingming();
@@ -219,24 +220,24 @@ public class NotifyController {
         }
 
         // 1.4.2 ???????????
-        EntityWrapper<DiscusszhongshimeishiEntity> myDiscussZhongshiEw = new EntityWrapper<>();
-        myDiscussZhongshiEw.eq("userid", userId)
-                .eq("recipetype", "zhongshimeishi")
+        EntityWrapper<ChineseRecipeCommentEntity> myDiscussZhongshiEw = new EntityWrapper<>();
+        myDiscussZhongshiEw.eq("user_id", userId)
+                .eq("source_type", "chinese_recipe")
                 .isNotNull("reply")
                 .ne("reply", "");
-        myDiscussZhongshiEw.orderBy("addtime", false);
-        List<DiscusszhongshimeishiEntity> myDiscussZhongshi = discusszhongshimeishiService.selectList(myDiscussZhongshiEw);
-        for (DiscusszhongshimeishiEntity c : myDiscussZhongshi) {
+        myDiscussZhongshiEw.orderBy("created_at", false);
+        List<ChineseRecipeCommentEntity> myDiscussZhongshi = chinese_recipe_commentService.selectList(myDiscussZhongshiEw);
+        for (ChineseRecipeCommentEntity c : myDiscussZhongshi) {
             String replyStr = c.getReply();
             if (replyStr == null || replyStr.trim().isEmpty()) {
                 continue;
             }
-            ZhongshimeishiEntity dish = zhongshimeishiService.selectById(c.getRefid());
+            ChineseRecipeEntity dish = chinese_recipeService.selectById(c.getRefid());
             String picture = dish != null ? dish.getTupian() : null;
             String defaultName = "??";
             String defaultTouxiang = "";
-            if (dish != null && dish.getUserid() != null) {
-                UserEntity author = userService.selectById(dish.getUserid());
+            if (dish != null && dish.getUserId() != null) {
+                UserEntity author = userService.selectById(dish.getUserId());
                 if (author != null) {
                     if (author.getYonghuxingming() != null) {
                         defaultName = author.getYonghuxingming();
@@ -251,24 +252,24 @@ public class NotifyController {
         }
 
         // 1.4.3 ???????????
-        EntityWrapper<DiscusswaiguomeishiEntity> myDiscussWaiguoEw = new EntityWrapper<>();
-        myDiscussWaiguoEw.eq("userid", userId)
-                .eq("recipetype", "waiguomeishi")
+        EntityWrapper<ForeignRecipeCommentEntity> myDiscussWaiguoEw = new EntityWrapper<>();
+        myDiscussWaiguoEw.eq("user_id", userId)
+                .eq("source_type", "foreign_recipe")
                 .isNotNull("reply")
                 .ne("reply", "");
-        myDiscussWaiguoEw.orderBy("addtime", false);
-        List<DiscusswaiguomeishiEntity> myDiscussWaiguo = discusswaiguomeishiService.selectList(myDiscussWaiguoEw);
-        for (DiscusswaiguomeishiEntity c : myDiscussWaiguo) {
+        myDiscussWaiguoEw.orderBy("created_at", false);
+        List<ForeignRecipeCommentEntity> myDiscussWaiguo = foreign_recipe_commentService.selectList(myDiscussWaiguoEw);
+        for (ForeignRecipeCommentEntity c : myDiscussWaiguo) {
             String replyStr = c.getReply();
             if (replyStr == null || replyStr.trim().isEmpty()) {
                 continue;
             }
-            WaiguomeishiEntity dish = waiguomeishiService.selectById(c.getRefid());
+            ForeignRecipeEntity dish = foreign_recipeService.selectById(c.getRefid());
             String picture = dish != null ? dish.getTupian() : null;
             String defaultName = "??";
             String defaultTouxiang = "";
-            if (dish != null && dish.getUserid() != null) {
-                UserEntity author = userService.selectById(dish.getUserid());
+            if (dish != null && dish.getUserId() != null) {
+                UserEntity author = userService.selectById(dish.getUserId());
                 if (author != null) {
                     if (author.getYonghuxingming() != null) {
                         defaultName = author.getYonghuxingming();
@@ -291,19 +292,19 @@ public class NotifyController {
         result.put("replyList", replyList);
 
         // 2. ????????? / ?? ????type=21?
-        EntityWrapper<ZhongshimeishiEntity> zew = new EntityWrapper<>();
-        zew.eq("userid", userId);
-        zew.eq("recipetype", "zhongshimeishi");
-        List<Long> myZhongshiIds = zhongshimeishiService.selectList(zew).stream()
-                .map(ZhongshimeishiEntity::getId).collect(Collectors.toList());
-        EntityWrapper<WaiguomeishiEntity> wew = new EntityWrapper<>();
-        wew.eq("userid", userId);
-        wew.eq("recipetype", "waiguomeishi");
-        List<Long> myWaiguoIds = waiguomeishiService.selectList(wew).stream()
-                .map(WaiguomeishiEntity::getId).collect(Collectors.toList());
+        EntityWrapper<ChineseRecipeEntity> zew = new EntityWrapper<>();
+        zew.eq("user_id", userId);
+        zew.eq("source_type", "chinese_recipe");
+        List<Long> myZhongshiIds = chinese_recipeService.selectList(zew).stream()
+                .map(ChineseRecipeEntity::getId).collect(Collectors.toList());
+        EntityWrapper<ForeignRecipeEntity> wew = new EntityWrapper<>();
+        wew.eq("user_id", userId);
+        wew.eq("source_type", "foreign_recipe");
+        List<Long> myWaiguoIds = foreign_recipeService.selectList(wew).stream()
+                .map(ForeignRecipeEntity::getId).collect(Collectors.toList());
 
         EntityWrapper<ForumPostEntity> forumPostThumbEw = new EntityWrapper<>();
-        forumPostThumbEw.eq("userid", userId);
+        forumPostThumbEw.eq("user_id", userId);
         List<Long> myForumPostIdsForLike = forumPostService.selectList(forumPostThumbEw).stream()
                 .map(ForumPostEntity::getId).collect(Collectors.toList());
 
@@ -425,16 +426,16 @@ public class NotifyController {
             item.put("picture", post.getPicture());
             return;
         }
-        ZhongshimeishiEntity zhongshi = zhongshimeishiService.selectById(refId);
+        ChineseRecipeEntity zhongshi = chinese_recipeService.selectById(refId);
         if (zhongshi != null) {
-            item.put("tablename", "zhongshimeishi");
+            item.put("tablename", "chinese_recipe");
             item.put("name", zhongshi.getCaipinmingcheng());
             item.put("picture", zhongshi.getTupian());
             return;
         }
-        WaiguomeishiEntity waiguo = waiguomeishiService.selectById(refId);
+        ForeignRecipeEntity waiguo = foreign_recipeService.selectById(refId);
         if (waiguo != null) {
-            item.put("tablename", "waiguomeishi");
+            item.put("tablename", "foreign_recipe");
             item.put("name", waiguo.getCaipinmingcheng());
             item.put("picture", waiguo.getTupian());
         }
@@ -552,3 +553,4 @@ public class NotifyController {
         return false;
     }
 }
+

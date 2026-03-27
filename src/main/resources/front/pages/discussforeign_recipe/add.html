@@ -1,4 +1,4 @@
-
+﻿
 <!DOCTYPE html>
 <html>
 	<head>
@@ -335,7 +335,7 @@
 			if(crossrefid && crossuserid) {
 				data.crossuserid=crossuserid;
 				data.crossrefid=crossrefid;
-				http.request('discusswaiguomeishi/list', 'get', {
+				http.request('foreign_recipe_comment/list', 'get', {
 					page: 1,
 					limit: 10,
 					crossuserid:crossuserid,
@@ -352,7 +352,7 @@
 
 
 						// 提交数据
-						http.requestJson('discusswaiguomeishi' + '/add', 'post', data, function(res) {
+						http.requestJson('foreign_recipe_comment' + '/add', 'post', data, function(res) {
 							layer.msg('提交成功', {
 								time: 2000,
 								icon: 6
@@ -365,7 +365,7 @@
 			} else {
                 // 跨表计算
 				// 提交数据
-				http.requestJson('discusswaiguomeishi' + '/add', 'post', data, function(res) {
+				http.requestJson('foreign_recipe_comment' + '/add', 'post', data, function(res) {
 					layer.msg('提交成功', {
 						time: 2000,
 						icon: 6
@@ -382,3 +382,4 @@
 		</script>
 	</body>
 </html>
+

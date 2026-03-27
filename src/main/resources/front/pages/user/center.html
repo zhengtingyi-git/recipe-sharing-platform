@@ -215,7 +215,7 @@
                         <div class="layui-form-item"  :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}'>
 							<label  :style='{"width":"94px","padding":"0 12px 0 0","fontSize":"14px","color":"#333","textAlign":"right"}' class="layui-form-label">用户账号</label>
 							<div class="layui-input-block input">
-								<input type="text" readonly="readonly" name="yonghuzhanghao" id="yonghuzhanghao" placeholder="用户账号" autocomplete="off" class="layui-input">
+								<input type="text" readonly="readonly" name="username" id="username" placeholder="用户账号" autocomplete="off" class="layui-input">
 							</div>
 						</div>
                         <div class="layui-form-item"  :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}'>
@@ -227,19 +227,19 @@
                         <div class="layui-form-item"  :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}'>
 							<label  :style='{"width":"94px","padding":"0 12px 0 0","fontSize":"14px","color":"#333","textAlign":"right"}' class="layui-form-label">用户昵称</label>
 							<div class="layui-input-block input">
-								<input type="text"  name="yonghuxingming" id="yonghuxingming" placeholder="用户昵称" autocomplete="off" class="layui-input">
+								<input type="text"  name="nickname" id="nickname" placeholder="用户昵称" autocomplete="off" class="layui-input">
 							</div>
 						</div>
                         <div class="layui-form-item"  :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}'>
 							<label  :style='{"width":"94px","padding":"0 12px 0 0","fontSize":"14px","color":"#333","textAlign":"right"}' class="layui-form-label">密码</label>
 							<div class="layui-input-block input">
-								<input type="password" name="mima" id="mima" placeholder="密码" autocomplete="off" class="layui-input">
+								<input type="password" name="password" id="password" placeholder="密码" autocomplete="off" class="layui-input">
 							</div>
 						</div>
                         <div class="layui-form-item"  :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}'>
 							<label  :style='{"width":"94px","padding":"0 12px 0 0","fontSize":"14px","color":"#333","textAlign":"right"}' class="layui-form-label">性别</label>
 							<div class="layui-input-block select">
-								<select name="xingbie" id="xingbie" >
+								<select name="gender" id="gender" >
 									<option value="">请选择</option>
 									<option v-for="(item,index) in xingbie" v-bind:key="index" :value="item">{{item}}</option>
 								</select>
@@ -254,14 +254,14 @@
                         <div class="layui-form-item"  :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}'>
 							<label  :style='{"width":"94px","padding":"0 12px 0 0","fontSize":"14px","color":"#333","textAlign":"right"}' style="opacity: 0;" class="layui-form-label">头像</label>
 							<div class="layui-input-block">
-								<img id="touxiangImg" style="width: 100px;height: 100px;border-radius: 50%;border: 2px solid #EEEEEE;" :style='{"boxShadow":"0 0 6px rgba(255,0,0,.8)","borderColor":"#DCDFE6","backgroundColor":"#fff","borderRadius":"10px","borderWidth":"1px","width":"80px","borderStyle":"solid","height":"80px"}' src="../../img/avator.png">
-								<input type="hidden" id="touxiang" name="touxiang" />
+								<img id="avatarImg" style="width: 100px;height: 100px;border-radius: 50%;border: 2px solid #EEEEEE;" :style='{"boxShadow":"0 0 6px rgba(255,0,0,.8)","borderColor":"#DCDFE6","backgroundColor":"#fff","borderRadius":"10px","borderWidth":"1px","width":"80px","borderStyle":"solid","height":"80px"}' src="../../img/avator.png">
+								<input type="hidden" id="avatar" name="avatar" />
 							</div>
 						</div>
 						<div class="layui-form-item"  :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}'>
 							<label  :style='{"width":"94px","padding":"0 12px 0 0","fontSize":"14px","color":"#333","textAlign":"right"}' style="opacity: 0;" class="layui-form-label">图片</label>
 							<div class="layui-input-block">
-								<button :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,.5)","margin":"0 10px 0 0","borderColor":"#ccc","backgroundColor":"red","color":"#fff","borderRadius":"8px","borderWidth":"0","width":"auto","fontSize":"14px","borderStyle":"solid","height":"44px"}' type="button" class="layui-btn btn-theme" id="touxiangUpload">
+								<button :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,.5)","margin":"0 10px 0 0","borderColor":"#ccc","backgroundColor":"red","color":"#fff","borderRadius":"8px","borderWidth":"0","width":"auto","fontSize":"14px","borderStyle":"solid","height":"44px"}' type="button" class="layui-btn btn-theme" id="avatarUpload">
 									<i v-if="true" :style='{"color":"#fff","show":true,"fontSize":"14px"}' class="layui-icon">&#xe67c;</i>上传图片
 								</button>
 							</div>
@@ -434,9 +434,9 @@
 
 				vue.xingbie = '男,女'.split(',')
 				// 上传图片
-				var touxiangUpload = upload.render({
+				var avatarUpload = upload.render({
 					//绑定元素
-					elem: '#touxiangUpload',
+					elem: '#avatarUpload',
 					//上传接口
 					url: http.baseurl + 'file/upload',
 					// 请求头
@@ -461,8 +461,8 @@
 								icon: 6
 							})
 							var url = 'upload/' + res.file;
-							jquery('#touxiang').val(url);
-							jquery('#touxiangImg').attr('src', http.baseurl+url)
+							jquery('#avatar').val(url);
+							jquery('#avatarImg').attr('src', http.baseurl+url)
 						} else {
 							layer.msg(res.msg, {
 								time: 2000,
@@ -499,7 +499,7 @@
 					// 表单赋值
 					form.val("myForm", data.data);
 					// 图片赋值
-					jquery("#touxiangImg").attr("src", http.baseurl+data.data.touxiang);
+					jquery("#avatarImg").attr("src", http.baseurl+data.data.avatar);
 					// 粉丝数
 					if (data.data && data.data.id) {
 						http.request('user-follows/followers-count', 'get', { userId: data.data.id }, function(r) {
@@ -511,7 +511,7 @@
 				// 提交表单
 				form.on('submit(*)', function(data) {
 					data = data.field;
-					if(!data.yonghuzhanghao){
+					if(!data.username){
 						layer.msg('用户账号不能为空', {
 														time: 2000,
 														icon: 5

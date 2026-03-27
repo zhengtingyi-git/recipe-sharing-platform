@@ -81,7 +81,7 @@ public class ForumPostController {
         if(tableNameObj != null && "user".equals(tableNameObj.toString())) {
             Object userIdObj = request.getSession().getAttribute("userId");
             if(userIdObj instanceof Long) {
-                forumPost.setUserid((Long)userIdObj);
+                forumPost.setUserId((Long)userIdObj);
             }
         }
 		PageUtils page = forumPostService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, forumPost), params), params));
@@ -193,8 +193,8 @@ public class ForumPostController {
     @RequestMapping("/info/{id}")
     public R info(@PathVariable("id") Long id){
         ForumPostEntity forumPost = forumPostService.selectById(id);
-        if(forumPost != null && forumPost.getUserid() != null) {
-            UserEntity user = userService.selectById(forumPost.getUserid());
+        if(forumPost != null && forumPost.getUserId() != null) {
+            UserEntity user = userService.selectById(forumPost.getUserId());
             if(user != null) {
                 forumPost.setYonghuzhanghao(user.getYonghuzhanghao());
                 forumPost.setYonghuxingming(user.getYonghuxingming());
@@ -214,8 +214,8 @@ public class ForumPostController {
     @RequestMapping("/detail/{id}")
     public R detail(@PathVariable("id") Long id){
         ForumPostEntity forumPost = forumPostService.selectById(id);
-        if(forumPost != null && forumPost.getUserid() != null) {
-            UserEntity user = userService.selectById(forumPost.getUserid());
+        if(forumPost != null && forumPost.getUserId() != null) {
+            UserEntity user = userService.selectById(forumPost.getUserId());
             if(user != null) {
                 forumPost.setYonghuzhanghao(user.getYonghuzhanghao());
                 forumPost.setYonghuxingming(user.getYonghuxingming());
@@ -250,7 +250,7 @@ public class ForumPostController {
     	forumPost.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
         Object userIdObj = request.getSession().getAttribute("userId");
         if(userIdObj instanceof Long) {
-            forumPost.setUserid((Long)userIdObj);
+            forumPost.setUserId((Long)userIdObj);
         }
     	//ValidatorUtils.validateEntity(forumPost);
         forumPostService.insert(forumPost);

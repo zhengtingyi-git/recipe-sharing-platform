@@ -304,7 +304,7 @@ color: #999 !important;
 				// 加入购物车数量
 				buynumber: 1,
 				// 当前详情页表
-				detailTable: 'waiguomeishi',
+				detailTable: 'foreign_recipe',
 				baseurl: '',
 				// 评论列表
 				dataList: [],
@@ -422,7 +422,7 @@ color: #999 !important;
 				isOwnComment(item) {
 					var uid = (localStorage.getItem('userid') || this.currentUserId || '').trim();
 					if (!uid || !item) return false;
-					var cid = item.userid != null && item.userid !== '' ? item.userid : item.userId;
+					var cid = item.userId != null && item.userId !== '' ? item.userId : item.userid;
 					if (cid != null && cid !== '' && String(cid) === String(uid)) return true;
 					var mine = this.currentUserDisplayName();
 					var name = (item.nickname || '').trim();
@@ -508,7 +508,7 @@ color: #999 !important;
 						});
 						return
 					}
-					localStorage.setItem('crossTable',`waiguomeishi`);
+					localStorage.setItem('crossTable',`foreign_recipe`);
 					localStorage.setItem('crossObj', JSON.stringify(this.detail));
 					localStorage.setItem('statusColumnName',statusColumnName);
 					localStorage.setItem('statusColumnValue',statusColumnValue);
@@ -612,7 +612,7 @@ color: #999 !important;
 						offset: [top + 'px', left + 'px']
 					}, function(confirmIndex){
 						layer.close(confirmIndex);
-						layui.http.requestJson(`discuss${_this.detailTable}/delete`, 'post', [id], function(res) {
+						layui.http.requestJson(`${_this.detailTable}_comment/delete`, 'post', [id], function(res) {
 							if (res.code === 0) {
 								_this.dataList.splice(index, 1);
 								layer.msg('删除成功', { icon: 6 });
@@ -647,7 +647,7 @@ color: #999 !important;
 						offset: [top + 'px', left + 'px']
 					}, function(confirmIndex) {
 						layer.close(confirmIndex);
-						layui.http.request('discuss' + _this.detailTable + '/detail/' + item.id, 'get', {}, function(res) {
+						layui.http.request(`${_this.detailTable}_comment/detail/` + item.id, 'get', {}, function(res) {
 							var entity = res.data || {};
 							var list = [];
 							var raw = entity.reply;
@@ -676,7 +676,7 @@ color: #999 !important;
 							}
 							list.splice(replyIndex, 1);
 							entity.reply = list.length ? JSON.stringify(list) : '';
-							layui.http.requestJson('discuss' + _this.detailTable + '/update', 'post', entity, function(r) {
+							layui.http.requestJson(`${_this.detailTable}_comment/update`, 'post', entity, function(r) {
 								if (r.code === 0) {
 									var row = Object.assign({}, _this.dataList[parentIndex]);
 									row.reply = entity.reply;
@@ -717,7 +717,7 @@ color: #999 !important;
 							layer.msg('回复内容不能为空', { icon: 5 });
 							return;
 						}
-						layui.http.request('discuss' + _this.detailTable + '/detail/' + item.id, 'get', {}, function(res) {
+						layui.http.request(`${_this.detailTable}_comment/detail/` + item.id, 'get', {}, function(res) {
 							var entity = res.data || {};
 							var replyPayload = {
 								userid: uid,
@@ -744,7 +744,7 @@ color: #999 !important;
 							}
 							list.push(replyPayload);
 							entity.reply = JSON.stringify(list);
-							layui.http.requestJson('discuss' + _this.detailTable + '/update', 'post', entity, function(r) {
+							layui.http.requestJson(`${_this.detailTable}_comment/update`, 'post', entity, function(r) {
 								if (r.code === 0) {
 									var newList = (item.replyList && item.replyList.slice()) || [];
 									newList.push({
@@ -915,10 +915,10 @@ color: #999 !important;
 			}
 
 			// 获取评论
-			http.request(`discuss${vue.detailTable}/list`, 'get', {
+			http.request(`${vue.detailTable}_comment/list`, 'get', {
 				page: 1,
 				limit: limit,
-				refid : vue.detail.id
+				recipeId : vue.detail.id
 			}, function(res) {
 				vue.normalizeReplyList(res.data.list);
 				vue.dataList = res.data.list
@@ -930,10 +930,10 @@ color: #999 !important;
 					jump: function(obj, first) {
 						//首次不执行
 						if (!first) {
-							http.request(`discuss${vue.detailTable}/list`, 'get', {
+							http.request(`${vue.detailTable}_comment/list`, 'get', {
 								page: obj.curr,
 								limit: obj.limit,
-								refid : vue.detail.id
+								recipeId : vue.detail.id
 							}, function(res) {
 								vue.normalizeReplyList(res.data.list);
 								vue.dataList = res.data.list
@@ -946,9 +946,9 @@ color: #999 !important;
 			// 提交评论（不整页刷新，只刷新评论列表）
 			form.on('submit(*)', function(data) {
 				data = data.field;
-				data.userid = localStorage.getItem('userid')
+				data.userId = localStorage.getItem('userid')
 				data.nickname = localStorage.getItem('yonghuxingming') || localStorage.getItem('adminName') || ''
-				data.refid = vue.detail.id
+				data.recipeId = vue.detail.id
                 var sensitiveWords = "";
                 var sensitiveWordsArr = [];
                 if(sensitiveWords) {
@@ -963,7 +963,7 @@ color: #999 !important;
                         data.content = data.content.replace(reg,"**");
                     }
                 }
-				http.requestJson(`discuss${vue.detailTable}/save`, 'post', data, function(res) {
+				http.requestJson(`${vue.detailTable}_comment/save`, 'post', data, function(res) {
 					layer.msg('评论成功', {
 						time: 1500,
 						icon: 6
@@ -971,10 +971,10 @@ color: #999 !important;
 					// 重置表单
 					jquery('.message-form')[0].reset();
 					// 重新加载评论列表到第一页
-					http.request(`discuss${vue.detailTable}/list`, 'get', {
+					http.request(`${vue.detailTable}_comment/list`, 'get', {
 						page: 1,
 						limit: limit,
-						refid : vue.detail.id
+						recipeId : vue.detail.id
 					}, function(r) {
 						vue.normalizeReplyList(r.data.list);
 						vue.dataList = r.data.list
@@ -984,10 +984,10 @@ color: #999 !important;
 							limit: limit,
 							jump: function(obj, first) {
 								if (!first) {
-									http.request(`discuss${vue.detailTable}/list`, 'get', {
+								http.request(`${vue.detailTable}_comment/list`, 'get', {
 										page: obj.curr,
 										limit: obj.limit,
-										refid : vue.detail.id
+										recipeId : vue.detail.id
 									}, function(rr) {
 										vue.normalizeReplyList(rr.data.list);
 										vue.dataList = rr.data.list
@@ -1004,3 +1004,4 @@ color: #999 !important;
 		</script>
 	</body>
 </html>
+

@@ -50,8 +50,8 @@ public class UserController {
 	@IgnoreAuth
 	@RequestMapping(value = "/login")
 	public R login(String username, String password, String captcha, HttpServletRequest request) {
-		UserEntity user = userService.selectOne(new EntityWrapper<UserEntity>().eq("yonghuzhanghao", username));
-		if(user==null || !user.getMima().equals(password)) {
+		UserEntity user = userService.selectOne(new EntityWrapper<UserEntity>().eq("username", username));
+		if(user==null || !user.getPassword().equals(password)) {
 			return R.error("账号或密码不正确");
 		}
 		
@@ -69,7 +69,7 @@ public class UserController {
     	if(yonghu.getPhone() == null || yonghu.getPhone().trim().isEmpty()) {
 			return R.error("手机号不能为空");
 		}
-    	UserEntity user = userService.selectOne(new EntityWrapper<UserEntity>().eq("yonghuzhanghao", yonghu.getYonghuzhanghao()));
+    	UserEntity user = userService.selectOne(new EntityWrapper<UserEntity>().eq("username", yonghu.getUsername()));
 		if(user!=null) {
 			return R.error("注册用户已存在");
 		}
@@ -105,11 +105,11 @@ public class UserController {
     @IgnoreAuth
 	@RequestMapping(value = "/resetPass")
     public R resetPass(String username, HttpServletRequest request){
-    	UserEntity user = userService.selectOne(new EntityWrapper<UserEntity>().eq("yonghuzhanghao", username));
+    	UserEntity user = userService.selectOne(new EntityWrapper<UserEntity>().eq("username", username));
     	if(user==null) {
     		return R.error("账号不存在");
     	}
-        user.setMima("123456");
+        user.setPassword("123456");
         userService.updateById(user);
         return R.ok("密码已重置为：123456");
     }
@@ -189,7 +189,7 @@ public class UserController {
     public R save(@RequestBody UserEntity yonghu, HttpServletRequest request){
     	yonghu.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
     	//ValidatorUtils.validateEntity(user);
-    	UserEntity user = userService.selectOne(new EntityWrapper<UserEntity>().eq("yonghuzhanghao", yonghu.getYonghuzhanghao()));
+    	UserEntity user = userService.selectOne(new EntityWrapper<UserEntity>().eq("username", yonghu.getUsername()));
 		if(user!=null) {
 			return R.error("用户已存在");
 		}
@@ -205,7 +205,7 @@ public class UserController {
     public R add(@RequestBody UserEntity yonghu, HttpServletRequest request){
     	yonghu.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
     	//ValidatorUtils.validateEntity(user);
-    	UserEntity user = userService.selectOne(new EntityWrapper<UserEntity>().eq("yonghuzhanghao", yonghu.getYonghuzhanghao()));
+    	UserEntity user = userService.selectOne(new EntityWrapper<UserEntity>().eq("username", yonghu.getUsername()));
 		if(user!=null) {
 			return R.error("用户已存在");
 		}

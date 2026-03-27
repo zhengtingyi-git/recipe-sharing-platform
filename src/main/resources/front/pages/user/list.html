@@ -266,11 +266,11 @@ width: 100%;
 		<form class="layui-form filter" :style='{"padding":"0 10px","boxShadow":"0 0 0px rgba(255,0,0,.8)","margin":"10px 0 10px 0","borderColor":"rgba(0,0,0,.3)","backgroundColor":"#FFE4E9","borderColor":"#F0C0C8","borderRadius":"4px","borderWidth":"0","borderStyle":"solid","justifyContent":"flex-end","height":"64px"}'>
 			<div class="item-list">
 				<div class="lable" :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,0)","margin":"0","borderColor":"rgba(0,0,0,0)","backgroundColor":"transparent","color":"#fff","borderRadius":"0","textAlign":"right","borderWidth":"0","width":"auto","fontSize":"16px","borderStyle":"solid"}'>用户账号</div>
-				<input type="text" :style='{"boxShadow":"0 0 6px rgba(255,0,0,0)","borderColor":"#ccc","backgroundColor":"#fff","color":"#333","borderRadius":"8px","textAlign":"center","borderWidth":"0","width":"140px","fontSize":"14px","borderStyle":"solid","height":"44px"}' name="yonghuzhanghao" id="yonghuzhanghao" placeholder="用户账号" autocomplete="off" class="layui-input">
+				<input type="text" :style='{"boxShadow":"0 0 6px rgba(255,0,0,0)","borderColor":"#ccc","backgroundColor":"#fff","color":"#333","borderRadius":"8px","textAlign":"center","borderWidth":"0","width":"140px","fontSize":"14px","borderStyle":"solid","height":"44px"}' name="username" id="username" placeholder="用户账号" autocomplete="off" class="layui-input">
 			</div>
 			<div class="item-list">
 				<div class="lable" :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,0)","margin":"0","borderColor":"rgba(0,0,0,0)","backgroundColor":"transparent","color":"#fff","borderRadius":"0","textAlign":"right","borderWidth":"0","width":"auto","fontSize":"16px","borderStyle":"solid"}'>用户昵称</div>
-				<input type="text" :style='{"boxShadow":"0 0 6px rgba(255,0,0,0)","borderColor":"#ccc","backgroundColor":"#fff","color":"#333","borderRadius":"8px","textAlign":"center","borderWidth":"0","width":"140px","fontSize":"14px","borderStyle":"solid","height":"44px"}' name="yonghuxingming" id="yonghuxingming" placeholder="用户昵称" autocomplete="off" class="layui-input">
+				<input type="text" :style='{"boxShadow":"0 0 6px rgba(255,0,0,0)","borderColor":"#ccc","backgroundColor":"#fff","color":"#333","borderRadius":"8px","textAlign":"center","borderWidth":"0","width":"140px","fontSize":"14px","borderStyle":"solid","height":"44px"}' name="nickname" id="nickname" placeholder="用户昵称" autocomplete="off" class="layui-input">
 			</div>
 			<button :style='{"padding":"0 15px","boxShadow":"0 0 8px rgba(0,0,0,0)","margin":"0 0 0 10px","borderColor":"#409EFF","backgroundColor":"#409EFF","color":"#fff","borderRadius":"4px","borderWidth":"0","width":"auto","fontSize":"14px","borderStyle":"solid","height":"40px"}' id="btn-search" type="button" class="layui-btn layui-btn-normal">
 			  <i v-if="true" class="layui-icon layui-icon-search"></i>搜索
@@ -398,11 +398,11 @@ width: 100%;
         }
 
 
-        if (jquery('#yonghuzhanghao').val()) {
-          param['yonghuzhanghao'] = jquery('#yonghuzhanghao').val() ? '%' + jquery('#yonghuzhanghao').val() + '%' : '';
+        if (jquery('#username').val()) {
+          param['username'] = jquery('#username').val() ? '%' + jquery('#username').val() + '%' : '';
         }
-        if (jquery('#yonghuxingming').val()) {
-          param['yonghuxingming'] = jquery('#yonghuxingming').val() ? '%' + jquery('#yonghuxingming').val() + '%' : '';
+        if (jquery('#nickname').val()) {
+          param['nickname'] = jquery('#nickname').val() ? '%' + jquery('#nickname').val() + '%' : '';
         }
 
 

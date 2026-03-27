@@ -47,9 +47,9 @@
 
 			<div class="profile-container">
 				<div class="profile-card" v-if="user.id">
-					<img class="profile-avatar" :src="user.touxiang ? (baseurl + user.touxiang) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'" alt="头像" />
+					<img class="profile-avatar" :src="user.avatar ? (baseurl + user.avatar) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'" alt="头像" />
 					<div class="profile-info">
-						<div class="profile-name">{{ user.yonghuxingming || '—' }}</div>
+						<div class="profile-name">{{ user.nickname || '—' }}</div>
 						<div class="profile-fans">粉丝数：{{ fansCount }}</div>
 					</div>
 					<a v-if="!isSelf" @click.prevent="followClick()" href="javascript:void(0)" class="profile-btn-follow" :class="{ followed: followFlag }">{{ followFlag ? '已关注' : '+ 关注' }}</a>
@@ -62,7 +62,7 @@
 					<div class="profile-section" style="width:100%;">
 						<h3>TA 发布的中式美食</h3>
 						<div class="profile-list" v-if="listZhong.length">
-							<div class="item" v-for="(item,index) in listZhong" :key="'z'+index" @click="jump('../zhongshimeishi/detail.html?id=' + item.id)">
+							<div class="item" v-for="(item,index) in listZhong" :key="'z'+index" @click="jump('../chinese_recipe/detail.html?id=' + item.id)">
 								<img :src="item.tupian ? (baseurl + item.tupian.split(',')[0]) : '../../img/default.png'" @error="$event.target.src='../../img/default.png'" />
 								<div class="name">{{ item.caipinmingcheng }}</div>
 							</div>
@@ -72,7 +72,7 @@
 					<div class="profile-section" style="width:100%;">
 						<h3>TA 发布的外国美食</h3>
 						<div class="profile-list" v-if="listWai.length">
-							<div class="item" v-for="(item,index) in listWai" :key="'w'+index" @click="jump('../waiguomeishi/detail.html?id=' + item.id)">
+							<div class="item" v-for="(item,index) in listWai" :key="'w'+index" @click="jump('../foreign_recipe/detail.html?id=' + item.id)">
 								<img :src="item.tupian ? (baseurl + item.tupian.split(',')[0]) : '../../img/default.png'" @error="$event.target.src='../../img/default.png'" />
 								<div class="name">{{ item.caipinmingcheng }}</div>
 							</div>
@@ -206,11 +206,11 @@
 							});
 						}
 						// 该用户发布的中式美食
-						http.request('zhongshimeishi/list', 'get', { page: 1, limit: 100, userid: id, sfsh: '是' }, function(r) {
+						http.request('chinese_recipe/list', 'get', { page: 1, limit: 100, userid: id, sfsh: '是' }, function(r) {
 							vue.listZhong = (r.data && r.data.list) ? r.data.list : [];
 						});
 						// 该用户发布的外国美食
-						http.request('waiguomeishi/list', 'get', { page: 1, limit: 100, userid: id, sfsh: '是' }, function(r) {
+						http.request('foreign_recipe/list', 'get', { page: 1, limit: 100, userid: id, sfsh: '是' }, function(r) {
 							vue.listWai = (r.data && r.data.list) ? r.data.list : [];
 						});
 						// 该用户发布的美食论坛
@@ -225,3 +225,4 @@
 		</script>
 	</body>
 </html>
+

@@ -15,16 +15,16 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.annotation.IgnoreAuth;
 
 import com.entity.RemencaipinEntity;
-import com.service.ZhongshimeishiService;
-import com.service.WaiguomeishiService;
+import com.service.ChineseRecipeService;
+import com.service.ForeignRecipeService;
 import com.utils.PageUtils;
 import com.utils.R;
 import com.service.UserInteractionsService;
 import com.service.TokenService;
 import com.entity.UserInteractionsEntity;
 import com.entity.TokenEntity;
-import com.entity.ZhongshimeishiEntity;
-import com.entity.WaiguomeishiEntity;
+import com.entity.ChineseRecipeEntity;
+import com.entity.ForeignRecipeEntity;
 import java.util.stream.Collectors;
 import java.util.Comparator;
 import java.util.Set;
@@ -37,6 +37,10 @@ import java.util.Arrays;
 @RestController
 @RequestMapping("/remencaipin")
 public class RemencaipinController {
+    private static final String SORT_RECOMMEND = "recommend";
+    private static final String SORT_ADDTIME = "addtime";
+    private static final String SORT_THUMBSUP = "thumbsupnum";
+    private static final String SORT_FAVORITE = "userInteractionsNum";
 
     @Autowired
     private UserInteractionsService userInteractionsService;
@@ -45,10 +49,10 @@ public class RemencaipinController {
     private TokenService tokenService;
 
     @Autowired
-    private ZhongshimeishiService zhongshimeishiService;
+    private ChineseRecipeService chinese_recipeService;
 
     @Autowired
-    private WaiguomeishiService waiguomeishiService;
+    private ForeignRecipeService foreign_recipeService;
 
     /**
      * 前端列表 - 显示全部中式美食和外国美食（sfsh=是），支持排序：addtime 最新、thumbsupnum 最多点赞、userInteractionsNum 最多收藏
@@ -80,21 +84,21 @@ public class RemencaipinController {
         }
 
         List<DishInfo> allDishes = new ArrayList<>();
-        String sort = params.get("sort") != null ? params.get("sort").toString().toLowerCase() : "addtime";
+        String sort = params.get("sort") != null ? params.get("sort").toString() : SORT_ADDTIME;
         String biaotiParam = params.get("biaoti") != null ? params.get("biaoti").toString().trim() : null;
         final String keyword = (biaotiParam != null && !biaotiParam.isEmpty()) ? biaotiParam.replace("%", "").trim() : null;
         String searchTypeParam = params.get("searchType") != null ? params.get("searchType").toString().trim() : "all";
         if (searchTypeParam.isEmpty()) searchTypeParam = "all";
         final boolean searchAllFields = "all".equalsIgnoreCase(searchTypeParam);
 
-        EntityWrapper<ZhongshimeishiEntity> zhongshiEw = new EntityWrapper<>();
-        zhongshiEw.eq("sfsh", "是");
-        zhongshiEw.eq("recipetype", "zhongshimeishi");
-        List<ZhongshimeishiEntity> zhongshiList = zhongshimeishiService.selectList(zhongshiEw);
+        EntityWrapper<ChineseRecipeEntity> zhongshiEw = new EntityWrapper<>();
+        zhongshiEw.eq("audit_status", "是");
+        zhongshiEw.eq("source_type", "chinese_recipe");
+        List<ChineseRecipeEntity> zhongshiList = chinese_recipeService.selectList(zhongshiEw);
         Map<Long, Integer> zhongshiUserInteractionsMap = new HashMap<>();
         Map<Long, Integer> zhongshiThumbsMap = new HashMap<>();
         if (!zhongshiList.isEmpty()) {
-            List<Long> zhongshiIds = zhongshiList.stream().map(ZhongshimeishiEntity::getId).collect(Collectors.toList());
+            List<Long> zhongshiIds = zhongshiList.stream().map(ChineseRecipeEntity::getId).collect(Collectors.toList());
             EntityWrapper<UserInteractionsEntity> userInteractionsWrapper1 = new EntityWrapper<>();
             userInteractionsWrapper1.in("resource_id", zhongshiIds);
             userInteractionsWrapper1.eq("interaction_type", "1");
@@ -110,7 +114,7 @@ public class RemencaipinController {
                 zhongshiThumbsMap.put(thumbs.getRefid(), zhongshiThumbsMap.getOrDefault(thumbs.getRefid(), 0) + 1);
             }
         }
-        for (ZhongshimeishiEntity dish : zhongshiList) {
+        for (ChineseRecipeEntity dish : zhongshiList) {
             if (keyword != null && !keyword.isEmpty()) {
                 boolean match;
                 if (searchAllFields) {
@@ -129,22 +133,22 @@ public class RemencaipinController {
                     dish.getId(),
                     dish.getCaipinmingcheng(),
                     dish.getTupian(),
-                    "zhongshimeishi",
+                    "chinese_recipe",
                     dish.getCaixi(),
                     zhongshiThumbsMap.getOrDefault(dish.getId(), 0),
                     zhongshiUserInteractionsMap.getOrDefault(dish.getId(), 0),
-                    dish.getAddtime()
+                    dish.getCreatedAt()
             ));
         }
 
-        EntityWrapper<WaiguomeishiEntity> waiguoEw = new EntityWrapper<>();
-        waiguoEw.eq("sfsh", "是");
-        waiguoEw.eq("recipetype", "waiguomeishi");
-        List<WaiguomeishiEntity> waiguoList = waiguomeishiService.selectList(waiguoEw);
+        EntityWrapper<ForeignRecipeEntity> waiguoEw = new EntityWrapper<>();
+        waiguoEw.eq("audit_status", "是");
+        waiguoEw.eq("source_type", "foreign_recipe");
+        List<ForeignRecipeEntity> waiguoList = foreign_recipeService.selectList(waiguoEw);
         Map<Long, Integer> waiguoUserInteractionsMap = new HashMap<>();
         Map<Long, Integer> waiguoThumbsMap = new HashMap<>();
         if (!waiguoList.isEmpty()) {
-            List<Long> waiguoIds = waiguoList.stream().map(WaiguomeishiEntity::getId).collect(Collectors.toList());
+            List<Long> waiguoIds = waiguoList.stream().map(ForeignRecipeEntity::getId).collect(Collectors.toList());
             EntityWrapper<UserInteractionsEntity> userInteractionsWrapper1 = new EntityWrapper<>();
             userInteractionsWrapper1.in("resource_id", waiguoIds);
             userInteractionsWrapper1.eq("interaction_type", "1");
@@ -160,7 +164,7 @@ public class RemencaipinController {
                 waiguoThumbsMap.put(thumbs.getRefid(), waiguoThumbsMap.getOrDefault(thumbs.getRefid(), 0) + 1);
             }
         }
-        for (WaiguomeishiEntity dish : waiguoList) {
+        for (ForeignRecipeEntity dish : waiguoList) {
             if (keyword != null && !keyword.isEmpty()) {
                 boolean match;
                 if (searchAllFields) {
@@ -179,19 +183,19 @@ public class RemencaipinController {
                     dish.getId(),
                     dish.getCaipinmingcheng(),
                     dish.getTupian(),
-                    "waiguomeishi",
+                    "foreign_recipe",
                     dish.getCaixi(),
                     waiguoThumbsMap.getOrDefault(dish.getId(), 0),
                     waiguoUserInteractionsMap.getOrDefault(dish.getId(), 0),
-                    dish.getAddtime()
+                    dish.getCreatedAt()
             ));
         }
 
-        if ("thumbsupnum".equals(sort)) {
+        if (SORT_THUMBSUP.equals(sort)) {
             allDishes.sort(Comparator.comparing((DishInfo d) -> d.thumbsupnum).reversed());
-        } else if ("userInteractionsNum".equals(sort)) {
+        } else if (SORT_FAVORITE.equals(sort)) {
             allDishes.sort(Comparator.comparing((DishInfo d) -> d.userInteractionsNum).reversed());
-        } else if ("recommend".equals(sort)) {
+        } else if (SORT_RECOMMEND.equals(sort)) {
             // 推荐排序（分三段）：
             // 1) 用户已点赞/收藏的菜品置顶
             // 2) 用户偏好菜系（由其点赞/收藏过的菜品推断）优先
@@ -267,12 +271,13 @@ public class RemencaipinController {
         if (refId == null) {
             return null;
         }
-        if (dishMap.containsKey("zhongshimeishi_" + refId)) {
-            return "zhongshimeishi";
+        if (dishMap.containsKey("chinese_recipe_" + refId)) {
+            return "chinese_recipe";
         }
-        if (dishMap.containsKey("waiguomeishi_" + refId)) {
-            return "waiguomeishi";
+        if (dishMap.containsKey("foreign_recipe_" + refId)) {
+            return "foreign_recipe";
         }
         return null;
     }
 }
+

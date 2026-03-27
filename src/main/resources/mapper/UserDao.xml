@@ -5,12 +5,13 @@
 
 	<!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="com.entity.UserEntity" id="yonghuMap">
-        <result property="yonghuzhanghao" column="yonghuzhanghao"/>
-        <result property="yonghuxingming" column="yonghuxingming"/>
-        <result property="mima" column="mima"/>
-        <result property="xingbie" column="xingbie"/>
+        <result property="username" column="username"/>
+        <result property="nickname" column="nickname"/>
+        <result property="password" column="password"/>
+        <result property="gender" column="gender"/>
         <result property="phone" column="phone"/>
-        <result property="touxiang" column="touxiang"/>
+        <result property="avatar" column="avatar"/>
+        <result property="createdAt" column="created_at"/>
     </resultMap>
 
 	<select id="selectListVO"

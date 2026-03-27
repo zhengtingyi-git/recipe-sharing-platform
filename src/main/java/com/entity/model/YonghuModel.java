@@ -20,19 +20,19 @@ public class YonghuModel  implements Serializable {
 	 * 用户昵称
 	 */
 	
-	private String yonghuxingming;
+	private String nickname;
 		
 	/**
 	 * 密码
 	 */
 	
-	private String mima;
+	private String password;
 		
 	/**
 	 * 性别
 	 */
 	
-	private String xingbie;
+	private String gender;
 		
 	/**
 	 * 联系方式
@@ -44,22 +44,22 @@ public class YonghuModel  implements Serializable {
 	 * 头像
 	 */
 	
-	private String touxiang;
+	private String avatar;
 				
 	
 	/**
 	 * 设置：用户昵称
 	 */
 	 
-	public void setYonghuxingming(String yonghuxingming) {
-		this.yonghuxingming = yonghuxingming;
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
 	}
 	
 	/**
 	 * 获取：用户昵称
 	 */
-	public String getYonghuxingming() {
-		return yonghuxingming;
+	public String getNickname() {
+		return nickname;
 	}
 				
 	
@@ -67,15 +67,15 @@ public class YonghuModel  implements Serializable {
 	 * 设置：密码
 	 */
 	 
-	public void setMima(String mima) {
-		this.mima = mima;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 	
 	/**
 	 * 获取：密码
 	 */
-	public String getMima() {
-		return mima;
+	public String getPassword() {
+		return password;
 	}
 				
 	
@@ -83,15 +83,15 @@ public class YonghuModel  implements Serializable {
 	 * 设置：性别
 	 */
 	 
-	public void setXingbie(String xingbie) {
-		this.xingbie = xingbie;
+	public void setGender(String gender) {
+		this.gender = gender;
 	}
 	
 	/**
 	 * 获取：性别
 	 */
-	public String getXingbie() {
-		return xingbie;
+	public String getGender() {
+		return gender;
 	}
 				
 	
@@ -115,15 +115,40 @@ public class YonghuModel  implements Serializable {
 	 * 设置：头像
 	 */
 	 
-	public void setTouxiang(String touxiang) {
-		this.touxiang = touxiang;
+	public void setAvatar(String avatar) {
+		this.avatar = avatar;
 	}
 	
 	/**
 	 * 获取：头像
 	 */
+	public String getAvatar() {
+		return avatar;
+	}
+	
+	public void setYonghuxingming(String yonghuxingming) {
+		this.nickname = yonghuxingming;
+	}
+	public String getYonghuxingming() {
+		return nickname;
+	}
+	public void setMima(String mima) {
+		this.password = mima;
+	}
+	public String getMima() {
+		return password;
+	}
+	public void setXingbie(String xingbie) {
+		this.gender = xingbie;
+	}
+	public String getXingbie() {
+		return gender;
+	}
+	public void setTouxiang(String touxiang) {
+		this.avatar = touxiang;
+	}
 	public String getTouxiang() {
-		return touxiang;
+		return avatar;
 	}
 			
 }

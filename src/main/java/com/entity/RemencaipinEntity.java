@@ -89,7 +89,7 @@ public class RemencaipinEntity<T> implements Serializable {
 	private String caixi;
 	
 	/**
-	 * 来源表（zhongshimeishi/waiguomeishi），用于前端跳转详情，非数据库字段
+	 * 来源表（chinese_recipe/foreign_recipe），用于前端跳转详情，非数据库字段
 	 */
 	@TableField(exist = false)
 	private String sourceType;
@@ -193,3 +193,4 @@ public class RemencaipinEntity<T> implements Serializable {
 	}
 
 }
+

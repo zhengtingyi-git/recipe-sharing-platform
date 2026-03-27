@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head lang="en">
 <meta charset="utf-8">
@@ -275,13 +275,13 @@ width: 100%;
 			<button :style='{"padding":"0 15px","boxShadow":"0 0 8px rgba(0,0,0,0)","margin":"0 0 0 10px","borderColor":"#409EFF","backgroundColor":"#409EFF","color":"#fff","borderRadius":"4px","borderWidth":"0","width":"auto","fontSize":"14px","borderStyle":"solid","height":"40px"}' id="btn-search" type="button" class="layui-btn layui-btn-normal">
 			  <i v-if="true" class="layui-icon layui-icon-search"></i>搜索
 			</button>
-			<button :style='{"padding":"0 15px","boxShadow":"0 0 8px rgba(0,0,0,0)","margin":"0 0 0 10px","borderColor":"#409EFF","backgroundColor":"#409EFF","color":"#fff","borderRadius":"4px","borderWidth":"0","width":"auto","fontSize":"14px","borderStyle":"solid","height":"40px"}' v-if="isAuth('discusszhongshimeishi','新增')" @click="jump('../discusszhongshimeishi/add.html')" type="button" class="layui-btn btn-theme">
+			<button :style='{"padding":"0 15px","boxShadow":"0 0 8px rgba(0,0,0,0)","margin":"0 0 0 10px","borderColor":"#409EFF","backgroundColor":"#409EFF","color":"#fff","borderRadius":"4px","borderWidth":"0","width":"auto","fontSize":"14px","borderStyle":"solid","height":"40px"}' v-if="isAuth('chinese_recipe_comment','新增')" @click="jump('../chinese_recipe_comment/add.html')" type="button" class="layui-btn btn-theme">
 			  <i v-if="true" class="layui-icon">&#xe654;</i>添加
 			</button>
 		</form>
 	    <!-- 样式一 -->
 	    <div class="list" style="position: relative;">
-	      <div @click="jump('../discusszhongshimeishi/detail.html?id='+item.id)" v-for="(item,index) in dataList" :key="index" class="list-item" :class="3=='3'?'list-item3':3=='5'?'list-item5':''">
+	      <div @click="jump('../chinese_recipe_comment/detail.html?id='+item.id)" v-for="(item,index) in dataList" :key="index" class="list-item" :class="3=='3'?'list-item3':3=='5'?'list-item5':''">
 	        <div class="list-item-body animation-box" :style='{"padding":"20px 10px","boxShadow":"0 0 0px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(0,0,0,.3)","backgroundColor":"rgba(255, 255, 255, 0)","borderRadius":"0","borderWidth":"0","borderStyle":"solid"}'>
 				<div class="info">
 				</div>
@@ -406,7 +406,7 @@ width: 100%;
 
 
         // 获取列表数据
-        http.request('discusszhongshimeishi/list', 'get', param, function(res) {
+        http.request('chinese_recipe_comment/list', 'get', param, function(res) {
           vue.dataList = res.data.list
           // 分页
           laypage.render({
@@ -420,7 +420,7 @@ width: 100%;
             	param.page = obj.curr;
               //首次不执行
               if (!first) {
-                http.request('discusszhongshimeishi/list', 'get', param, function(res) {
+                http.request('chinese_recipe_comment/list', 'get', param, function(res) {
                   vue.dataList = res.data.list
                 })
               }
@@ -439,3 +439,4 @@ width: 100%;
   </script>
 </body>
 </html>
+

@@ -27,14 +27,14 @@ import com.annotation.IgnoreAuth;
 
 import com.entity.UserInteractionsEntity;
 import com.entity.ForumPostEntity;
-import com.entity.ZhongshimeishiEntity;
-import com.entity.WaiguomeishiEntity;
+import com.entity.ChineseRecipeEntity;
+import com.entity.ForeignRecipeEntity;
 import com.entity.view.UserInteractionsView;
 
 import com.service.UserInteractionsService;
 import com.service.ForumPostService;
-import com.service.ZhongshimeishiService;
-import com.service.WaiguomeishiService;
+import com.service.ChineseRecipeService;
+import com.service.ForeignRecipeService;
 import com.utils.PageUtils;
 import com.utils.R;
 import com.utils.MD5Util;
@@ -57,9 +57,9 @@ public class UserInteractionsController {
     @Autowired
     private ForumPostService forumPostService;
     @Autowired
-    private ZhongshimeishiService zhongshimeishiService;
+    private ChineseRecipeService chinese_recipeService;
     @Autowired
-    private WaiguomeishiService waiguomeishiService;
+    private ForeignRecipeService foreign_recipeService;
 
 
     
@@ -345,11 +345,11 @@ public class UserInteractionsController {
             return;
         }
         switch (tablename) {
-            case "waiguomeishi":
-                ew.andNew().where("resource_id IN (SELECT id FROM recipe WHERE recipetype = {0})", "waiguomeishi");
+            case "foreign_recipe":
+                ew.andNew().where("resource_id IN (SELECT id FROM recipe WHERE source_type = {0})", "foreign_recipe");
                 break;
-            case "zhongshimeishi":
-                ew.andNew().where("resource_id IN (SELECT id FROM recipe WHERE recipetype = {0})", "zhongshimeishi");
+            case "chinese_recipe":
+                ew.andNew().where("resource_id IN (SELECT id FROM recipe WHERE source_type = {0})", "chinese_recipe");
                 break;
             case "forum_post":
                 ew.andNew().where("resource_id IN (SELECT id FROM forum_post)");
@@ -389,17 +389,17 @@ public class UserInteractionsController {
             return;
         }
 
-        ZhongshimeishiEntity zhongshi = zhongshimeishiService.selectById(refId);
+        ChineseRecipeEntity zhongshi = chinese_recipeService.selectById(refId);
         if (zhongshi != null) {
-            userInteractions.setTablename("zhongshimeishi");
+            userInteractions.setTablename("chinese_recipe");
             userInteractions.setName(zhongshi.getCaipinmingcheng());
             userInteractions.setPicture(zhongshi.getTupian());
             return;
         }
 
-        WaiguomeishiEntity waiguo = waiguomeishiService.selectById(refId);
+        ForeignRecipeEntity waiguo = foreign_recipeService.selectById(refId);
         if (waiguo != null) {
-            userInteractions.setTablename("waiguomeishi");
+            userInteractions.setTablename("foreign_recipe");
             userInteractions.setName(waiguo.getCaipinmingcheng());
             userInteractions.setPicture(waiguo.getTupian());
         }
@@ -465,3 +465,4 @@ public class UserInteractionsController {
 
 
 }
+

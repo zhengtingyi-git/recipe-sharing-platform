@@ -121,25 +121,25 @@
                     <div  :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="layui-form-item" pane>
 						<label  :style='{"width":"94px","padding":"0 12px 0 0","fontSize":"14px","color":"#333","textAlign":"right"}' class="layui-form-label">用户账号：</label>
 						<div class="layui-input-block">
-							<input :style='{"padding":"0 12px","boxShadow":"0 0 6px rgba(255,0,0,.8)","borderColor":"#DCDFE6","backgroundColor":"#fff","color":"#333","borderRadius":"4px","textAlign":"left","borderWidth":"1px","fontSize":"14px","borderStyle":"solid","height":"40px"}' v-model="detail.yonghuzhanghao" type="text" :readonly="ro.yonghuzhanghao" name="yonghuzhanghao" id="yonghuzhanghao" autocomplete="off" class="layui-input">
+							<input :style='{"padding":"0 12px","boxShadow":"0 0 6px rgba(255,0,0,.8)","borderColor":"#DCDFE6","backgroundColor":"#fff","color":"#333","borderRadius":"4px","textAlign":"left","borderWidth":"1px","fontSize":"14px","borderStyle":"solid","height":"40px"}' v-model="detail.username" type="text" :readonly="ro.username" name="username" id="username" autocomplete="off" class="layui-input">
 						</div>
 					</div>
                     <div  :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="layui-form-item" pane>
 						<label  :style='{"width":"94px","padding":"0 12px 0 0","fontSize":"14px","color":"#333","textAlign":"right"}' class="layui-form-label">用户昵称：</label>
 						<div class="layui-input-block">
-							<input :style='{"padding":"0 12px","boxShadow":"0 0 6px rgba(255,0,0,.8)","borderColor":"#DCDFE6","backgroundColor":"#fff","color":"#333","borderRadius":"4px","textAlign":"left","borderWidth":"1px","fontSize":"14px","borderStyle":"solid","height":"40px"}' v-model="detail.yonghuxingming" type="text" :readonly="ro.yonghuxingming" name="yonghuxingming" id="yonghuxingming" autocomplete="off" class="layui-input">
+							<input :style='{"padding":"0 12px","boxShadow":"0 0 6px rgba(255,0,0,.8)","borderColor":"#DCDFE6","backgroundColor":"#fff","color":"#333","borderRadius":"4px","textAlign":"left","borderWidth":"1px","fontSize":"14px","borderStyle":"solid","height":"40px"}' v-model="detail.nickname" type="text" :readonly="ro.nickname" name="nickname" id="nickname" autocomplete="off" class="layui-input">
 						</div>
 					</div>
                     <div  :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="layui-form-item" pane>
 						<label  :style='{"width":"94px","padding":"0 12px 0 0","fontSize":"14px","color":"#333","textAlign":"right"}' class="layui-form-label">密码：</label>
 						<div class="layui-input-block">
-							<input :style='{"padding":"0 12px","boxShadow":"0 0 6px rgba(255,0,0,.8)","borderColor":"#DCDFE6","backgroundColor":"#fff","color":"#333","borderRadius":"4px","textAlign":"left","borderWidth":"1px","fontSize":"14px","borderStyle":"solid","height":"40px"}' v-model="detail.mima" type="text" :readonly="ro.mima" name="mima" id="mima" autocomplete="off" class="layui-input">
+							<input :style='{"padding":"0 12px","boxShadow":"0 0 6px rgba(255,0,0,.8)","borderColor":"#DCDFE6","backgroundColor":"#fff","color":"#333","borderRadius":"4px","textAlign":"left","borderWidth":"1px","fontSize":"14px","borderStyle":"solid","height":"40px"}' v-model="detail.password" type="text" :readonly="ro.password" name="password" id="password" autocomplete="off" class="layui-input">
 						</div>
 					</div>
                     <div  :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="layui-form-item" pane>
                         <label  :style='{"width":"94px","padding":"0 12px 0 0","fontSize":"14px","color":"#333","textAlign":"right"}' class="layui-form-label">性别：</label>
                         <div class="layui-input-block">
-                            <select name="xingbie" id="xingbie" lay-filter="xingbie" >
+                            <select name="gender" id="gender" lay-filter="gender" >
                                 <option value="">请选择</option>
                                 <option v-for="(item,index) in xingbie" v-bind:key="index" :value="item">{{item}}</option>
                             </select>
@@ -154,11 +154,11 @@
                     <div :style='{"padding":"10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 0 10px 0","borderColor":"rgba(255,0,0,.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="layui-form-item" pane>
 						<label :style='{"width":"94px","padding":"0 12px 0 0","fontSize":"14px","color":"#333","textAlign":"right"}' class="layui-form-label">头像：</label>
 						<div class="layui-input-block">
-							<div v-if="detail.touxiang" style="display:inline-block;margin-right:10px;">
-								<img id="touxiangImg" style="width: 100px;height: 100px;border-radius: 50%;border: 2px solid #EEEEEE;" :src="baseurl+detail.touxiang.split(',')[0]">
-								<input type="hidden" :value="detail.touxiang" id="touxiang" name="touxiang" />
+							<div v-if="detail.avatar" style="display:inline-block;margin-right:10px;">
+								<img id="avatarImg" style="width: 100px;height: 100px;border-radius: 50%;border: 2px solid #EEEEEE;" :src="baseurl+detail.avatar.split(',')[0]">
+								<input type="hidden" :value="detail.avatar" id="avatar" name="avatar" />
 							</div>
-							<button v-if="!ro.touxiang" :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,.5)","margin":"0 10px 0 0","borderColor":"#ccc","backgroundColor":"red","color":"#fff","borderRadius":"8px","borderWidth":"0","width":"auto","fontSize":"14px","borderStyle":"solid","height":"44px"}' type="button" class="layui-btn btn-theme" id="touxiangUpload">
+							<button v-if="!ro.avatar" :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,.5)","margin":"0 10px 0 0","borderColor":"#ccc","backgroundColor":"red","color":"#fff","borderRadius":"8px","borderWidth":"0","width":"auto","fontSize":"14px","borderStyle":"solid","height":"44px"}' type="button" class="layui-btn btn-theme" id="avatarUpload">
 								<i v-if="true" :style='{"color":"#fff","show":true,"fontSize":"14px"}' class="layui-icon">&#xe67c;</i>上传头像
 							</button>
 						</div>
@@ -204,20 +204,20 @@
 					dataList: [],
 					baseurl:'',
       					ro:{
-				        yonghuzhanghao : false,
-				        yonghuxingming : false,
-				        mima : false,
-				        xingbie : false,
+				        username : false,
+				        nickname : false,
+				        password : false,
+				        gender : false,
 				        phone : false,
-				        touxiang : false,
+				        avatar : false,
               				},
                     detail: {
-                        yonghuzhanghao: '',
-                        yonghuxingming: '',
-                        mima: '',
-                        xingbie: '',
+                        username: '',
+                        nickname: '',
+                        password: '',
+                        gender: '',
                         phone: '',
-                        touxiang: '',
+                        avatar: '',
                     },
 					xingbie: '男,女'.split(','),
 					centerMenu: centerMenu
@@ -291,13 +291,13 @@
 					}
 				});
 
-                form.on('select(xingbie)', function (data) {
-                    vue.detail.xingbie=data.value;
+                form.on('select(gender)', function (data) {
+                    vue.detail.gender=data.value;
                 });
 				// 上传图片
-				var touxiangUpload = upload.render({
+				var avatarUpload = upload.render({
 					//绑定元素
-					elem: '#touxiangUpload',
+					elem: '#avatarUpload',
 					//上传接口
 					url: http.baseurl + 'file/upload',
 					// 请求头
@@ -322,9 +322,9 @@
 								icon: 6
 							})
 							var url = 'upload/' + res.file;
-							jquery('#touxiang').val(url);
-							jquery('#touxiangImg').attr('src', url)
-                            vue.detail.touxiang = url;
+							jquery('#avatar').val(url);
+							jquery('#avatarImg').attr('src', url)
+                            vue.detail.avatar = url;
 						} else {
 							layer.msg(res.msg, {
 								time: 2000,
@@ -356,24 +356,24 @@
                 if(http.getParam('corss')){
 					var obj = JSON.parse(localStorage.getItem('crossObj'));
 					for (var o in obj){
-					if(o=='yonghuzhanghao'){
+					if(o=='username'){
           	                                vue.detail[o] = obj[o];
-						vue.ro.yonghuzhanghao = true;
+						vue.ro.username = true;
 						continue;
                                         }
-					if(o=='yonghuxingming'){
+					if(o=='nickname'){
           	                                vue.detail[o] = obj[o];
-						vue.ro.yonghuxingming = true;
+						vue.ro.nickname = true;
 						continue;
                                         }
-					if(o=='mima'){
+					if(o=='password'){
           	                                vue.detail[o] = obj[o];
-						vue.ro.mima = true;
+						vue.ro.password = true;
 						continue;
                                         }
-					if(o=='xingbie'){
+					if(o=='gender'){
           	                                vue.detail[o] = obj[o];
-						vue.ro.xingbie = true;
+						vue.ro.gender = true;
 						continue;
                                         }
 					if(o=='phone'){
@@ -381,9 +381,9 @@
 						vue.ro.phone = true;
 						continue;
                                         }
-					if(o=='touxiang'){
+					if(o=='avatar'){
           	                                vue.detail[o] = obj[o];
-						vue.ro.touxiang = true;
+						vue.ro.avatar = true;
 						continue;
                                         }
                                         }
@@ -394,7 +394,7 @@
 		form.on('submit(*)', function(data) {
 			data = data.field;
                     // 数据校验
-                    if(!data.yonghuzhanghao){
+                    if(!data.username){
                         layer.msg('用户账号不能为空', {
 				time: 2000,
 				icon: 5

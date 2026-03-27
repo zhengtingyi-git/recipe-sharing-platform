@@ -4,8 +4,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.baomidou.mybatisplus.enums.IdType;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /** 
  * 用户
@@ -32,7 +35,10 @@ public class AdminEntity implements Serializable {
 	 */
 	private String phone;
 	
-	private Date addtime;
+	@JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat
+	@TableField("created_at")
+	private Date createdAt;
 
 	public String getUsername() {
 		return username;
@@ -58,12 +64,12 @@ public class AdminEntity implements Serializable {
 		this.phone = phone;
 	}
 
-	public Date getAddtime() {
-		return addtime;
+	public Date getCreatedAt() {
+		return createdAt;
 	}
 
-	public void setAddtime(Date addtime) {
-		this.addtime = addtime;
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
 	}
 
 	public Long getId() {

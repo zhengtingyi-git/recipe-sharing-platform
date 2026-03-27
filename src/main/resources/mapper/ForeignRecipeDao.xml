@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dao.ForeignRecipeDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.entity.ForeignRecipeEntity" id="foreign_recipeMap">
+        <result property="caipinmingcheng" column="dish_name"/>
+        <result property="caixi" column="cuisine"/>
+        <result property="tupian" column="image"/>
+        <result property="caipinleixing" column="dish_type"/>
+        <result property="cailiao" column="ingredients"/>
+        <result property="pengrenfangfa" column="cooking_method"/>
+        <result property="meishideyoulai" column="meishideyoulai"/>
+        <result property="userId" column="user_id"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="auditStatus" column="audit_status"/>
+        <result property="auditReply" column="audit_reply"/>
+        <result property="viewCount" column="view_count"/>
+    </resultMap>
+
+	<select id="selectListVO"
+		resultType="com.entity.vo.ForeignRecipeVO" >
+		SELECT 
+			cuisine AS caixi,
+			image AS tupian,
+			dish_type AS caipinleixing,
+			ingredients AS cailiao,
+			cooking_method AS pengrenfangfa,
+			audit_status AS sfsh,
+			audit_reply AS shhf,
+			view_count AS clicknum
+		FROM recipe  foreign_recipe         
+        <where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+	
+	<select id="selectVO"
+		resultType="com.entity.vo.ForeignRecipeVO" >
+		SELECT 
+			cuisine AS caixi,
+			image AS tupian,
+			dish_type AS caipinleixing,
+			ingredients AS cailiao,
+			cooking_method AS pengrenfangfa,
+			audit_status AS sfsh,
+			audit_reply AS shhf,
+			view_count AS clicknum
+		FROM recipe  foreign_recipe 	
+ 		<where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+
+    <select id="selectListView"
+		resultType="com.entity.view.ForeignRecipeView" >
+		SELECT 
+			foreign_recipe.id,
+			foreign_recipe.dish_name AS caipinmingcheng,
+			foreign_recipe.cuisine AS caixi,
+			foreign_recipe.image AS tupian,
+			foreign_recipe.dish_type AS caipinleixing,
+			foreign_recipe.ingredients AS cailiao,
+			foreign_recipe.cooking_method AS pengrenfangfa,
+			foreign_recipe.user_id AS userId,
+			foreign_recipe.created_at AS createdAt,
+			foreign_recipe.audit_status AS auditStatus,
+			foreign_recipe.audit_reply AS auditReply,
+			foreign_recipe.view_count AS viewCount,
+			foreign_recipe.source_type AS sourceType
+		FROM recipe  foreign_recipe 	        
+        <where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+	
+	<select id="selectView"
+		resultType="com.entity.view.ForeignRecipeView" >
+		SELECT 
+			foreign_recipe.id,
+			foreign_recipe.dish_name AS caipinmingcheng,
+			foreign_recipe.cuisine AS caixi,
+			foreign_recipe.image AS tupian,
+			foreign_recipe.dish_type AS caipinleixing,
+			foreign_recipe.ingredients AS cailiao,
+			foreign_recipe.cooking_method AS pengrenfangfa,
+			foreign_recipe.user_id AS userId,
+			foreign_recipe.created_at AS createdAt,
+			foreign_recipe.audit_status AS auditStatus,
+			foreign_recipe.audit_reply AS auditReply,
+			foreign_recipe.view_count AS viewCount,
+			foreign_recipe.source_type AS sourceType
+		FROM recipe  foreign_recipe 
+		<where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+	
+
+</mapper>
+

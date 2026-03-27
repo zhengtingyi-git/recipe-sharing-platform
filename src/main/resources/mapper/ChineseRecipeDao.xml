@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dao.ChineseRecipeDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.entity.ChineseRecipeEntity" id="chinese_recipeMap">
+        <result property="caipinmingcheng" column="dish_name"/>
+        <result property="caixi" column="cuisine"/>
+        <result property="tupian" column="image"/>
+        <result property="caipinleixing" column="dish_type"/>
+        <result property="cailiao" column="ingredients"/>
+        <result property="pengrenfangfa" column="cooking_method"/>
+        <result property="meishideyoulai" column="meishideyoulai"/>
+        <result property="userId" column="user_id"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="auditStatus" column="audit_status"/>
+        <result property="auditReply" column="audit_reply"/>
+        <result property="viewCount" column="view_count"/>
+    </resultMap>
+
+	<select id="selectListVO"
+		resultType="com.entity.vo.ChineseRecipeVO" >
+		SELECT 
+			cuisine AS caixi,
+			image AS tupian,
+			dish_type AS caipinleixing,
+			ingredients AS cailiao,
+			cooking_method AS pengrenfangfa,
+			audit_status AS sfsh,
+			audit_reply AS shhf,
+			view_count AS clicknum
+		FROM recipe  chinese_recipe         
+        <where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+	
+	<select id="selectVO"
+		resultType="com.entity.vo.ChineseRecipeVO" >
+		SELECT 
+			cuisine AS caixi,
+			image AS tupian,
+			dish_type AS caipinleixing,
+			ingredients AS cailiao,
+			cooking_method AS pengrenfangfa,
+			audit_status AS sfsh,
+			audit_reply AS shhf,
+			view_count AS clicknum
+		FROM recipe  chinese_recipe 	
+ 		<where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+
+    <select id="selectListView"
+		resultType="com.entity.view.ChineseRecipeView" >
+		SELECT 
+			chinese_recipe.id,
+			chinese_recipe.dish_name AS caipinmingcheng,
+			chinese_recipe.cuisine AS caixi,
+			chinese_recipe.image AS tupian,
+			chinese_recipe.dish_type AS caipinleixing,
+			chinese_recipe.ingredients AS cailiao,
+			chinese_recipe.cooking_method AS pengrenfangfa,
+			chinese_recipe.user_id AS userId,
+			chinese_recipe.created_at AS createdAt,
+			chinese_recipe.audit_status AS auditStatus,
+			chinese_recipe.audit_reply AS auditReply,
+			chinese_recipe.view_count AS viewCount,
+			chinese_recipe.source_type AS sourceType
+		FROM recipe  chinese_recipe 	        
+        <where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+	
+	<select id="selectView"
+		resultType="com.entity.view.ChineseRecipeView" >
+		SELECT 
+			chinese_recipe.id,
+			chinese_recipe.dish_name AS caipinmingcheng,
+			chinese_recipe.cuisine AS caixi,
+			chinese_recipe.image AS tupian,
+			chinese_recipe.dish_type AS caipinleixing,
+			chinese_recipe.ingredients AS cailiao,
+			chinese_recipe.cooking_method AS pengrenfangfa,
+			chinese_recipe.user_id AS userId,
+			chinese_recipe.created_at AS createdAt,
+			chinese_recipe.audit_status AS auditStatus,
+			chinese_recipe.audit_reply AS auditReply,
+			chinese_recipe.view_count AS viewCount,
+			chinese_recipe.source_type AS sourceType
+		FROM recipe  chinese_recipe 
+		<where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+	
+
+</mapper>
+

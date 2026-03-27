@@ -139,8 +139,8 @@
 			<h1 class="title">{{ detail.title }}</h1>
 			<div class="auth-container">
 				<div class="meta-time">时间：{{ timeText }}</div>
-				<div class="author-container" v-if="detail.yonghuxingming || detail.userid">
-					<a class="author-link" href="javascript:void(0)" v-if="detail.userid" @click="jump('../user/profile.html?id=' + detail.userid)">
+				<div class="author-container" v-if="detail.yonghuxingming || authorUserId">
+					<a class="author-link" href="javascript:void(0)" v-if="authorUserId" @click="jump('../user/profile.html?id=' + authorUserId)">
 						<img class="author-avatar" :src="detail.touxiang ? (baseurl + detail.touxiang) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'">
 						<span class="author-name">{{ detail.yonghuxingming || '作者' }}</span>
 					</a>
@@ -148,7 +148,7 @@
 						<img class="author-avatar" :src="detail.touxiang ? (baseurl + detail.touxiang) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'">
 						<span class="author-name">{{ detail.yonghuxingming || '作者' }}</span>
 					</div>
-					<a v-if="detail.userid && !isSelf" href="javascript:void(0)" class="author-follow-btn" :class="{ followed: followFlag }" @click="followClick()">
+					<a v-if="authorUserId && !isSelf" href="javascript:void(0)" class="author-follow-btn" :class="{ followed: followFlag }" @click="followClick()">
 						{{ followFlag ? '已关注' : '+ 关注' }}
 					</a>
 				</div>
@@ -279,9 +279,12 @@
 				commentPrefix: 'forum-post-comment'
 			},
 			computed: {
+				authorUserId: function() {
+					return this.detail.userId != null && this.detail.userId !== '' ? this.detail.userId : '';
+				},
 				isSelf: function() {
 					var uid = localStorage.getItem('userid');
-					return !uid || (this.detail.userid && String(this.detail.userid) === String(uid));
+					return !uid || (this.authorUserId && String(this.authorUserId) === String(uid));
 				},
 				timeText: function() {
 					if (this.detail.createdAt) return this.detail.createdAt;
@@ -410,8 +413,8 @@
 						layer.msg('请先登录', { icon: 5 });
 						return;
 					}
-					if (!this.detail.userid) return;
-					var followedId = this.detail.userid;
+					if (!this.authorUserId) return;
+					var followedId = this.authorUserId;
 					var api = this.followFlag ? 'guanzhu/unfollow' : 'guanzhu/follow';
 					var _this = this;
 					layui.http.request(api, 'get', { followedId: followedId }, function(res) {
@@ -688,8 +691,9 @@
 				if (vue.detail.content) {
 					vue.detail.content = vue.detail.content.replace(/<img/g, '<img class="forum-img"');
 				}
-				if (res.data && res.data.userid) {
-					http.request('guanzhu/status', 'get', { followedId: res.data.userid }, function(r) {
+				var followQueryUserId = res.data && res.data.userId;
+				if (followQueryUserId) {
+					http.request('guanzhu/status', 'get', { followedId: followQueryUserId }, function(r) {
 						vue.followFlag = (r.data && r.data.followed) ? 1 : 0;
 					});
 				}

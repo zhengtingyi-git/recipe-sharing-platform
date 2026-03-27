@@ -1,6 +1,7 @@
 package com.entity;
 
 import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableName;
 
 import java.lang.reflect.InvocationTargetException;
@@ -46,26 +47,22 @@ public class UserEntity<T> implements Serializable {
 	/**
 	 * 用户账号
 	 */
-					
-	private String yonghuzhanghao;
+	private String username;
 	
 	/**
 	 * 用户昵称
 	 */
-					
-	private String yonghuxingming;
+	private String nickname;
 	
 	/**
 	 * 密码
 	 */
-					
-	private String mima;
+	private String password;
 	
 	/**
 	 * 性别
 	 */
-					
-	private String xingbie;
+	private String gender;
 	
 	/**
 	 * 联系方式
@@ -76,19 +73,19 @@ public class UserEntity<T> implements Serializable {
 	/**
 	 * 头像
 	 */
-					
-	private String touxiang;
+	private String avatar;
 	
 	
 	@JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
 	@DateTimeFormat
-	private Date addtime;
+	@TableField("created_at")
+	private Date createdAt;
 
-	public Date getAddtime() {
-		return addtime;
+	public Date getCreatedAt() {
+		return createdAt;
 	}
-	public void setAddtime(Date addtime) {
-		this.addtime = addtime;
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
 	}
 
 	public Long getId() {
@@ -101,50 +98,50 @@ public class UserEntity<T> implements Serializable {
 	/**
 	 * 设置：用户账号
 	 */
-	public void setYonghuzhanghao(String yonghuzhanghao) {
-		this.yonghuzhanghao = yonghuzhanghao;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 	/**
 	 * 获取：用户账号
 	 */
-	public String getYonghuzhanghao() {
-		return yonghuzhanghao;
+	public String getUsername() {
+		return username;
 	}
 	/**
 	 * 设置：用户昵称
 	 */
-	public void setYonghuxingming(String yonghuxingming) {
-		this.yonghuxingming = yonghuxingming;
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
 	}
 	/**
 	 * 获取：用户昵称
 	 */
-	public String getYonghuxingming() {
-		return yonghuxingming;
+	public String getNickname() {
+		return nickname;
 	}
 	/**
 	 * 设置：密码
 	 */
-	public void setMima(String mima) {
-		this.mima = mima;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 	/**
 	 * 获取：密码
 	 */
-	public String getMima() {
-		return mima;
+	public String getPassword() {
+		return password;
 	}
 	/**
 	 * 设置：性别
 	 */
-	public void setXingbie(String xingbie) {
-		this.xingbie = xingbie;
+	public void setGender(String gender) {
+		this.gender = gender;
 	}
 	/**
 	 * 获取：性别
 	 */
-	public String getXingbie() {
-		return xingbie;
+	public String getGender() {
+		return gender;
 	}
 	/**
 	 * 设置：联系方式
@@ -161,14 +158,52 @@ public class UserEntity<T> implements Serializable {
 	/**
 	 * 设置：头像
 	 */
-	public void setTouxiang(String touxiang) {
-		this.touxiang = touxiang;
+	public void setAvatar(String avatar) {
+		this.avatar = avatar;
 	}
 	/**
 	 * 获取：头像
 	 */
+	public String getAvatar() {
+		return avatar;
+	}
+
+	public Date getAddtime() {
+		return createdAt;
+	}
+	public void setAddtime(Date addtime) {
+		this.createdAt = addtime;
+	}
+
+	public void setYonghuzhanghao(String yonghuzhanghao) {
+		this.username = yonghuzhanghao;
+	}
+	public String getYonghuzhanghao() {
+		return username;
+	}
+	public void setYonghuxingming(String yonghuxingming) {
+		this.nickname = yonghuxingming;
+	}
+	public String getYonghuxingming() {
+		return nickname;
+	}
+	public void setMima(String mima) {
+		this.password = mima;
+	}
+	public String getMima() {
+		return password;
+	}
+	public void setXingbie(String xingbie) {
+		this.gender = xingbie;
+	}
+	public String getXingbie() {
+		return gender;
+	}
+	public void setTouxiang(String touxiang) {
+		this.avatar = touxiang;
+	}
 	public String getTouxiang() {
-		return touxiang;
+		return avatar;
 	}
 
 }

@@ -257,7 +257,7 @@ color: #999 !important;
 				// 加入购物车数量
 				buynumber: 1,
 				// 当前详情页表
-				detailTable: 'discusszhongshimeishi',
+				detailTable: 'chinese_recipe_comment',
 				baseurl: '',
 				// 评论列表
 				dataList: [],
@@ -365,7 +365,7 @@ color: #999 !important;
 				},
 				// 跨表
 				onAcrossTap(acrossTable,crossOptAudit,statusColumnName,tips,statusColumnValue){
-					localStorage.setItem('crossTable',`discusszhongshimeishi`);
+					localStorage.setItem('crossTable',`chinese_recipe_comment`);
 					localStorage.setItem('crossObj', JSON.stringify(this.detail));
 					localStorage.setItem('statusColumnName',statusColumnName);
 					localStorage.setItem('statusColumnValue',statusColumnValue);
@@ -494,7 +494,7 @@ color: #999 !important;
 
 
 			// 获取评论
-			http.request(`discuss${vue.detailTable}/list`, 'get', {
+			http.request(`${vue.detailTable}/list`, 'get', {
 				page: 1,
 				limit: limit,
 				refid : vue.detail.id
@@ -509,7 +509,7 @@ color: #999 !important;
 					jump: function(obj, first) {
 						//首次不执行
 						if (!first) {
-							http.request(`discuss${vue.detailTable}/list`, 'get', {
+							http.request(`${vue.detailTable}/list`, 'get', {
 								page: obj.curr,
 								limit: obj.limit,
 								refid : vue.detail.id
@@ -542,7 +542,7 @@ color: #999 !important;
                         data.content = data.content.replace(reg,"**");
                     }
                 }
-				http.requestJson(`discuss${vue.detailTable}/save`, 'post', data, function(res) {
+				http.requestJson(`${vue.detailTable}/save`, 'post', data, function(res) {
 					layer.msg('评论成功', {
 						time: 2000,
 						icon: 6
@@ -558,3 +558,4 @@ color: #999 !important;
 		</script>
 	</body>
 </html>
+
