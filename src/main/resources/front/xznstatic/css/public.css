@@ -1,23 +1,23 @@
-@charset "utf-8"; /* CSS Document *//*css预设*/
+﻿@charset "utf-8"; /* CSS Document *//*css棰勮*/
 * {
     margin: 0;
     padding: 0;
 }
 
-/*将所有HTML元素的默认边距清0*/
+/*灏嗘墍鏈塇TML鍏冪礌鐨勯粯璁よ竟璺濇竻0*/
 html, body {
     font-size: 12px;
-    font-family: "微软雅黑", "arial";
+    font-family: "寰蒋闆呴粦", "arial";
     color: #262626;
     background: #FFF;
 }
 
-/*对HTML元素中的字体、颜色、背景色进行初始设置*/
+/*瀵笻TML鍏冪礌涓殑瀛椾綋銆侀鑹层€佽儗鏅壊杩涜鍒濆璁剧疆*/
 ul li, ol li {
     list-style: none;
 }
 
-/*将列表标签的默认样式清除*/
+/*灏嗗垪琛ㄦ爣绛剧殑榛樿鏍峰紡娓呴櫎*/
 a {
     text-decoration: none;
     outline: none;
@@ -25,12 +25,12 @@ a {
     blr: expression(this.onFocus=this.blur());
 }
 
-/*将超链接的下划线去掉以及在ie6中点击出现的虚线框去掉*/
+/*灏嗚秴閾炬帴鐨勪笅鍒掔嚎鍘绘帀浠ュ強鍦╥e6涓偣鍑诲嚭鐜扮殑铏氱嚎妗嗗幓鎺?/
 img {
     border: none;
 }
 
-/*图片的默认边框去掉 */
+/*鍥剧墖鐨勯粯璁よ竟妗嗗幓鎺?*/
 table {
     border-collapse: collapse;
     border-spacing: 0;
@@ -64,7 +64,7 @@ article, aside, figcaption, figure, footer, header, hgroup, nav, section, summar
     display: block;
 }
 
-/*清楚浮动*/
+/*娓呮娴姩*/
 .clearfix:after {
     content: "";
     display: block;
@@ -78,7 +78,7 @@ article, aside, figcaption, figure, footer, header, hgroup, nav, section, summar
     zoom: 1;
 }
 
-/*解决ie6的兼容性问题*/
+/*瑙ｅ喅ie6鐨勫吋瀹规€ч棶棰?/
 .fl {
     float: left;
 }
@@ -141,7 +141,7 @@ article, aside, figcaption, figure, footer, header, hgroup, nav, section, summar
     float: right;
     width: 13%;
     padding-bottom: 10px;
-    background: url("../img/ss.png") no-repeat right 5px;
+    background: url(/recipe-sharing-platform/upload/ss.png) no-repeat right 5px;
     cursor: pointer;
 }
 
@@ -254,7 +254,7 @@ article, aside, figcaption, figure, footer, header, hgroup, nav, section, summar
     margin-right: 40px;
 }
 
-/*定位样式*/
+/*瀹氫綅鏍峰紡*/
 .ding {
     margin-top: 0;
     position: fixed;
@@ -315,7 +315,7 @@ article, aside, figcaption, figure, footer, header, hgroup, nav, section, summar
     line-height: 35px;
 }
 
-/*头部二维码*/
+/*澶撮儴浜岀淮鐮?/
 .head div.btn p {
     display: none;
 }

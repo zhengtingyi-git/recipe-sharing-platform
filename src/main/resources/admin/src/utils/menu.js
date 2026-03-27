@@ -1,4 +1,4 @@
-﻿const menu = {
+const menu = {
     list() {
         return [
             {
@@ -95,7 +95,7 @@
                                 buttons: ["查看", "查看评论"],
                                 menu: "每日推荐列表",
                                 menuJump: "列表",
-                                tableName: "remencaipin"
+                                tableName: "daily-recommendations"
                             }
                         ],
                         menu: "每日推荐模块"

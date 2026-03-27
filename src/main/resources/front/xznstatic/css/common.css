@@ -174,7 +174,7 @@ i, em {
 	font-size: 24px;
 	font-family: Arial;
 	color: #fff;
-	background: url(img/index_03.gif) left center no-repeat;
+	background: url(/recipe-sharing-platform/upload/index_03.gif) left center no-repeat;
 	padding-left: 30px;
 }
 #header .top .search {
@@ -198,7 +198,7 @@ i, em {
 }
 .search .button {
 	float: left;
-	background: url(img/index_07.gif) no-repeat;
+	background: url(/recipe-sharing-platform/upload/index_07.gif) no-repeat;
 	width: 9px;
 	height: 9px;
 	border: none;
@@ -225,7 +225,7 @@ i, em {
 }
 #footer {
 	width: 100%;
-	background: url(img/index_42.gif) center center no-repeat;
+	background: url(/recipe-sharing-platform/upload/index_42.gif) center center no-repeat;
 	height: 300px;
 	overflow: hidden
 }
@@ -242,7 +242,7 @@ i, em {
 	border-right: 1px dashed #ae1a25;
 	height: 143px;
 	overflow: hidden;
-	background: url(img/index_49.jpg) left 43px no-repeat;
+	background: url(/recipe-sharing-platform/upload/index_49.jpg) left 43px no-repeat;
 	padding: 34px 0 0 133px;
 	color: #fff;
 	line-height: 22px;
@@ -311,7 +311,7 @@ i, em {
 	float: left;
 }
 .ny_left li:hover, .ny_left li.hover {
-	background: url(../img/service_btn.png) #d42e3b 140px center no-repeat;
+	background: url(/recipe-sharing-platform/upload/service_btn.png) #d42e3b 140px center no-repeat;
 }
 .ny_left li:hover a, .ny_left li.hover a {
 	color: #fff
@@ -321,7 +321,7 @@ i, em {
 	width: 191px;
 	height: 48px;
 	border: solid 2px #d42e3b;
-	background: url(../img/service_btn.png) #d42e3b 140px center no-repeat;
+	background: url(/recipe-sharing-platform/upload/service_btn.png) #d42e3b 140px center no-repeat;
 }
 .ny_left ul .hover p {
 	color: #fff;
@@ -331,7 +331,7 @@ i, em {
 	margin-top: 36px;
 }
 .ny_left .service_tel p {
-	background: url(img/service_tel.png) left center no-repeat;
+	background: url(/recipe-sharing-platform/upload/service_tel.png) left center no-repeat;
 	padding-left: 29px;
 	font-size: 21px;
 	margin-left: 5px;
@@ -410,4 +410,5 @@ i, em {
 	background-color: #ffffff !important;
 	background: #ffffff !important;
 }
+
 

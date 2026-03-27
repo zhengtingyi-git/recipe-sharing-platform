@@ -67,7 +67,7 @@
 	text-align: center
 }
 .section1 {
-	background: url(../img/index_24.gif) center center no-repeat;
+	background: url(/recipe-sharing-platform/upload/index_24.gif) center center no-repeat;
 	width: 100%;
 	height: 551px;
 	margin-bottom: 38px;
@@ -170,7 +170,7 @@
 .student {
 	width: 1002px;
 	margin: 0 auto;
-	background: url(../img/index_35.gif) #fffefa 145px bottom no-repeat;
+	background: url(/recipe-sharing-platform/upload/index_35.gif) #fffefa 145px bottom no-repeat;
 	height: 572px;
 	overflow: hidden
 }
@@ -245,10 +245,10 @@
 	cursor: pointer
 }
 .student .hd .prev {
-	background: url(../img/index_44.gif) no-repeat
+	background: url(/recipe-sharing-platform/upload/index_44.gif) no-repeat
 }
 .student .hd .next {
-	background: url(../img/index_41.gif) no-repeat
+	background: url(/recipe-sharing-platform/upload/index_41.gif) no-repeat
 }
 /*??????*/
 .single_con .ny_right .content {
@@ -313,7 +313,7 @@
 	display: block;
 	height: 20px;
 	line-height: 20px;
-	background: url(../img/forum_post_list_time.jpg) left center no-repeat;
+	background: url(/recipe-sharing-platform/upload/forum_post_list_time.jpg) left center no-repeat;
 	padding-left: 20px;
 	margin-top: 10px;
 }
@@ -496,4 +496,5 @@
 .pagelink a.on, .pagelink a:hover {
 	color: #F9003B;
 }
+
 

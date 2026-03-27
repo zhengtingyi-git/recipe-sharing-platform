@@ -315,7 +315,7 @@ export default {
 		background-position: center center;
 		background-size: cover;
 		background-repeat: no-repeat;
-		background-image: url('../../../front/xznstatic/img/qiantaidenglu.png');
+		background-image: url('/recipe-sharing-platform/upload/qiantaidenglu.png');
 		    
 		.login-form {
 			right: 50%;

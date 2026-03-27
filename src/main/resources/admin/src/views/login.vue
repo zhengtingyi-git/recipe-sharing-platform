@@ -176,8 +176,8 @@ export default {
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
-      /* 使用统一静态目录 /recipe-sharing-platform/xznstatic/img */
-      background-image: url('../../../front/xznstatic/img/qiantaidenglu.png');
+      /* 登录背景图统一走 static/upload 目录 */
+      background-image: url('/recipe-sharing-platform/upload/qiantaidenglu.png');
     
 
   .loginInBt {
