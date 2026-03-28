@@ -68,13 +68,13 @@ public class ForeignRecipeVO  implements Serializable {
 	 * 是否审核
 	 */
 	
-	private String sfsh;
+	private String auditStatus;
 		
 	/**
 	 * 审核回复
 	 */
 	
-	private String shhf;
+	private String auditReply;
 		
 	/**
 	 * 赞
@@ -207,15 +207,15 @@ public class ForeignRecipeVO  implements Serializable {
 	 * 设置：是否审核
 	 */
 	 
-	public void setSfsh(String sfsh) {
-		this.sfsh = sfsh;
+	public void setAuditStatus(String auditStatus) {
+		this.auditStatus = auditStatus;
 	}
 	
 	/**
 	 * 获取：是否审核
 	 */
-	public String getSfsh() {
-		return sfsh;
+	public String getAuditStatus() {
+		return auditStatus;
 	}
 				
 	
@@ -223,15 +223,15 @@ public class ForeignRecipeVO  implements Serializable {
 	 * 设置：审核回复
 	 */
 	 
-	public void setShhf(String shhf) {
-		this.shhf = shhf;
+	public void setAuditReply(String auditReply) {
+		this.auditReply = auditReply;
 	}
 	
 	/**
 	 * 获取：审核回复
 	 */
-	public String getShhf() {
-		return shhf;
+	public String getAuditReply() {
+		return auditReply;
 	}
 				
 	

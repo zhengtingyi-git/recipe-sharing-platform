@@ -246,8 +246,8 @@ public class UserInteractionsController {
     	if (userInteractions.getResourceId() == null) {
     		return R.error("缺少 resourceId");
     	}
-    	if (userInteractions.getType() != null && !("1".equals(userInteractions.getType()) || "21".equals(userInteractions.getType()))) {
-    		return R.error("user-interactions.type 只允许 1(收藏) 或 21(赞)");
+    	if (userInteractions.getType() != null && !("1".equals(userInteractions.getType()) || "0".equals(userInteractions.getType()))) {
+    		return R.error("user-interactions.type 只允许 1(收藏) 或 0(赞)");
     	}
     	if (interactionRowExists(uid, userInteractions.getResourceId(), userInteractions.getType())) {
     		return R.ok();
@@ -271,8 +271,8 @@ public class UserInteractionsController {
     	if (userInteractions.getResourceId() == null) {
     		return R.error("缺少 resourceId");
     	}
-    	if (userInteractions.getType() != null && !("1".equals(userInteractions.getType()) || "21".equals(userInteractions.getType()))) {
-    		return R.error("user-interactions.type 只允许 1(收藏) 或 21(赞)");
+    	if (userInteractions.getType() != null && !("1".equals(userInteractions.getType()) || "0".equals(userInteractions.getType()))) {
+    		return R.error("user-interactions.type 只允许 1(收藏) 或 0(赞)");
     	}
     	if (interactionRowExists(uid, userInteractions.getResourceId(), userInteractions.getType())) {
     		return R.ok();
@@ -282,12 +282,15 @@ public class UserInteractionsController {
         return R.ok();
     }
 
-    /** JSON 里 type 可能是数字，统一成 "1"/"21" 字符串再入库、再查重 */
+    /** JSON 里 type 可能是数字；赞由 0 表示，历史 21 归一为 0 */
     private static void normalizeInteractionType(UserInteractionsEntity e) {
     	if (e == null || e.getType() == null) {
     		return;
     	}
     	String t = String.valueOf(e.getType()).trim();
+    	if ("21".equals(t)) {
+    		t = "0";
+    	}
     	e.setType(t);
     }
 
@@ -298,7 +301,11 @@ public class UserInteractionsController {
     	EntityWrapper<UserInteractionsEntity> w = new EntityWrapper<>();
     	w.eq("user_id", userId);
     	w.eq("resource_id", resourceId);
-    	w.eq("interaction_type", interactionType);
+    	if ("0".equals(interactionType)) {
+    		w.in("interaction_type", Arrays.asList("0", "21"));
+    	} else {
+    		w.eq("interaction_type", interactionType);
+    	}
     	return userInteractionsService.selectCount(w) > 0;
     }
 
@@ -308,8 +315,9 @@ public class UserInteractionsController {
     @RequestMapping("/update")
     public R update(@RequestBody UserInteractionsEntity userInteractions, HttpServletRequest request){
         //ValidatorUtils.validateEntity(userInteractions);
-    	if (userInteractions.getType() != null && !("1".equals(userInteractions.getType()) || "21".equals(userInteractions.getType()))) {
-    		return R.error("user-interactions.type 只允许 1(收藏) 或 21(赞)");
+    	normalizeInteractionType(userInteractions);
+    	if (userInteractions.getType() != null && !("1".equals(userInteractions.getType()) || "0".equals(userInteractions.getType()))) {
+    		return R.error("user-interactions.type 只允许 1(收藏) 或 0(赞)");
     	}
         userInteractionsService.updateById(userInteractions);//全部更新
         return R.ok();

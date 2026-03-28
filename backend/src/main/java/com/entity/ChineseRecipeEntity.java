@@ -116,14 +116,12 @@ public class ChineseRecipeEntity<T> implements Serializable {
 	/**
 	 * 是否审核
 	 */
-	@JsonAlias("sfsh")
 	@TableField("audit_status")
 	private String auditStatus;
 	
 	/**
 	 * 审核回复
 	 */
-	@JsonAlias("shhf")
 	@TableField("audit_reply")
 	private String auditReply;
 	

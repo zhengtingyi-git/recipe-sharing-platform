@@ -27,7 +27,9 @@ import com.entity.view.ChineseRecipeView;
 
 import com.service.ChineseRecipeService;
 import com.service.UserService;
+import com.service.TokenService;
 import com.entity.UserEntity;
+import com.entity.TokenEntity;
 import com.utils.PageUtils;
 import com.utils.R;
 import com.utils.MPUtil;
@@ -53,9 +55,45 @@ public class ChineseRecipeController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private TokenService tokenService;
+
+    /**
+     * 后台多用 session；前台发布接口带 @IgnoreAuth 时拦截器不写 session，需从 Token 头解析 JWT。
+     */
+    private Long resolveRequestUserId(HttpServletRequest request) {
+        Object uidObj = request.getSession().getAttribute("userId");
+        if (uidObj != null) {
+            if (uidObj instanceof Long) {
+                return (Long) uidObj;
+            }
+            if (uidObj instanceof Integer) {
+                return ((Integer) uidObj).longValue();
+            }
+            try {
+                return Long.valueOf(uidObj.toString());
+            } catch (Exception e) {
+                return null;
+            }
+        }
+        String token = request.getHeader("Token");
+        if (token != null && !token.trim().isEmpty()) {
+            TokenEntity te = tokenService.getTokenEntity(token.trim());
+            if (te != null && te.getUserId() != null) {
+                return te.getUserId();
+            }
+        }
+        return null;
+    }
+
     private int countAction(Long resourceId, String type) {
         EntityWrapper<UserInteractionsEntity> ew = new EntityWrapper<>();
-        ew.eq("resource_id", resourceId).eq("interaction_type", type);
+        ew.eq("resource_id", resourceId);
+        if ("0".equals(type)) {
+            ew.in("interaction_type", Arrays.asList("0", "21"));
+        } else {
+            ew.eq("interaction_type", type);
+        }
         return userInteractionsService.selectCount(ew);
     }
 
@@ -112,7 +150,7 @@ public class ChineseRecipeController {
                 ChineseRecipeEntity entity = (ChineseRecipeEntity)obj;
                 fillRecipeUser(entity);
                 if (entity.getId() != null) {
-                    entity.setThumbsupnum(countAction(entity.getId(), "21"));
+                    entity.setThumbsupnum(countAction(entity.getId(), "0"));
                     entity.setUserInteractionsNum(countAction(entity.getId(), "1"));
                 }
             }
@@ -131,7 +169,7 @@ public class ChineseRecipeController {
 		chinese_recipe.setSourceType("chinese_recipe");
 		// 语义化查询参数：authorId / approved
 		// - authorId: 发布者用户ID（等价于 userId/userid）
-		// - approved: true 表示仅返回审核通过（等价于 auditStatus='是' / sfsh='是'）
+		// - approved: true 表示仅返回审核通过（等价于 auditStatus='是'）
 		Object authorId = params.get("authorId");
 		if (authorId != null && chinese_recipe.getUserId() == null) {
 			try {
@@ -148,6 +186,8 @@ public class ChineseRecipeController {
 		// 防止 MPUtil 将语义化参数误当作列名参与构造
 		params.remove("authorId");
 		params.remove("approved");
+		// 公开列表仅展示审核通过：不依赖前端是否传 auditStatus（旧版传 sfsh 无法绑定到实体导致未审核数据全部露出）
+		chinese_recipe.setAuditStatus("是");
         String sort = params.get("sort") != null ? params.get("sort").toString() : "";
         // 排序列名映射（兼容旧前端键）
         if ("addtime".equals(sort)) {
@@ -223,7 +263,7 @@ public class ChineseRecipeController {
             if (!all.isEmpty()) {
                 List<Long> ids = all.stream().map(ChineseRecipeEntity::getId).collect(Collectors.toList());
                 EntityWrapper<UserInteractionsEntity> suEw = new EntityWrapper<>();
-                suEw.in("resource_id", ids).eq("interaction_type", "21");
+                suEw.in("resource_id", ids).in("interaction_type", Arrays.asList("0", "21"));
                 List<UserInteractionsEntity> suList = userInteractionsService.selectList(suEw);
                 Map<Long, Integer> countMap = new HashMap<>();
                 for (UserInteractionsEntity su : suList) {
@@ -264,7 +304,7 @@ public class ChineseRecipeController {
                 ChineseRecipeEntity entity = (ChineseRecipeEntity)obj;
                 fillRecipeUser(entity);
                 if (entity.getId() != null) {
-                    entity.setThumbsupnum(countAction(entity.getId(), "21"));
+                    entity.setThumbsupnum(countAction(entity.getId(), "0"));
                     entity.setUserInteractionsNum(countAction(entity.getId(), "1"));
                 }
             }
@@ -307,7 +347,7 @@ public class ChineseRecipeController {
         fillRecipeUser(chinese_recipe);
 		chinese_recipe.setViewCount(chinese_recipe.getViewCount()+1);
 		chinese_recipeService.updateById(chinese_recipe);
-        chinese_recipe.setThumbsupnum(countAction(id, "21"));
+        chinese_recipe.setThumbsupnum(countAction(id, "0"));
         chinese_recipe.setUserInteractionsNum(countAction(id, "1"));
         return R.ok().put("data", chinese_recipe);
     }
@@ -317,12 +357,28 @@ public class ChineseRecipeController {
      */
 	@IgnoreAuth
     @RequestMapping("/detail/{id}")
-    public R detail(@PathVariable("id") Long id){
+    public R detail(@PathVariable("id") Long id, HttpServletRequest request){
         ChineseRecipeEntity chinese_recipe = chinese_recipeService.selectById(id);
+        if (chinese_recipe == null) {
+        	return R.error("记录不存在");
+        }
+        if (!"chinese_recipe".equals(chinese_recipe.getSourceType())) {
+        	return R.error("记录不存在");
+        }
+        if (!"是".equals(chinese_recipe.getAuditStatus())) {
+        	Object uid = request.getSession().getAttribute("userId");
+        	Long ownerId = chinese_recipe.getUserId();
+        	boolean owner = uid != null && ownerId != null && uid.toString().equals(String.valueOf(ownerId));
+        	if (!owner) {
+        		// 不用 403：前台 http 模块会把 403 当作需登录并跳转登录页
+        		return R.error("内容未通过审核或不存在");
+        	}
+        }
         fillRecipeUser(chinese_recipe);
-		chinese_recipe.setViewCount(chinese_recipe.getViewCount()+1);
+        int vc = chinese_recipe.getViewCount() != null ? chinese_recipe.getViewCount() : 0;
+		chinese_recipe.setViewCount(vc + 1);
 		chinese_recipeService.updateById(chinese_recipe);
-        chinese_recipe.setThumbsupnum(countAction(id, "21"));
+        chinese_recipe.setThumbsupnum(countAction(id, "0"));
         chinese_recipe.setUserInteractionsNum(countAction(id, "1"));
         return R.ok().put("data", chinese_recipe);
     }
@@ -334,7 +390,7 @@ public class ChineseRecipeController {
      */
     @RequestMapping("/thumbsup/{id}")
     public R vote(@PathVariable("id") String id,String type){
-        // 点赞行为统一以 user_interactions(type=21) 为唯一事实源，不再写入主表 thumbsupnum
+        // 点赞行为统一以 user_interactions(type=0) 为唯一事实源，不再写入主表 thumbsupnum
         return R.ok("投票成功");
     }
 
@@ -345,10 +401,11 @@ public class ChineseRecipeController {
     public R save(@RequestBody ChineseRecipeEntity chinese_recipe, HttpServletRequest request){
     	chinese_recipe.setSourceType("chinese_recipe");
     	chinese_recipe.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
-        Long userId = (Long)request.getSession().getAttribute("userId");
-        if(userId != null) {
-            chinese_recipe.setUserId(userId);
+        Long userId = resolveRequestUserId(request);
+        if (userId == null) {
+            return R.error("请先登录");
         }
+        chinese_recipe.setUserId(userId);
         // 兼容：如果前端没传 addtime，则用当前时间兜底
         if (chinese_recipe.getCreatedAt() == null) {
             chinese_recipe.setCreatedAt(new Date());
@@ -366,10 +423,11 @@ public class ChineseRecipeController {
     public R add(@RequestBody ChineseRecipeEntity chinese_recipe, HttpServletRequest request){
     	chinese_recipe.setSourceType("chinese_recipe");
     	chinese_recipe.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
-        Long userId = (Long)request.getSession().getAttribute("userId");
-        if(userId != null) {
-            chinese_recipe.setUserId(userId);
+        Long userId = resolveRequestUserId(request);
+        if (userId == null) {
+            return R.error("请先登录");
         }
+        chinese_recipe.setUserId(userId);
         // 兼容：如果前端没传 addtime，则用当前时间兜底
         if (chinese_recipe.getCreatedAt() == null) {
             chinese_recipe.setCreatedAt(new Date());
@@ -456,9 +514,9 @@ public class ChineseRecipeController {
 				return "created_at";
 			case "userid":
 				return "user_id";
-			case "sfsh":
+			case "auditStatus":
 				return "audit_status";
-			case "shhf":
+			case "auditReply":
 				return "audit_reply";
 			case "recipetype":
 				return "source_type";

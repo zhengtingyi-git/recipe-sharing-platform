@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="main-content">
     <!-- 列表页 -->
     <div v-if="showFlag">
@@ -9,10 +9,10 @@
                   <el-input v-if="contents.inputIcon == 1 && contents.inputIconPosition == 2" suffix-icon="el-icon-search" v-model="searchForm.caipinmingcheng" placeholder="菜品名称" clearable></el-input>
                   <el-input v-if="contents.inputIcon == 0" v-model="searchForm.caipinmingcheng" placeholder="菜品名称" clearable></el-input>
                 </el-form-item>
-		<el-form-item class="select" label="是否通过" prop="sfsh">
-		  <el-select  @change="sfshChange" clearable v-model="searchForm.sfsh" placeholder="是否通过">
+		<el-form-item class="select" label="是否通过" prop="auditStatus">
+		  <el-select  @change="auditStatusChange" clearable v-model="searchForm.auditStatus" placeholder="是否通过">
 		    <el-option
-			v-for="(item,index) in sfshOptions"
+			v-for="(item,index) in auditStatusOptions"
 			v-bind:key="index"
 			:label="item"
 			:value="item">
@@ -161,21 +161,21 @@
                      </template>
                 </el-table-column>
               <el-table-column :sortable="contents.tableSortable" :align="contents.tableAlign" 
-                  prop="shhf"
+                  prop="auditReply"
                  :header-align="contents.tableAlign"
                   label="审核回复">
               </el-table-column>
               <el-table-column :sortable="contents.tableSortable" :align="contents.tableAlign" 
-                  prop="sfsh"
+                  prop="auditStatus"
                  :header-align="contents.tableAlign"
                   label="审核状态">
                   <template slot-scope="scope">
-                    <span style="margin-right:10px">{{scope.row.sfsh=='是'?'通过':'未通过'}}</span>
+                    <span style="margin-right:10px">{{scope.row.auditStatus=='是'?'通过':'未通过'}}</span>
                   </template>
               </el-table-column>
               <el-table-column :sortable="contents.tableSortable" :align="contents.tableAlign" 
                   v-if="isAuth('chinese_recipe','审核')"
-                  prop="sfsh"
+                  prop="auditStatus"
                  :header-align="contents.tableAlign"
                   label="审核">
                   <template slot-scope="scope">
@@ -227,17 +227,17 @@
 
     <el-dialog
       title="审核"
-      :visible.sync="sfshVisiable"
+      :visible.sync="auditDialogVisible"
       width="50%">
       <el-form ref="form" :model="form" label-width="80px">
         <el-form-item label="审核状态">
-          <el-select v-model="shForm.sfsh" placeholder="审核状态">
+          <el-select v-model="shForm.auditStatus" placeholder="审核状态">
             <el-option label="通过" value="是"></el-option>
             <el-option label="不通过" value="否"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="内容">
-          <el-input type="textarea" :rows="8" v-model="shForm.shhf"></el-input>
+          <el-input type="textarea" :rows="8" v-model="shForm.auditReply"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -267,7 +267,7 @@ export default {
       dataListLoading: false,
       dataListSelections: [],
       showFlag: true,
-      sfshVisiable: false,
+      auditDialogVisible: false,
       shForm: {},
       chartVisiable: false,
       addOrUpdateFlag:false,
@@ -472,7 +472,10 @@ export default {
     },
 
     init () {
-        this.sfshOptions = "是,否".split(',');
+        this.auditStatusOptions = "是,否".split(',');
+    },
+    auditStatusChange () {
+      this.search();
     },
     search() {
       this.pageIndex = 1;
@@ -487,8 +490,8 @@ export default {
         limit: this.pageSize,
         sort: 'id',
       }
-          if(this.searchForm.sfsh!='' && this.searchForm.sfsh!=undefined){
-            params['sfsh'] = this.searchForm.sfsh
+          if(this.searchForm.auditStatus!='' && this.searchForm.auditStatus!=undefined){
+            params['auditStatus'] = this.searchForm.auditStatus
           }
           if(this.searchForm.caipinmingcheng!='' && this.searchForm.caipinmingcheng!=undefined){
             params['caipinmingcheng'] = '%' + this.searchForm.caipinmingcheng + '%'
@@ -541,7 +544,7 @@ export default {
     },
     // 审核窗口
     shDialog(row){
-      this.sfshVisiable = !this.sfshVisiable;
+      this.auditDialogVisible = !this.auditDialogVisible;
       if(row){
         this.shForm = {
           caipinmingcheng: row.caipinmingcheng,
@@ -551,8 +554,8 @@ export default {
           cailiao: row.cailiao,
           pengrenfangfa: row.pengrenfangfa,
           addtime: row.addtime,
-          sfsh: row.sfsh,
-          shhf: row.shhf,
+          auditStatus: row.auditStatus,
+          auditReply: row.auditReply,
           thumbsupnum: row.thumbsupnum,
           id: row.id
         }

@@ -48,7 +48,7 @@ public class UserInteractionsModel  implements Serializable {
 	private String picture;
 		
 	/**
-	 * 类型(1:收藏,21:赞)
+	 * 类型(1:收藏,0:赞；历史数据可能为 21)
 	 */
 	
 	private String type;
@@ -118,7 +118,7 @@ public class UserInteractionsModel  implements Serializable {
 				
 	
 	/**
-	 * 设置：类型(1:收藏,21:赞)
+	 * 设置：类型(1:收藏,0:赞)
 	 */
 	 
 	public void setType(String type) {
@@ -126,7 +126,7 @@ public class UserInteractionsModel  implements Serializable {
 	}
 	
 	/**
-	 * 获取：类型(1:收藏,21:赞)
+	 * 获取：类型(1:收藏,0:赞)
 	 */
 	public String getType() {
 		return type;

@@ -455,7 +455,7 @@ color: #999 !important;
 					layui.http.request('user-interactions/list', 'get', {
 						page: 1,
 						limit: 1,
-						type:'21',
+						type:'0',
 						resourceId : this.detail.id,
 						tablename : this.detailTable,
 						userId: localStorage.getItem('userid'),
@@ -474,7 +474,7 @@ color: #999 !important;
 						}
 						layui.http.requestJson('user-interactions/save', 'post', {
 							userId: localStorage.getItem('userid'),
-							type:'21',
+							type:'0',
 							name: this.title,
 							picture:vue.detail.tupian,
 							resourceId: this.detail.id,
@@ -903,7 +903,7 @@ color: #999 !important;
 					http.request(`user-interactions/list`, 'get', {
 						page: 1,
 						limit: 1,
-						type: '21',
+						type: '0',
 						resourceId: rid,
 						tablename: vue.detailTable,
 						userId: localStorage.getItem('userid'),

@@ -27,8 +27,8 @@
 			dish_type AS caipinleixing,
 			ingredients AS cailiao,
 			cooking_method AS pengrenfangfa,
-			audit_status AS sfsh,
-			audit_reply AS shhf,
+			audit_status AS auditStatus,
+			audit_reply AS auditReply,
 			view_count AS clicknum
 		FROM recipe  chinese_recipe         
         <where> 1=1 ${ew.sqlSegment}</where>
@@ -42,8 +42,8 @@
 			dish_type AS caipinleixing,
 			ingredients AS cailiao,
 			cooking_method AS pengrenfangfa,
-			audit_status AS sfsh,
-			audit_reply AS shhf,
+			audit_status AS auditStatus,
+			audit_reply AS auditReply,
 			view_count AS clicknum
 		FROM recipe  chinese_recipe 	
  		<where> 1=1 ${ew.sqlSegment}</where>

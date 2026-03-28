@@ -55,7 +55,8 @@ public class DailyRecommendationController {
     private ForeignRecipeService foreign_recipeService;
 
     /**
-     * 鍓嶇鍒楄〃 - 鏄剧ず鍏ㄩ儴涓紡缇庨鍜屽鍥界編椋燂紙sfsh=鏄級锛屾敮鎸佹帓搴忥細addtime 鏈€鏂般€乼humbsupnum 鏈€澶氱偣璧炪€乽serInteractionsNum 鏈€澶氭敹钘?     */
+     * 前端列表：展示全部中式与外国美食（仅 audit_status=是），支持排序：addtime、thumbsupnum、userInteractionsNum。
+     */
     @IgnoreAuth
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params, DailyRecommendationEntity remencaipin,
@@ -107,7 +108,7 @@ public class DailyRecommendationController {
             }
             EntityWrapper<UserInteractionsEntity> userInteractionsWrapper21 = new EntityWrapper<>();
             userInteractionsWrapper21.in("resource_id", zhongshiIds);
-            userInteractionsWrapper21.eq("interaction_type", "21");
+            userInteractionsWrapper21.in("interaction_type", Arrays.asList("0", "21"));
             List<UserInteractionsEntity> thumbsList = userInteractionsService.selectList(userInteractionsWrapper21);
             for (UserInteractionsEntity thumbs : thumbsList) {
                 zhongshiThumbsMap.put(thumbs.getResourceId(), zhongshiThumbsMap.getOrDefault(thumbs.getResourceId(), 0) + 1);
@@ -157,7 +158,7 @@ public class DailyRecommendationController {
             }
             EntityWrapper<UserInteractionsEntity> userInteractionsWrapper21 = new EntityWrapper<>();
             userInteractionsWrapper21.in("resource_id", waiguoIds);
-            userInteractionsWrapper21.eq("interaction_type", "21");
+            userInteractionsWrapper21.in("interaction_type", Arrays.asList("0", "21"));
             List<UserInteractionsEntity> thumbsList = userInteractionsService.selectList(userInteractionsWrapper21);
             for (UserInteractionsEntity thumbs : thumbsList) {
                 waiguoThumbsMap.put(thumbs.getResourceId(), waiguoThumbsMap.getOrDefault(thumbs.getResourceId(), 0) + 1);
@@ -207,7 +208,7 @@ public class DailyRecommendationController {
                 if (te != null && te.getUserId() != null) {
                     EntityWrapper<UserInteractionsEntity> userEw = new EntityWrapper<>();
                     userEw.eq("user_id", te.getUserId());
-                    userEw.in(true, "interaction_type", Arrays.asList("1", "21"));
+                    userEw.in(true, "interaction_type", Arrays.asList("1", "0", "21"));
                     for (UserInteractionsEntity s : userInteractionsService.selectList(userEw)) {
                         String resolvedType = resolveRecipeType(s.getResourceId(), dishMap);
                         if (resolvedType == null) {

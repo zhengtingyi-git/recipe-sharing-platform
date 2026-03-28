@@ -401,7 +401,7 @@
 					layui.http.request('user-interactions/list', 'get', {
 						page: 1,
 						limit: 1,
-						type: '21',
+						type: '0',
 						resourceId: this.detail.id,
 						tablename: this.detailTable,
 						userId: localStorage.getItem('userid'),
@@ -416,7 +416,7 @@
 						}
 						layui.http.requestJson('user-interactions/save', 'post', {
 							userId: localStorage.getItem('userid'),
-							type: '21',
+							type: '0',
 							name: _this.title,
 							picture: _this.coverPicture(),
 							resourceId: _this.detail.id,
@@ -773,7 +773,7 @@
 					http.request('user-interactions/list', 'get', {
 						page: 1,
 						limit: 1,
-						type: '21',
+						type: '0',
 						resourceId: vue.detail.id,
 						tablename: vue.detailTable,
 						userId: localStorage.getItem('userid'),

@@ -86,7 +86,7 @@ public class CommonController{
 	}
 	
 	/**
-	 * 修改table表的sfsh状态
+	 * 修改 table 表的 audit_status（请求体需含 auditStatus、id）
 	 * @param table
 	 * @param map
 	 * @return

@@ -27,7 +27,9 @@ import com.entity.view.ForeignRecipeView;
 
 import com.service.ForeignRecipeService;
 import com.service.UserService;
+import com.service.TokenService;
 import com.entity.UserEntity;
+import com.entity.TokenEntity;
 import com.utils.PageUtils;
 import com.utils.R;
 import com.utils.MPUtil;
@@ -53,9 +55,42 @@ public class ForeignRecipeController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private TokenService tokenService;
+
+    private Long resolveRequestUserId(HttpServletRequest request) {
+        Object uidObj = request.getSession().getAttribute("userId");
+        if (uidObj != null) {
+            if (uidObj instanceof Long) {
+                return (Long) uidObj;
+            }
+            if (uidObj instanceof Integer) {
+                return ((Integer) uidObj).longValue();
+            }
+            try {
+                return Long.valueOf(uidObj.toString());
+            } catch (Exception e) {
+                return null;
+            }
+        }
+        String token = request.getHeader("Token");
+        if (token != null && !token.trim().isEmpty()) {
+            TokenEntity te = tokenService.getTokenEntity(token.trim());
+            if (te != null && te.getUserId() != null) {
+                return te.getUserId();
+            }
+        }
+        return null;
+    }
+
     private int countAction(Long resourceId, String type) {
         EntityWrapper<UserInteractionsEntity> ew = new EntityWrapper<>();
-        ew.eq("resource_id", resourceId).eq("interaction_type", type);
+        ew.eq("resource_id", resourceId);
+        if ("0".equals(type)) {
+            ew.in("interaction_type", Arrays.asList("0", "21"));
+        } else {
+            ew.eq("interaction_type", type);
+        }
         return userInteractionsService.selectCount(ew);
     }
 
@@ -110,7 +145,7 @@ public class ForeignRecipeController {
                 ForeignRecipeEntity entity = (ForeignRecipeEntity)obj;
                 fillRecipeUser(entity);
                 if (entity.getId() != null) {
-                    entity.setThumbsupnum(countAction(entity.getId(), "21"));
+                    entity.setThumbsupnum(countAction(entity.getId(), "0"));
                     entity.setUserInteractionsNum(countAction(entity.getId(), "1"));
                 }
             }
@@ -143,6 +178,8 @@ public class ForeignRecipeController {
 		}
 		params.remove("authorId");
 		params.remove("approved");
+		// 公开列表仅展示审核通过：不依赖前端是否传 auditStatus（旧版传 sfsh 无法绑定到实体导致未审核数据全部露出）
+		foreign_recipe.setAuditStatus("是");
         String sort = params.get("sort") != null ? params.get("sort").toString() : "";
         // 排序列名映射（兼容旧前端键）
         if ("addtime".equals(sort)) {
@@ -218,7 +255,7 @@ public class ForeignRecipeController {
             if (!all.isEmpty()) {
                 List<Long> ids = all.stream().map(ForeignRecipeEntity::getId).collect(Collectors.toList());
                 EntityWrapper<UserInteractionsEntity> suEw = new EntityWrapper<>();
-                suEw.in("resource_id", ids).eq("interaction_type", "21");
+                suEw.in("resource_id", ids).in("interaction_type", Arrays.asList("0", "21"));
                 List<UserInteractionsEntity> suList = userInteractionsService.selectList(suEw);
                 Map<Long, Integer> countMap = new HashMap<>();
                 for (UserInteractionsEntity su : suList) {
@@ -259,7 +296,7 @@ public class ForeignRecipeController {
                 ForeignRecipeEntity entity = (ForeignRecipeEntity)obj;
                 fillRecipeUser(entity);
                 if (entity.getId() != null) {
-                    entity.setThumbsupnum(countAction(entity.getId(), "21"));
+                    entity.setThumbsupnum(countAction(entity.getId(), "0"));
                     entity.setUserInteractionsNum(countAction(entity.getId(), "1"));
                 }
             }
@@ -302,7 +339,7 @@ public class ForeignRecipeController {
         fillRecipeUser(foreign_recipe);
 		foreign_recipe.setViewCount(foreign_recipe.getViewCount()+1);
 		foreign_recipeService.updateById(foreign_recipe);
-        foreign_recipe.setThumbsupnum(countAction(id, "21"));
+        foreign_recipe.setThumbsupnum(countAction(id, "0"));
         foreign_recipe.setUserInteractionsNum(countAction(id, "1"));
         return R.ok().put("data", foreign_recipe);
     }
@@ -312,12 +349,27 @@ public class ForeignRecipeController {
      */
 	@IgnoreAuth
     @RequestMapping("/detail/{id}")
-    public R detail(@PathVariable("id") Long id){
+    public R detail(@PathVariable("id") Long id, HttpServletRequest request){
         ForeignRecipeEntity foreign_recipe = foreign_recipeService.selectById(id);
+        if (foreign_recipe == null) {
+        	return R.error("记录不存在");
+        }
+        if (!"foreign_recipe".equals(foreign_recipe.getSourceType())) {
+        	return R.error("记录不存在");
+        }
+        if (!"是".equals(foreign_recipe.getAuditStatus())) {
+        	Object uid = request.getSession().getAttribute("userId");
+        	Long ownerId = foreign_recipe.getUserId();
+        	boolean owner = uid != null && ownerId != null && uid.toString().equals(String.valueOf(ownerId));
+        	if (!owner) {
+        		return R.error("内容未通过审核或不存在");
+        	}
+        }
         fillRecipeUser(foreign_recipe);
-		foreign_recipe.setViewCount(foreign_recipe.getViewCount()+1);
+        int vc = foreign_recipe.getViewCount() != null ? foreign_recipe.getViewCount() : 0;
+		foreign_recipe.setViewCount(vc + 1);
 		foreign_recipeService.updateById(foreign_recipe);
-        foreign_recipe.setThumbsupnum(countAction(id, "21"));
+        foreign_recipe.setThumbsupnum(countAction(id, "0"));
         foreign_recipe.setUserInteractionsNum(countAction(id, "1"));
         return R.ok().put("data", foreign_recipe);
     }
@@ -329,7 +381,7 @@ public class ForeignRecipeController {
      */
     @RequestMapping("/thumbsup/{id}")
     public R vote(@PathVariable("id") String id,String type){
-        // 点赞行为统一以 user_interactions(type=21) 为唯一事实源，不再写入主表 thumbsupnum
+        // 点赞行为统一以 user_interactions(type=0) 为唯一事实源，不再写入主表 thumbsupnum
         return R.ok("投票成功");
     }
 
@@ -340,11 +392,11 @@ public class ForeignRecipeController {
     public R save(@RequestBody ForeignRecipeEntity foreign_recipe, HttpServletRequest request){
     	foreign_recipe.setSourceType("foreign_recipe");
     	foreign_recipe.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
-        // 记录发布用户id
-        Long userId = (Long)request.getSession().getAttribute("userId");
-        if(userId != null) {
-            foreign_recipe.setUserId(userId);
+        Long userId = resolveRequestUserId(request);
+        if (userId == null) {
+            return R.error("请先登录");
         }
+        foreign_recipe.setUserId(userId);
         // 兼容：如果前端没传 addtime，则用当前时间兜底
         if (foreign_recipe.getCreatedAt() == null) {
             foreign_recipe.setCreatedAt(new Date());
@@ -362,10 +414,11 @@ public class ForeignRecipeController {
     public R add(@RequestBody ForeignRecipeEntity foreign_recipe, HttpServletRequest request){
     	foreign_recipe.setSourceType("foreign_recipe");
     	foreign_recipe.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
-        Long userId = (Long)request.getSession().getAttribute("userId");
-        if(userId != null) {
-            foreign_recipe.setUserId(userId);
+        Long userId = resolveRequestUserId(request);
+        if (userId == null) {
+            return R.error("请先登录");
         }
+        foreign_recipe.setUserId(userId);
         // 兼容：如果前端没传 addtime，则用当前时间兜底
         if (foreign_recipe.getCreatedAt() == null) {
             foreign_recipe.setCreatedAt(new Date());
@@ -452,9 +505,9 @@ public class ForeignRecipeController {
 				return "created_at";
 			case "userid":
 				return "user_id";
-			case "sfsh":
+			case "auditStatus":
 				return "audit_status";
-			case "shhf":
+			case "auditReply":
 				return "audit_reply";
 			case "recipetype":
 				return "source_type";

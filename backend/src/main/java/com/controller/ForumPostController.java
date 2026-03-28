@@ -62,7 +62,12 @@ public class ForumPostController {
 
     private int countAction(Long resourceId, String type) {
         EntityWrapper<UserInteractionsEntity> ew = new EntityWrapper<>();
-        ew.eq("resource_id", resourceId).eq("interaction_type", type);
+        ew.eq("resource_id", resourceId);
+        if ("0".equals(type)) {
+            ew.in("interaction_type", Arrays.asList("0", "21"));
+        } else {
+            ew.eq("interaction_type", type);
+        }
         return userInteractionsService.selectCount(ew);
     }
 
@@ -89,7 +94,7 @@ public class ForumPostController {
             if (obj instanceof ForumPostEntity) {
                 ForumPostEntity entity = (ForumPostEntity) obj;
                 if (entity.getId() != null) {
-                    entity.setThumbsupnum(countAction(entity.getId(), "21"));
+                    entity.setThumbsupnum(countAction(entity.getId(), "0"));
                 }
             }
         }
@@ -116,7 +121,7 @@ public class ForumPostController {
             if (!all.isEmpty()) {
                 List<Long> ids = all.stream().map(ForumPostEntity::getId).collect(Collectors.toList());
                 EntityWrapper<UserInteractionsEntity> suEw = new EntityWrapper<>();
-                suEw.in("resource_id", ids).in("interaction_type", Arrays.asList("1", "21"));
+                suEw.in("resource_id", ids).in("interaction_type", Arrays.asList("1", "0", "21"));
                 List<UserInteractionsEntity> suList = userInteractionsService.selectList(suEw);
                 Map<Long, Integer> countMap = new HashMap<>();
                 for (UserInteractionsEntity su : suList) {
@@ -132,7 +137,7 @@ public class ForumPostController {
                         .thenComparing((ForumPostEntity n) -> n.getCreatedAt() != null ? n.getCreatedAt().getTime() : 0L,
                                 Comparator.reverseOrder()));
                 EntityWrapper<UserInteractionsEntity> thumbsEw = new EntityWrapper<>();
-                thumbsEw.in("resource_id", ids).eq("interaction_type", "21");
+                thumbsEw.in("resource_id", ids).in("interaction_type", Arrays.asList("0", "21"));
                 List<UserInteractionsEntity> thumbsList = userInteractionsService.selectList(thumbsEw);
                 Map<Long, Integer> thumbsMap = new HashMap<>();
                 for (UserInteractionsEntity thumbs : thumbsList) {
@@ -159,7 +164,7 @@ public class ForumPostController {
             if (obj instanceof ForumPostEntity) {
                 ForumPostEntity entity = (ForumPostEntity) obj;
                 if (entity.getId() != null) {
-                    entity.setThumbsupnum(countAction(entity.getId(), "21"));
+                    entity.setThumbsupnum(countAction(entity.getId(), "0"));
                 }
             }
         }
@@ -202,7 +207,7 @@ public class ForumPostController {
             }
         }
         if (forumPost != null && forumPost.getId() != null) {
-            forumPost.setThumbsupnum(countAction(forumPost.getId(), "21"));
+            forumPost.setThumbsupnum(countAction(forumPost.getId(), "0"));
         }
         return R.ok().put("data", forumPost);
     }
@@ -223,7 +228,7 @@ public class ForumPostController {
             }
         }
         if (forumPost != null && forumPost.getId() != null) {
-            forumPost.setThumbsupnum(countAction(forumPost.getId(), "21"));
+            forumPost.setThumbsupnum(countAction(forumPost.getId(), "0"));
         }
         return R.ok().put("data", forumPost);
     }

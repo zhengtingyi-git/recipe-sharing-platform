@@ -1,4 +1,4 @@
-﻿<!-- 我的发布 -->
+<!-- 我的发布 -->
 <!DOCTYPE html>
 <html>
 	<head>
@@ -44,7 +44,7 @@
 						<tr v-for="(item,index) in dataList" v-bind:key="index">
 							<td @click="jumpToDetail(item)" style="text-align:left;cursor:pointer;">{{item.caipinmingcheng || item.biaoti}}</td>
 							<td style="text-align:left">{{item.type}}</td>
-							<td style="text-align:left">{{item.addtime}}</td>
+							<td style="text-align:left">{{ formatPublishTime(item.addtime) }}</td>
 							<td style="text-align:left">
 								<button @click="jumpToDetail(item)" type="button" class="layui-btn layui-btn-radius btn-theme" style="margin-right:5px;">
 									查看
@@ -77,6 +77,17 @@
 					currentType: 'all'
 				},
 				methods: {
+					formatPublishTime(val) {
+						if (val == null || val === '') return '';
+						var d = new Date(val);
+						if (isNaN(d.getTime())) return String(val);
+						var y = d.getFullYear();
+						var m = ('0' + (d.getMonth() + 1)).slice(-2);
+						var day = ('0' + d.getDate()).slice(-2);
+						var h = ('0' + d.getHours()).slice(-2);
+						var min = ('0' + d.getMinutes()).slice(-2);
+						return y + '-' + m + '-' + day + ' ' + h + ':' + min;
+					},
 					jump(url) {
 						jump(url)
 					},
@@ -136,6 +147,17 @@
 			var currentPage = 1;
 			var limit = 10;
 
+			/** 菜谱接口返回 createdAt；论坛可能为 createdAt / created_at / addtime */
+			function pickPublishTime(item) {
+				return item.createdAt || item.created_at || item.addtime || null;
+			}
+
+			function publishTimeMs(v) {
+				if (v == null || v === '') return 0;
+				var n = new Date(v).getTime();
+				return isNaN(n) ? 0 : n;
+			}
+
 			function filterByType(type, list) {
 				if (!type || type === 'all') return list || [];
 				return (list || []).filter(function(item) {
@@ -159,7 +181,7 @@
 								id: item.id,
 								caipinmingcheng: item.caipinmingcheng,
 								caixi: item.caixi,
-								addtime: item.addtime,
+								addtime: pickPublishTime(item),
 								type: '外国美食',
 								tableName: 'foreign_recipe'
 							};
@@ -178,7 +200,7 @@
 									id: item.id,
 									caipinmingcheng: item.caipinmingcheng,
 									caixi: item.caixi,
-									addtime: item.addtime,
+									addtime: pickPublishTime(item),
 									type: '中式美食',
 									tableName: 'chinese_recipe'
 								};
@@ -194,7 +216,7 @@
 							if (res3.data && res3.data.list) {
 								forumPostList = res3.data.list.map(function(item) {
 									// 论坛帖时间为 created_at，接口 JSON 字段为 createdAt
-									var t = item.createdAt || item.created_at || item.addtime;
+									var t = pickPublishTime(item);
 									return {
 										id: item.id,
 										caipinmingcheng: item.title,
@@ -209,9 +231,7 @@
 							// 合并所有数据并按时间排序
 							var allData = waiguoList.concat(zhongshiList).concat(forumPostList);
 							allData.sort(function(a, b) {
-								var timeA = new Date(a.addtime || 0).getTime();
-								var timeB = new Date(b.addtime || 0).getTime();
-								return timeB - timeA;
+								return publishTimeMs(b.addtime) - publishTimeMs(a.addtime);
 							});
 
 							vue.allData = allData;

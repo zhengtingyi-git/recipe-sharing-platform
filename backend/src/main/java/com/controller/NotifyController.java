@@ -3,6 +3,7 @@ package com.controller;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -430,7 +431,7 @@ public class NotifyController {
         replyList.sort(this::compareNotifyTimeDesc);
         result.put("replyList", replyList);
 
-        // 2. 点赞 / 收藏（interaction_type=21 / 1）
+        // 2. 点赞 / 收藏（interaction_type=0，历史 21 仍算赞 / 1=收藏）
         // 兼容 recipe 表里 source_type 为空的历史数据，否则「我的作品」ID 集合为空，消息中心一直无赞藏提醒
         EntityWrapper<ChineseRecipeEntity> zew = new EntityWrapper<>();
         zew.eq("user_id", userId);
@@ -451,7 +452,7 @@ public class NotifyController {
         List<Map<String, Object>> thumbsupList = new ArrayList<>();
         if (!myZhongshiIds.isEmpty()) {
             EntityWrapper<UserInteractionsEntity> storeEw = new EntityWrapper<>();
-            storeEw.eq("interaction_type", "21").in("resource_id", myZhongshiIds);
+            storeEw.in("interaction_type", Arrays.asList("0", "21")).in("resource_id", myZhongshiIds);
             storeEw.orderBy("created_at", false);
             List<UserInteractionsEntity> thumbs = userInteractionsService.selectList(storeEw);
             for (UserInteractionsEntity s : thumbs) {
@@ -463,7 +464,7 @@ public class NotifyController {
         }
         if (!myWaiguoIds.isEmpty()) {
             EntityWrapper<UserInteractionsEntity> storeEw2 = new EntityWrapper<>();
-            storeEw2.eq("interaction_type", "21").in("resource_id", myWaiguoIds);
+            storeEw2.in("interaction_type", Arrays.asList("0", "21")).in("resource_id", myWaiguoIds);
             storeEw2.orderBy("created_at", false);
             List<UserInteractionsEntity> thumbs = userInteractionsService.selectList(storeEw2);
             for (UserInteractionsEntity s : thumbs) {
@@ -475,7 +476,7 @@ public class NotifyController {
         }
         if (!myForumPostIdsForLike.isEmpty()) {
             EntityWrapper<UserInteractionsEntity> storeEwForumPost = new EntityWrapper<>();
-            storeEwForumPost.eq("interaction_type", "21").in("resource_id", myForumPostIdsForLike);
+            storeEwForumPost.in("interaction_type", Arrays.asList("0", "21")).in("resource_id", myForumPostIdsForLike);
             storeEwForumPost.orderBy("created_at", false);
             List<UserInteractionsEntity> forumPostThumbs = userInteractionsService.selectList(storeEwForumPost);
             for (UserInteractionsEntity s : forumPostThumbs) {

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="addEdit-block">
     <el-form
       class="detail-form-content"
@@ -212,8 +212,8 @@ export default {
 	cailiao : false,
 	pengrenfangfa : false,
 	addtime : false,
-	sfsh : false,
-	shhf : false,
+	auditStatus : false,
+	auditReply : false,
 	thumbsupnum : false,
 	clicknum : false,
       },
@@ -225,7 +225,7 @@ export default {
         cailiao: '',
         pengrenfangfa: '',
         addtime: null,
-        shhf: '',
+        auditReply: '',
       },
           caipinleixingOptions: [],
       rules: {
@@ -243,9 +243,9 @@ export default {
           ],
           addtime: [
           ],
-          sfsh: [
+          auditStatus: [
           ],
-          shhf: [
+          auditReply: [
           ],
           thumbsupnum: [
                 { validator: validateIntNumber, trigger: 'blur' },

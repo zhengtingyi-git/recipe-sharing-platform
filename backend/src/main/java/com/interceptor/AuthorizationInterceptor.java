@@ -59,9 +59,18 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         String token = request.getHeader(LOGIN_TOKEN_KEY);
         
         /**
-         * 不需要验证权限的方法直接放过
+         * 不需要验证权限的方法直接放过；若仍携带 Token，则写入会话（供 @IgnoreAuth 接口识别当前用户，如本人查看未审核详情）
          */
         if(annotation!=null) {
+        	if(StringUtils.isNotBlank(token)) {
+        		TokenEntity te = tokenService.getTokenEntity(token);
+        		if (te != null) {
+        			request.getSession().setAttribute("userId", te.getUserId());
+        			request.getSession().setAttribute("role", te.getRole());
+        			request.getSession().setAttribute("tableName", te.getTablename());
+        			request.getSession().setAttribute("username", te.getUsername());
+        		}
+        	}
         	return true;
         }
         
