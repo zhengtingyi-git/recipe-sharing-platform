@@ -1,4 +1,4 @@
-﻿<!-- 我的点赞 -->
+<!-- 我的点赞 -->
 <!DOCTYPE html>
 <html>
 	<head>
@@ -119,9 +119,9 @@
 					</ul>
 				</div>
 				<div class="data-list layui-col-md8 layui-col-md-offset2">
-					<div @click="jump('../'+item.tablename+'/detail.html?id='+item.refid)" v-for="(item,index) in dataList" v-bind:key="index"
+					<div @click="openInteractionDetail(item)" v-for="(item,index) in dataList" v-bind:key="index"
 					 class="data-item layui-col-md3">
-						<img class="cover" :src="baseurl+item.picture.split(',')[0]">
+						<img class="cover" :src="baseurl + (item.picture ? item.picture.split(',')[0] : 'img/banner.jpg')">
 						<h3 class="title">{{item.name}}</h3>
 					</div>
 				</div>
@@ -167,6 +167,20 @@
 				methods: {
 					jump(url) {
 						jump(url)
+					},
+					openInteractionDetail: function(item) {
+						if (!item) return;
+						var rid = item.resourceId != null && item.resourceId !== '' ? item.resourceId : item.refid;
+						if (rid == null || rid === '') {
+							if (typeof layui !== 'undefined' && layui.layer) {
+								layui.layer.msg('无法打开：缺少资源 id', { icon: 5 });
+							}
+							return;
+						}
+						var t = item.tablename ? String(item.tablename) : '';
+						var folder = t === 'forum_post' ? 'forum-post' : t;
+						if (!folder) return;
+						this.jump('../' + folder + '/detail.html?id=' + rid);
 					}
 				}
 			})

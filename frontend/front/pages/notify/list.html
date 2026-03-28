@@ -39,6 +39,21 @@
 			margin-bottom: -1px;
 		}
 		.notify-tabs .tab:hover { color: red; }
+		.notify-tabs .tab { position: relative; }
+		.notify-tabs .tab-badge {
+			display: inline-block;
+			min-width: 16px;
+			height: 16px;
+			line-height: 16px;
+			margin-left: 4px;
+			padding: 0 4px;
+			font-size: 11px;
+			color: #fff;
+			background: #e53935;
+			border-radius: 8px;
+			vertical-align: middle;
+			text-align: center;
+		}
 		.notify-list {
 			padding: 0 20px 20px;
 			box-shadow: 0 0 6px rgba(255,0,0,.2);
@@ -90,10 +105,10 @@
 
 			<div class="notify-list">
 				<div class="notify-tabs">
-					<div class="tab" :class="{ current: currentTab === 'reply' }" @click="currentTab='reply'">回复我的</div>
-					<div class="tab" :class="{ current: currentTab === 'thumbsup' }" @click="currentTab='thumbsup'">点赞我的</div>
-					<div class="tab" :class="{ current: currentTab === 'user-interactions' }" @click="currentTab='user-interactions'">收藏我的</div>
-					<div class="tab" :class="{ current: currentTab === 'followMe' }" @click="currentTab='followMe'">关注我的</div>
+					<div class="tab" :class="{ current: currentTab === 'reply' }" @click="switchNotifyTab('reply')">回复我的<span v-if="tabUnread.reply > 0" class="tab-badge">{{ tabUnread.reply > 99 ? '99+' : tabUnread.reply }}</span></div>
+					<div class="tab" :class="{ current: currentTab === 'thumbsup' }" @click="switchNotifyTab('thumbsup')">点赞我的<span v-if="tabUnread.thumbsup > 0" class="tab-badge">{{ tabUnread.thumbsup > 99 ? '99+' : tabUnread.thumbsup }}</span></div>
+					<div class="tab" :class="{ current: currentTab === 'user-interactions' }" @click="switchNotifyTab('user-interactions')">收藏我的<span v-if="tabUnread.userInteractions > 0" class="tab-badge">{{ tabUnread.userInteractions > 99 ? '99+' : tabUnread.userInteractions }}</span></div>
+					<div class="tab" :class="{ current: currentTab === 'followMe' }" @click="switchNotifyTab('followMe')">关注我的<span v-if="tabUnread.followMe > 0" class="tab-badge">{{ tabUnread.followMe > 99 ? '99+' : tabUnread.followMe }}</span></div>
 				</div>
 
 				<!-- 回复我的 -->
@@ -106,7 +121,7 @@
 								<div class="notify-desc" v-if="item.messageContent">您的留言：{{ item.messageContent | forumPostDesc }}</div>
 								<div class="notify-desc" v-if="item.content">回复内容：{{ item.content | replyText }}</div>
 								<img v-if="item.picture" class="notify-pic" :src="baseurl + item.picture" />
-								<div class="notify-time">{{ item.createdAt }}</div>
+								<div class="notify-time">{{ item.createdAt | formatNotifyTime }}</div>
 							</div>
 						</div>
 					</template>
@@ -123,7 +138,7 @@
 								<div class="notify-desc" v-if="item.picture">
 									<img class="notify-pic" :src="baseurl + item.picture" />
 								</div>
-								<div class="notify-time">{{ item.createdAt }}</div>
+								<div class="notify-time">{{ item.createdAt | formatNotifyTime }}</div>
 							</div>
 						</div>
 					</template>
@@ -140,7 +155,7 @@
 								<div class="notify-desc" v-if="item.picture">
 									<img class="notify-pic" :src="baseurl + (item.picture ? item.picture.split(',')[0] : '')" />
 								</div>
-								<div class="notify-time">{{ item.createdAt }}</div>
+								<div class="notify-time">{{ item.createdAt | formatNotifyTime }}</div>
 							</div>
 						</div>
 					</template>
@@ -154,7 +169,7 @@
 							<img class="notify-avatar" :src="item.operatorAvatar ? (baseurl + item.operatorAvatar) : defaultAvatar" @error="$event.target.src=defaultAvatar" />
 							<div class="notify-body">
 								<div class="notify-title">{{ item.operatorName || item.operator_name || '用户' }} 关注了您</div>
-								<div class="notify-time">{{ item.createdAt }}</div>
+								<div class="notify-time">{{ item.createdAt | formatNotifyTime }}</div>
 							</div>
 						</div>
 					</template>
@@ -169,6 +184,36 @@
 		<script src="../../modules/config.js"></script>
 		<script src="../../js/utils.js"></script>
 		<script>
+			function loadPerTabLastRead(uid) {
+				var empty = { reply: null, thumbsup: null, userInteractions: null, followMe: null };
+				if (!uid) {
+					return empty;
+				}
+				var key = 'notifyPerTabLastReadMs_' + uid;
+				var raw = localStorage.getItem(key);
+				if (raw) {
+					try {
+						var o = JSON.parse(raw);
+						return {
+							reply: o.reply != null ? o.reply : null,
+							thumbsup: o.thumbsup != null ? o.thumbsup : null,
+							userInteractions: o.userInteractions != null ? o.userInteractions : null,
+							followMe: o.followMe != null ? o.followMe : null
+						};
+					} catch (e) {
+						return empty;
+					}
+				}
+				var legacy = localStorage.getItem('notifyLastReadAtMillis_' + uid);
+				if (legacy != null && legacy !== '') {
+					var m = parseInt(legacy, 10);
+					if (!isNaN(m)) {
+						return { reply: m, thumbsup: m, userInteractions: m, followMe: m };
+					}
+				}
+				return empty;
+			}
+
 			var vue = new Vue({
 				el: '#app',
 				data: {
@@ -176,10 +221,22 @@
 					baseurl: '',
 					defaultAvatar: '',
 					currentTab: 'reply',
+					perTabLastRead: { reply: null, thumbsup: null, userInteractions: null, followMe: null },
 					replyList: [],
 					thumbsupList: [],
 					userInteractionsList: [],
 					followMeList: []
+				},
+				computed: {
+					tabUnread: function() {
+						var p = this.perTabLastRead || {};
+						return {
+							reply: this.countUnreadInList(this.replyList, p.reply),
+							thumbsup: this.countUnreadInList(this.thumbsupList, p.thumbsup),
+							userInteractions: this.countUnreadInList(this.userInteractionsList, p.userInteractions),
+							followMe: this.countUnreadInList(this.followMeList, p.followMe)
+						};
+					}
 				},
 				filters: {
 					forumPostDesc: function(val) {
@@ -216,6 +273,32 @@
 							return s;
 						}
 						return s;
+					},
+					// 时间戳（毫秒/秒）或日期字符串 -> yyyy-MM-dd HH:mm:ss
+					formatNotifyTime: function(val) {
+						if (val == null || val === '') return '';
+						var d = null;
+						if (val instanceof Date) {
+							d = val;
+						} else if (typeof val === 'number') {
+							d = new Date(val > 1e12 ? val : val * 1000);
+						} else {
+							var s = String(val).trim();
+							if (/^\d+$/.test(s)) {
+								var num = parseInt(s, 10);
+								d = new Date(num > 1e12 ? num : num * 1000);
+							} else {
+								d = new Date(s);
+							}
+						}
+						if (!d || isNaN(d.getTime())) return String(val);
+						var y = d.getFullYear();
+						var m = ('0' + (d.getMonth() + 1)).slice(-2);
+						var day = ('0' + d.getDate()).slice(-2);
+						var h = ('0' + d.getHours()).slice(-2);
+						var min = ('0' + d.getMinutes()).slice(-2);
+						var sec = ('0' + d.getSeconds()).slice(-2);
+						return y + '-' + m + '-' + day + ' ' + h + ':' + min + ':' + sec;
 					}
 				},
 				methods: {
@@ -224,9 +307,105 @@
 						if (item.tablename && item.resourceId) {
 							jump('../' + item.tablename + '/detail.html?id=' + item.resourceId);
 						}
+					},
+					createdAtToMs: function(val) {
+						if (val == null || val === '') {
+							return 0;
+						}
+						var d = null;
+						if (val instanceof Date) {
+							d = val;
+						} else if (typeof val === 'number') {
+							d = new Date(val > 1e12 ? val : val * 1000);
+						} else {
+							var s = String(val).trim();
+							if (/^\d+$/.test(s)) {
+								var num = parseInt(s, 10);
+								d = new Date(num > 1e12 ? num : num * 1000);
+							} else {
+								d = new Date(s);
+							}
+						}
+						if (!d || isNaN(d.getTime())) {
+							return 0;
+						}
+						return d.getTime();
+					},
+					countUnreadInList: function(list, cutoffMs) {
+						if (!list || !list.length) {
+							return 0;
+						}
+						if (cutoffMs == null || cutoffMs === '') {
+							return list.length;
+						}
+						var co = typeof cutoffMs === 'number' ? cutoffMs : parseInt(cutoffMs, 10);
+						if (isNaN(co)) {
+							return list.length;
+						}
+						var n = 0;
+						for (var i = 0; i < list.length; i++) {
+							if (this.createdAtToMs(list[i].createdAt) > co) {
+								n++;
+							}
+						}
+						return n;
+					},
+					/** UI 分签 id -> localStorage / 接口字段名 */
+					tabKeyForUi: function(uiTab) {
+						var map = { 'reply': 'reply', 'thumbsup': 'thumbsup', 'user-interactions': 'userInteractions', 'followMe': 'followMe' };
+						return map[uiTab] || null;
+					},
+					switchNotifyTab: function(uiTab) {
+						this.currentTab = uiTab;
+						var k = this.tabKeyForUi(uiTab);
+						if (k) {
+							this.markTabRead(k);
+						}
+					},
+					markTabRead: function(tabKey) {
+						var uid = localStorage.getItem('userid');
+						if (!uid) {
+							return;
+						}
+						var now = Date.now();
+						var next = Object.assign({}, this.perTabLastRead);
+						next[tabKey] = now;
+						this.perTabLastRead = next;
+						try {
+							localStorage.setItem('notifyPerTabLastReadMs_' + uid, JSON.stringify(next));
+						} catch (e) {}
+						try {
+							if (window.parent && window.parent !== window) {
+								window.parent.postMessage({ type: 'notifyMarkedRead' }, '*');
+							}
+						} catch (e2) {}
+					},
+					switchToFirstUnreadTab: function() {
+						var u = this.tabUnread;
+						if (u.reply > 0) {
+							this.currentTab = 'reply';
+						} else if (u.thumbsup > 0) {
+							this.currentTab = 'thumbsup';
+						} else if (u.userInteractions > 0) {
+							this.currentTab = 'user-interactions';
+						} else if (u.followMe > 0) {
+							this.currentTab = 'followMe';
+						}
 					}
 				}
 			});
+
+			(function() {
+				function pingParentUnread() {
+					try {
+						if (window.parent && window.parent !== window) {
+							window.parent.postMessage({ type: 'notifyMarkedRead' }, '*');
+						}
+					} catch (e) {}
+				}
+				window.addEventListener('pagehide', pingParentUnread);
+				window.addEventListener('beforeunload', pingParentUnread);
+			})();
 
 			layui.use(['layer', 'element', 'carousel', 'http', 'jquery'], function() {
 				var layer = layui.layer;
@@ -279,6 +458,11 @@
 						vue.thumbsupList = res.data.thumbsupList || [];
 						vue.userInteractionsList = res.data.userInteractionsList || [];
 						vue.followMeList = res.data.followMeList || [];
+						var uid = localStorage.getItem('userid');
+						vue.perTabLastRead = loadPerTabLastRead(uid);
+						vue.$nextTick(function() {
+							vue.switchToFirstUnreadTab();
+						});
 					} else {
 						layer.msg(res.msg || '加载失败', { icon: 5 });
 						if (res.code === 401 || (res.msg && res.msg.indexOf('登录') >= 0)) {

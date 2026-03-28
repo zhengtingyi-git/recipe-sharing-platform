@@ -569,15 +569,17 @@ label {
 	line-height: 30px;
 }
 
-/* 美食论坛正文中的图片统一样式 */
-.forum-post-container .content img.forum-img {
+/* 美食论坛正文中的图片：与详情页一致，每张图固定同一画幅 */
+.forum-post-container .content img {
 	display: block;
-	margin: 10px auto;
-	max-width: 700px;   /* 图片最大宽度，按需要调整 */
-	max-height: 420px;  /* 图片最大高度，按需要调整 */
-	width: auto;
-	height: auto;
-	object-fit: contain;
+	margin: 16px auto;
+	width: min(100%, 780px) !important;
+	max-width: min(100%, 780px) !important;
+	height: 360px !important;
+	object-fit: cover !important;
+	object-position: center !important;
+	border-radius: 8px;
+	box-sizing: border-box;
 }
 
 .forum-post-container .auth-container {

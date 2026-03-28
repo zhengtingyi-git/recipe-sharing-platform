@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.annotation.IgnoreAuth;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.entity.TokenEntity;
 import com.entity.UserEntity;
 import com.entity.UserFollowEntity;
+import com.service.TokenService;
 import com.service.UserFollowService;
 import com.service.UserService;
 import com.utils.R;
@@ -30,6 +32,8 @@ public class UserFollowController {
     private UserFollowService userFollowService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private TokenService tokenService;
 
     /** 关注某用户（需登录） */
     @RequestMapping({"/follow", "/create"})
@@ -72,10 +76,22 @@ public class UserFollowController {
     @IgnoreAuth
     @RequestMapping({"/status", "/relation-status"})
     public R status(@RequestParam Long followedId, HttpServletRequest request) {
+        // @IgnoreAuth 时拦截器不会把 Token 写入 session，需从 Token 头解析当前用户
+        Long followerId = null;
         Object uidObj = request.getSession().getAttribute("userId");
-        boolean followed = false;
         if (uidObj != null) {
-            Long followerId = Long.valueOf(uidObj.toString());
+            followerId = Long.valueOf(uidObj.toString());
+        } else {
+            String token = request.getHeader("Token");
+            if (token != null && !token.trim().isEmpty()) {
+                TokenEntity te = tokenService.getTokenEntity(token.trim());
+                if (te != null && te.getUserId() != null) {
+                    followerId = te.getUserId();
+                }
+            }
+        }
+        boolean followed = false;
+        if (followerId != null) {
             EntityWrapper<UserFollowEntity> ew = new EntityWrapper<>();
             ew.eq("follower_id", followerId).eq("followed_id", followedId);
             followed = userFollowService.selectCount(ew) > 0;

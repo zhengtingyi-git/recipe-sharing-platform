@@ -3,7 +3,7 @@ layui.define(['jquery', 'layer'], function(exports) { //提示：模块也可以
 	"use strict";
 	var jquery = layui.jquery,
 		layer = layui.layer,
-        baseurl = "http://localhost:8080/recipe-sharing-platform/";
+        baseurl = (typeof apiBaseUrl !== 'undefined' && apiBaseUrl) ? apiBaseUrl : "http://localhost:8080/recipe-sharing-platform/";
 	var http = {
         domain : "http://localhost:8080/recipe-sharing-platform/",
 		baseurl: baseurl,
@@ -58,6 +58,35 @@ layui.define(['jquery', 'layer'], function(exports) { //提示：模块也可以
 						});
 					}
 					layer.close(index);
+				}
+			});
+		},
+		/** 不显示全局 loading，用于轮询等 */
+		requestSilent: function(url, type, data, callback) {
+			url = baseurl + url;
+			data = data || {};
+			data['t'] = jquery.now();
+			jquery.ajax({
+				url: url,
+				beforeSend: function(request) {
+					request.setRequestHeader("Token", localStorage.getItem("Token"));
+				},
+				contentType: 'application/x-www-form-urlencoded',
+				data: data,
+				dataType: 'json',
+				type: type,
+				success: function(result, status, xhr) {
+					if (result.code == 0) {
+						callback(result);
+					} else if (result.code == 401 || result.code == 403) {
+						window.parent.location.href = '../login/login.html';
+					}
+				},
+				error: function(xhr, status, error) {
+					var res = xhr.responseJSON;
+					if(res && (res.code==401 || res.code==403)) {
+						window.parent.location.href = '../login/login.html';
+					}
 				}
 			});
 		},

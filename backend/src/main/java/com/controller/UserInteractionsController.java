@@ -83,6 +83,7 @@ public class UserInteractionsController {
         params.remove("name");
         params.remove("tablename");
         normalizeUserInteractionsParams(params);
+        coerceResourceIdAndTypeFromParams(userInteractions, params);
 
         EntityWrapper<UserInteractionsEntity> ew = new EntityWrapper<UserInteractionsEntity>();
         // 仅对物理列过滤：避免 MPUtil 依据旧字段名生成不存在 where 条件
@@ -104,7 +105,7 @@ public class UserInteractionsController {
 
         // Between 条件（_start/_end）+ 排序（sort）
         ew = (EntityWrapper<UserInteractionsEntity>) MPUtil.between(ew, params);
-		applyUserInteractionsCategoryFilter(ew, categoryTablename);
+		applyUserInteractionsCategoryFilterIfBulkList(ew, categoryTablename, userInteractions.getResourceId());
 		ew = (EntityWrapper<UserInteractionsEntity>) MPUtil.sort(ew, params);
 		PageUtils page = userInteractionsService.queryPage(params, ew);
         enrichUserInteractionsPage(page);
@@ -129,6 +130,7 @@ public class UserInteractionsController {
         params.remove("name");
         params.remove("tablename");
         normalizeUserInteractionsParams(params);
+        coerceResourceIdAndTypeFromParams(userInteractions, params);
 
         EntityWrapper<UserInteractionsEntity> ew = new EntityWrapper<UserInteractionsEntity>();
         if (userInteractions.getId() != null) {
@@ -148,7 +150,7 @@ public class UserInteractionsController {
         }
 
         ew = (EntityWrapper<UserInteractionsEntity>) MPUtil.between(ew, params);
-		applyUserInteractionsCategoryFilter(ew, categoryTablename);
+		applyUserInteractionsCategoryFilterIfBulkList(ew, categoryTablename, userInteractions.getResourceId());
 		ew = (EntityWrapper<UserInteractionsEntity>) MPUtil.sort(ew, params);
 		PageUtils page = userInteractionsService.queryPage(params, ew);
         enrichUserInteractionsPage(page);
@@ -234,12 +236,23 @@ public class UserInteractionsController {
      */
     @RequestMapping("/save")
     public R save(@RequestBody UserInteractionsEntity userInteractions, HttpServletRequest request){
-    	userInteractions.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
     	//ValidatorUtils.validateEntity(userInteractions);
-    	userInteractions.setUserId((Long)request.getSession().getAttribute("userId"));
+    	Long uid = (Long) request.getSession().getAttribute("userId");
+    	if (uid == null) {
+    		return R.error("请先登录");
+    	}
+    	userInteractions.setUserId(uid);
+    	normalizeInteractionType(userInteractions);
+    	if (userInteractions.getResourceId() == null) {
+    		return R.error("缺少 resourceId");
+    	}
     	if (userInteractions.getType() != null && !("1".equals(userInteractions.getType()) || "21".equals(userInteractions.getType()))) {
     		return R.error("user-interactions.type 只允许 1(收藏) 或 21(赞)");
     	}
+    	if (interactionRowExists(uid, userInteractions.getResourceId(), userInteractions.getType())) {
+    		return R.ok();
+    	}
+    	userInteractions.setId(new Date().getTime() + new Double(Math.floor(Math.random() * 1000)).longValue());
         userInteractionsService.insert(userInteractions);
         return R.ok();
     }
@@ -249,14 +262,44 @@ public class UserInteractionsController {
      */
     @RequestMapping("/add")
     public R add(@RequestBody UserInteractionsEntity userInteractions, HttpServletRequest request){
-    	userInteractions.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
-    	//ValidatorUtils.validateEntity(userInteractions);
-    	userInteractions.setUserId((Long)request.getSession().getAttribute("userId"));
+    	Long uid = (Long) request.getSession().getAttribute("userId");
+    	if (uid == null) {
+    		return R.error("请先登录");
+    	}
+    	userInteractions.setUserId(uid);
+    	normalizeInteractionType(userInteractions);
+    	if (userInteractions.getResourceId() == null) {
+    		return R.error("缺少 resourceId");
+    	}
     	if (userInteractions.getType() != null && !("1".equals(userInteractions.getType()) || "21".equals(userInteractions.getType()))) {
     		return R.error("user-interactions.type 只允许 1(收藏) 或 21(赞)");
     	}
+    	if (interactionRowExists(uid, userInteractions.getResourceId(), userInteractions.getType())) {
+    		return R.ok();
+    	}
+    	userInteractions.setId(new Date().getTime() + new Double(Math.floor(Math.random() * 1000)).longValue());
         userInteractionsService.insert(userInteractions);
         return R.ok();
+    }
+
+    /** JSON 里 type 可能是数字，统一成 "1"/"21" 字符串再入库、再查重 */
+    private static void normalizeInteractionType(UserInteractionsEntity e) {
+    	if (e == null || e.getType() == null) {
+    		return;
+    	}
+    	String t = String.valueOf(e.getType()).trim();
+    	e.setType(t);
+    }
+
+    private boolean interactionRowExists(Long userId, Long resourceId, String interactionType) {
+    	if (userId == null || resourceId == null || interactionType == null) {
+    		return false;
+    	}
+    	EntityWrapper<UserInteractionsEntity> w = new EntityWrapper<>();
+    	w.eq("user_id", userId);
+    	w.eq("resource_id", resourceId);
+    	w.eq("interaction_type", interactionType);
+    	return userInteractionsService.selectCount(w) > 0;
     }
 
     /**
@@ -337,6 +380,36 @@ public class UserInteractionsController {
 
 
     /**
+     * 详情页「是否已赞/已藏」传了 resourceId：再按 tablename 做菜谱子查询可能把当前 id 排除掉（source_type 与库不一致），
+     * 因此仅在没有指定具体 resourceId 时（个人中心列表）才做分类筛选。
+     */
+    private void applyUserInteractionsCategoryFilterIfBulkList(EntityWrapper<UserInteractionsEntity> ew,
+                                                               String tablename,
+                                                               Long resourceId) {
+        if (resourceId != null) {
+            return;
+        }
+        applyUserInteractionsCategoryFilter(ew, tablename);
+    }
+
+    /** GET 参数名与实体绑定偶发失败时，从 params 补 resourceId、interaction_type */
+    private void coerceResourceIdAndTypeFromParams(UserInteractionsEntity userInteractions, Map<String, Object> params) {
+        if (userInteractions == null || params == null) {
+            return;
+        }
+        if (userInteractions.getResourceId() == null && params.get("resourceId") != null) {
+            try {
+                userInteractions.setResourceId(Long.parseLong(String.valueOf(params.get("resourceId")).trim()));
+            } catch (NumberFormatException ignored) {
+                // ignore
+            }
+        }
+        if (userInteractions.getType() == null && params.get("type") != null) {
+            userInteractions.setType(String.valueOf(params.get("type")).trim());
+        }
+    }
+
+    /**
      * 个人中心「我的收藏/我的点赞」按分类筛选：库表无 tablename 列，通过 refid 与 recipe / forum_post 关联。
      * 中式/外国美食共用 recipe 表，以 recipetype 区分。
      */
@@ -349,7 +422,8 @@ public class UserInteractionsController {
                 ew.andNew().where("resource_id IN (SELECT id FROM recipe WHERE source_type = {0})", "foreign_recipe");
                 break;
             case "chinese_recipe":
-                ew.andNew().where("resource_id IN (SELECT id FROM recipe WHERE source_type = {0})", "chinese_recipe");
+                // 与业务侧一致：中式菜品历史上 source_type 可能为 NULL/空，否则会筛掉记录导致前端误判未收藏再走 save → 唯一键冲突
+                ew.andNew().where("resource_id IN (SELECT id FROM recipe WHERE source_type = 'chinese_recipe' OR source_type IS NULL OR source_type = '')");
                 break;
             case "forum_post":
                 ew.andNew().where("resource_id IN (SELECT id FROM forum_post)");

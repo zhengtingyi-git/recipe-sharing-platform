@@ -179,11 +179,7 @@
 				</div>
 			</div> -->
 			<div class="layui-carousel" id="swiper" :style='{"boxShadow":"0 0 8px rgba(255, 69, 0, 1)","margin":"0px 0 0 0","borderColor":"rgba(0, 0, 0, 0.75)","borderRadius":"20px","borderWidth":"5px 0 0 0","width":"100%","borderStyle":"solid"}'>
-			  <div carousel-item>
-				<div v-for="(item,index) in swiperList" :key="index">
-					<img style="width: 100%;height: 100%;object-fit:cover;" :src="item.img" />
-				</div>
-			  </div>
+			  <div carousel-item id="swiper-item"></div>
 			</div>
 			<!-- 轮播图 -->
 
@@ -302,8 +298,6 @@
 			var vue = new Vue({
 				el: '#app',
 				data: {
-					// 轮播图
-					swiperList: [],
 					xingbie: [],
 					centerMenu: centerMenu,
 					fansCount: 0
@@ -340,38 +334,6 @@
 				var laydate = layui.laydate;
 				vue.baseurl = http.baseurl;
 
-      // 获取轮播图 数据
-      http.request('config/list', 'get', {
-        page: 1,
-        limit: 5
-      }, function(res) {
-        if (res.data.list.length > 0) {
-          let swiperList = [];
-          res.data.list.forEach(element => {
-            if (element.value != null) {
-              swiperList.push({
-                img: http.baseurl+element.value
-              });
-            }
-          });
-                  vue.swiperList = swiperList;
-                  vue.$nextTick(() => {
-                    carousel.render({
-                        elem: '#test1',
-                                width: '100%',
-                        height: '300px',
-                        arrow: 'hover',
-                        anim: 'default',
-                        autoplay: 'true',
-                        interval: '3000',
-                        indicator: 'inside'
-                    });
-                  })
-          // vue.$nextTick(()=>{
-          //   window.xznSlide();
-          // });
-        }
-      });
 				// 充值
 				jquery('#btn-recharge').click(function(e) {
 					layer.open({
@@ -391,45 +353,38 @@
 					});
 				});
 
-				// 获取轮播图 数据
+				// 轮播图（与二级页一致：注入 #swiper-item 后 render #swiper；之前缺少 swiper-item 且重复请求里有错误的 #test1）
 				http.request('config/list', 'get', {
 					page: 1,
 					limit: 5
 				}, function(res) {
-					if (res.data.list.length > 0) {
-						var swiperItemHtml = '';
+					var swiperItemHtml = '';
+					if (res.data && res.data.list && res.data.list.length > 0) {
 						for (let item of res.data.list) {
 							if (item.name.indexOf('picture') >= 0 && item.value && item.value != "" && item.value != null) {
 								swiperItemHtml +=
 									'<div>' +
-									'<img style="width: 100%;height: 100%;object-fit:cover;" class="swiper-item" src="' + http.baseurl+item.value + '">' +
+									'<img style="width: 100%;height: 100%;object-fit:cover;" class="swiper-item" src="' + http.baseurl + item.value + '">' +
 									'</div>';
 							}
 						}
-						jquery('#swiper-item').html(swiperItemHtml);
-						// 轮播图
-						vue.$nextTick(() => {
-						  carousel.render({
-						  	elem: '#swiper',
-							width: '100%',
-						  	height: '300px',
-						  	arrow: 'hover',
-						  	anim: 'default',
-						  	autoplay: 'true',
-						  	interval: '3000',
-						  	indicator: 'inside'
-						  });
-
-						})
-						// carousel.render({
-						// 	elem: '#swiper',
-						// 	width: swiper.width,height:swiper.height,
-						// 	arrow: swiper.arrow,
-						// 	anim: swiper.anim,
-						// 	interval: swiper.interval,
-						// 	indicator: "none"
-						// });
 					}
+					if (!swiperItemHtml) {
+						swiperItemHtml = '<div><img style="width: 100%;height: 100%;object-fit:cover;" class="swiper-item" src="../../img/banner.jpg"></div>';
+					}
+					jquery('#swiper-item').html(swiperItemHtml);
+					vue.$nextTick(function() {
+						carousel.render({
+							elem: '#swiper',
+							width: '100%',
+							height: '300px',
+							arrow: 'hover',
+							anim: 'default',
+							autoplay: 'true',
+							interval: '3000',
+							indicator: 'inside'
+						});
+					});
 				});
 
 				vue.xingbie = '男,女'.split(',')

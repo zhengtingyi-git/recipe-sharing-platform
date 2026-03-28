@@ -26,7 +26,7 @@
 			top: 0;
 			left: 0;
 			width: 100%;
-			z-index: 1;
+			z-index: 1000;
 		}
 
 		#header .nav-top {
@@ -148,6 +148,8 @@
 		}
 		#header .navs li a{
 			color: inherit;
+			position: relative;
+			display: inline-block;
 		}
 		#header .navs li.current a{
 			color: inherit;
@@ -175,6 +177,26 @@
 			background-color: rgba(255, 69, 0, 1);
 			box-shadow: 0 0 0px rgba(0,0,0,.3);
 		}
+		#header .navs li.nav-has-badge {
+			position: relative;
+		}
+		#header .navs li .nav-notify-badge {
+			position: absolute;
+			top: -6px;
+			right: -8px;
+			min-width: 16px;
+			height: 16px;
+			padding: 0 4px;
+			line-height: 16px;
+			font-size: 11px;
+			color: #fff;
+			background: #e53935;
+			border-radius: 8px;
+			text-align: center;
+			box-sizing: border-box;
+			z-index: 3;
+			pointer-events: none;
+		}
 	</style>
 	<body>
 		<!-- start 顶部导航栏 -->
@@ -190,7 +212,7 @@
 				<div class="list">
 					<ul>
 						<li class='current'><a href="javascript:navPage('./pages/home/home.html')" class="menumain"><i v-if="false" class="layui-icon layui-icon-home"></i>首页</a></li>
-						<li v-for="(item,index) in indexNav" v-bind:key="index"><a :href="'javascript:navPage(\''+item.url+'\')'" class="menumain" style="cursor: pointer;"><i v-if="false" class="layui-icon" :class="iconArr[index]"></i>{{item.name}}</a></li>
+						<li v-for="(item,index) in indexNav" v-bind:key="index" :class="{'nav-has-badge': item.url.indexOf('notify')>=0 && notifyUnreadCount>0}"><a :href="'javascript:navPage(\''+item.url+'\')'" class="menumain" style="cursor: pointer;"><i v-if="false" class="layui-icon" :class="iconArr[index]"></i>{{item.name}}<span v-if="item.url.indexOf('notify')>=0 && notifyUnreadCount>0" class="nav-notify-badge">{{ notifyUnreadCount > 99 ? '99+' : notifyUnreadCount }}</span></a></li>
 						<li><a href="javascript:centerPage();" class="menumain"><i v-if="false" class="layui-icon layui-icon-username"></i>个人中心</a></li>
 						<li v-if="isAdmin"><a :href="adminurl" target="_blank" class="menumain" style="cursor: pointer;"><i v-if="false" class="layui-icon layui-icon-link"></i>后台管理</a></li>
 					</ul>
@@ -207,6 +229,7 @@
     </div>
 
 		<script src="./js/jquery.js"></script>
+		<script src="./modules/config.js"></script>
 		<script src="./layui/layui.js"></script>
 		<script src="./js/vue.js"></script>
 		<script src="./js/config.js"></script>
@@ -224,10 +247,12 @@
 					chatFlag: chatFlag,
 					projectName: projectName,
 					isAdmin: false,
+					notifyUnreadCount: 0,
 				},
 				mounted: function() {
 					this.bindClickOnLi();
 					this.checkAdmin();
+					this.initNotifyUnread();
 				},
 				created() {
 					this.iconArr.sort(()=>{
@@ -239,6 +264,56 @@
 					checkAdmin() {
 						var userTable = localStorage.getItem('userTable');
 						this.isAdmin = (userTable === 'admin');
+					},
+					initNotifyUnread() {
+						var self = this;
+						var base = (typeof apiBaseUrl !== 'undefined' && apiBaseUrl) ? apiBaseUrl : 'http://localhost:8080/recipe-sharing-platform/';
+						if (base.slice(-1) !== '/') {
+							base += '/';
+						}
+						// 不依赖 layui http 模块加载顺序，避免角标永远不请求
+						self.refreshNotifyUnread = function() {
+							if (!localStorage.getItem('Token') || localStorage.getItem('userTable') !== 'user') {
+								self.notifyUnreadCount = 0;
+								return;
+							}
+							var uid = localStorage.getItem('userid');
+							var params = { t: Date.now() };
+							var perKey = uid ? 'notifyPerTabLastReadMs_' + uid : null;
+							var perRaw = perKey ? localStorage.getItem(perKey) : null;
+							if (perRaw) {
+								params.lastReadByTab = perRaw;
+							} else {
+								var lrKey = uid ? 'notifyLastReadAtMillis_' + uid : null;
+								var lrVal = lrKey ? localStorage.getItem(lrKey) : null;
+								if (lrVal) {
+									params.lastReadAt = lrVal;
+								}
+							}
+							jQuery.ajax({
+								url: base + 'notify/unreadCount',
+								type: 'GET',
+								data: params,
+								dataType: 'json',
+								beforeSend: function(xhr) {
+									xhr.setRequestHeader('Token', localStorage.getItem('Token'));
+								},
+								success: function(result) {
+									if (result && result.code === 0 && result.data && result.data.unreadCount != null) {
+										var n = parseInt(result.data.unreadCount, 10);
+										self.notifyUnreadCount = isNaN(n) ? 0 : n;
+									}
+								}
+							});
+						};
+						window.addEventListener('message', function(e) {
+							if (e.data && e.data.type === 'notifyMarkedRead' && typeof self.refreshNotifyUnread === 'function') {
+								self.refreshNotifyUnread();
+							}
+						});
+						self.refreshNotifyUnread();
+						setInterval(function() { self.refreshNotifyUnread(); }, 60000);
+						setTimeout(function() { self.refreshNotifyUnread(); }, 1500);
 					},
 					jump(url) {
 						jump(url)
@@ -259,10 +334,13 @@
 				var element = layui.element;
 				var layer = layui.layer;
 				
-				// 监听localStorage变化，更新isAdmin状态
+				// 监听localStorage变化，更新isAdmin状态；消息已读时间在其他标签页更新时同步角标
 				window.addEventListener('storage', function(e) {
 					if (e.key === 'userTable') {
 						vue.checkAdmin();
+					}
+					if (e.key && (e.key.indexOf('notifyLastReadAtMillis_') === 0 || e.key.indexOf('notifyPerTabLastReadMs_') === 0) && typeof vue.refreshNotifyUnread === 'function') {
+						vue.refreshNotifyUnread();
 					}
 				});
 				
@@ -305,7 +383,17 @@
 			}
 
 			var iframeUrl = localStorage.getItem('iframeUrl');
-			document.getElementById('iframe').src = iframeUrl  || './pages/home/home.html';
+			var iframeEl = document.getElementById('iframe');
+			iframeEl.src = iframeUrl  || './pages/home/home.html';
+			iframeEl.addEventListener('load', function() {
+				function pingUnread() {
+					if (typeof vue !== 'undefined' && typeof vue.refreshNotifyUnread === 'function') {
+						vue.refreshNotifyUnread();
+					}
+				}
+				pingUnread();
+				setTimeout(pingUnread, 400);
+			});
 
             let list = document.getElementsByTagName("li");
             for(var i = 0;i<list.length;i++){

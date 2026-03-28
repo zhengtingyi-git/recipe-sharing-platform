@@ -113,7 +113,8 @@
 		width: 100%;
 		flex-wrap: wrap;
 		width: 980px !important;
-		margin: 0 auto !important;
+		/* 勿用 margin:0 auto，会清掉上下间距导致黑条贴住上方图片 */
+		margin: 20px auto 10px !important;
 		justify-content: space-between !important;
 	}
 	.news-container .btn-container button i { margin-right: 4px; }
@@ -123,6 +124,45 @@
 		font-size: 22px;
 		font-weight: bold;
 		margin: 20px auto 10px;
+	}
+	/* 帖子封面 + 正文插图：同一固定像素画幅，cover 裁切，各帖之间也一致 */
+	.news-container {
+		--forum-fixed-img-w: min(100%, 780px);
+		--forum-fixed-img-h: 360px;
+	}
+	.post-cover-wrap {
+		width: var(--forum-fixed-img-w);
+		max-width: 980px;
+		height: var(--forum-fixed-img-h);
+		margin: 24px auto 12px;
+		padding: 0;
+		box-sizing: border-box;
+		overflow: hidden;
+		border-radius: 8px;
+		box-shadow: 0 2px 12px rgba(255, 0, 0, 0.12);
+		border: 1px solid rgba(255, 200, 200, 0.6);
+	}
+	.post-cover-img {
+		width: 100% !important;
+		height: 100% !important;
+		max-width: none !important;
+		max-height: none !important;
+		object-fit: cover !important;
+		object-position: center !important;
+		display: block;
+	}
+	.news-container > .content img {
+		width: var(--forum-fixed-img-w) !important;
+		max-width: min(100%, 780px) !important;
+		height: var(--forum-fixed-img-h) !important;
+		object-fit: cover !important;
+		object-position: center !important;
+		display: block;
+		margin: 16px auto;
+		border-radius: 8px;
+		box-sizing: border-box;
+		box-shadow: 0 2px 12px rgba(255, 0, 0, 0.08);
+		border: 1px solid rgba(255, 200, 200, 0.45);
 	}
 </style>
 <body style="padding-bottom: 10px;">
@@ -154,15 +194,18 @@
 				</div>
 			</div>
 			<div class="content" v-html="detail.content"></div>
+			<div v-if="postCoverSrc()" class="post-cover-wrap">
+				<img class="post-cover-img" :src="postCoverSrc()" alt="封面" @error="$event.target.style.display='none'" />
+			</div>
 
-			<div class="btn-container" :style='{"padding":"0 10px","boxShadow":"0 0 0px rgba(255,0,0,.8)","margin":"10px 0 10px 0","borderColor":"rgba(0,0,0,.3)","backgroundColor":"rgba(0,0,0,1)","borderRadius":"4px","borderWidth":"0","borderStyle":"solid","justifyContent":"flex-end","height":"64px"}'>
+			<div class="btn-container" :style='{"padding":"0 10px","boxShadow":"0 0 0px rgba(255,0,0,.8)","borderColor":"rgba(0,0,0,.3)","backgroundColor":"rgba(0,0,0,1)","borderRadius":"4px","borderWidth":"0","borderStyle":"solid","justifyContent":"flex-end","height":"64px"}'>
 				<div class="tool-container" style="display:flex;align-items:center;color:#fff;">
 					<div v-if='!thumbsupFlag' @click="thumbsupnumClick()" style="display:flex;align-items:center;cursor:pointer;">
-						<i class="layui-icon" style="font-size: 20px;color: red;margin-right: 10px;">&#xe6c6;</i>
+						<i class="layui-icon layui-icon-heart" style="font-size: 20px;color: red;margin-right: 10px;"></i>
 						赞一下({{ detail.thumbsupnum==null?0:detail.thumbsupnum }})
 					</div>
 					<div v-if='thumbsupFlag' @click="thumbsupnumClick()" style="display:flex;align-items:center;cursor:pointer;">
-						<i class="layui-icon" style="font-size: 20px;color: red;margin-right: 10px;">&#xe6c6;</i>
+						<i class="layui-icon layui-icon-heart-fill" style="font-size: 20px;color: red;margin-right: 10px;"></i>
 						取消赞({{ detail.thumbsupnum==null?0:detail.thumbsupnum }})
 					</div>
 					<a v-if='userInteractionsFlag' @click="userInteractionsUp()" href="javascript:void(0)" style="display:flex;align-items:center;margin-left: 15px;color:#fff;">
@@ -216,7 +259,6 @@
 								<img :style='{"boxShadow":"0 0 6px rgba(255,0,0,.3)","margin":"0 10px 0 0","borderColor":"rgba(0,0,0,.3)","borderRadius":"100%","borderWidth":"0","width":"40px","borderStyle":"solid","height":"40px"}' class="avator" :src="item.touxiang ? (baseurl + item.touxiang) : '../../img/avator.png'" @error="$event.target.src='../../img/avator.png'">
 								<div>
 									<span style="display: inline-block;" :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,.3)","margin":"0","borderColor":"rgba(0,0,0,.3)","backgroundColor":"#fff","color":"#333","borderRadius":"4px","borderWidth":"0","width":"auto","lineHeight":"28px","fontSize":"14px","borderStyle":"solid"}' class="username">{{ item.nickname || '用户' }}</span>
-									<div style="font-size:12px;color:#999;margin-top:4px;margin-left:10px;">{{ item.createdAt || '' }}</div>
 								</div>
 							</div>
 							<div style="display:flex;gap:8px;align-items:center;">
@@ -294,12 +336,15 @@
 			methods: {
 				jump(url) { jump(url); },
 				currentUserDisplayName: function() {
-					return (localStorage.getItem('yonghuxingming') || localStorage.getItem('adminName') || '').trim();
+					return (localStorage.getItem('yonghuxingming') || localStorage.getItem('nickname') || localStorage.getItem('adminName') || '').trim();
 				},
 				replyRowUserId: function(o) {
 					if (!o || typeof o !== 'object') return '';
-					if (o.userId != null && o.userId !== '') return String(o.userId);
-					return '';
+					var v = o.userid != null && o.userid !== '' ? o.userid
+						: (o.userId != null && o.userId !== '' ? o.userId
+						: (o.user_id != null && o.user_id !== '' ? o.user_id
+						: (o.uid != null && o.uid !== '' ? o.uid : '')));
+					return v !== '' && v != null ? String(v) : '';
 				},
 				isOwnReply: function(row) {
 					var uid = (localStorage.getItem('userid') || this.currentUserId || '').trim();
@@ -337,7 +382,15 @@
 				coverPicture: function() {
 					if (!this.detail.picture) return '';
 					var p = String(this.detail.picture).split(',')[0];
-					return p || '';
+					return (p || '').trim();
+				},
+				postCoverSrc: function() {
+					var p = this.coverPicture();
+					if (!p) return '';
+					if (/^https?:\/\//i.test(p)) return p;
+					var b = this.baseurl || '';
+					if (b && b.charAt(b.length - 1) === '/' && p.charAt(0) === '/') return b + p.slice(1);
+					return b + p;
 				},
 				thumbsupnumClick: function() {
 					var _this = this;
@@ -355,7 +408,9 @@
 					}, function(res) {
 						if (res.data.list.length === 1) {
 							layui.http.requestJson('user-interactions/delete', 'post', [res.data.list[0].id], function() {
-								layer.msg('取消成功', { time: 1000, icon: 5 }, function() { location.reload(); });
+								_this.thumbsupFlag = 0;
+								_this.detail.thumbsupnum = Math.max(0, parseInt(_this.detail.thumbsupnum == null ? 0 : _this.detail.thumbsupnum, 10) - 1);
+								layer.msg('取消成功', { time: 1000, icon: 5 });
 							});
 							return;
 						}
@@ -367,7 +422,9 @@
 							resourceId: _this.detail.id,
 							tablename: _this.detailTable
 						}, function() {
-							layer.msg('点赞成功', { time: 1000, icon: 6 }, function() { location.reload(); });
+							_this.thumbsupFlag = 1;
+							_this.detail.thumbsupnum = parseInt(_this.detail.thumbsupnum == null ? 0 : _this.detail.thumbsupnum, 10) + 1;
+							layer.msg('点赞成功', { time: 1000, icon: 6 });
 						});
 					});
 				},
@@ -387,7 +444,9 @@
 					}, function(res) {
 						if (res.data.list.length === 1) {
 							layui.http.requestJson('user-interactions/delete', 'post', [res.data.list[0].id], function() {
-								layer.msg('取消成功', { time: 1000, icon: 5 }, function() { location.reload(); });
+								_this.userInteractionsFlag = 0;
+								_this.userInteractionsCount = Math.max(0, parseInt(_this.userInteractionsCount == null ? 0 : _this.userInteractionsCount, 10) - 1);
+								layer.msg('取消成功', { time: 1000, icon: 5 });
 							});
 							return;
 						}
@@ -399,7 +458,9 @@
 							resourceId: _this.detail.id,
 							tablename: _this.detailTable
 						}, function() {
-							layer.msg('收藏成功', { time: 1000, icon: 6 }, function() { location.reload(); });
+							_this.userInteractionsFlag = 1;
+							_this.userInteractionsCount = parseInt(_this.userInteractionsCount == null ? 0 : _this.userInteractionsCount, 10) + 1;
+							layer.msg('收藏成功', { time: 1000, icon: 6 });
 						});
 					});
 				},
@@ -521,7 +582,10 @@
 					}
 					var pick = function(o) {
 						if (!o || typeof o !== 'object') return { nickname: '', avatar: '', content: '', userId: '' };
-						var uid = o.userId != null && o.userId !== '' ? o.userId : '';
+						var uid = o.userId != null && o.userId !== '' ? o.userId
+							: (o.userid != null && o.userid !== '' ? o.userid
+							: (o.user_id != null && o.user_id !== '' ? o.user_id
+							: (o.uid != null && o.uid !== '' ? o.uid : '')));
 						return {
 							nickname: o.nickname || o.yonghuxingming || o.username || '',
 							avatar: o.touxiang || o.avatar || o.headimg || '',
@@ -680,9 +744,6 @@
 			http.request('forum-post/detail/' + id, 'get', {}, function(res) {
 				vue.detail = res.data || {};
 				vue.title = (vue.detail && vue.detail.title) ? vue.detail.title : '';
-				if (vue.detail.content) {
-					vue.detail.content = vue.detail.content.replace(/<img/g, '<img class="forum-img"');
-				}
 				var followQueryUserId = res.data && res.data.userId;
 				if (followQueryUserId) {
 					http.request('guanzhu/status', 'get', { followedId: followQueryUserId }, function(r) {
@@ -707,7 +768,7 @@
 						tablename: vue.detailTable,
 						userId: localStorage.getItem('userid'),
 					}, function(r1) {
-						vue.userInteractionsFlag = r1.data.list.length;
+						vue.userInteractionsFlag = r1.data.list && r1.data.list.length > 0 ? 1 : 0;
 					});
 					http.request('user-interactions/list', 'get', {
 						page: 1,
@@ -717,7 +778,7 @@
 						tablename: vue.detailTable,
 						userId: localStorage.getItem('userid'),
 					}, function(r2) {
-						if (r2.data.list.length > 0) vue.thumbsupFlag = 1;
+						vue.thumbsupFlag = r2.data.list && r2.data.list.length > 0 ? 1 : 0;
 					});
 				}
 			});

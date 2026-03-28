@@ -1,5 +1,7 @@
 
 var projectName = '小食堂记';
+/** 后端 context-path 根地址，需与 application.yml 中 server.servlet.context-path 一致；部署改域名/端口时只改这里即可 */
+var apiBaseUrl = 'http://localhost:8080/recipe-sharing-platform/';
 /**
  * 轮播图配置
  */

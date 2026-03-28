@@ -105,11 +105,11 @@ color: #999 !important;
 					
 				<div class="tool-container">
 						<div v-if='!thumbsupFlag' @click="thumbsupnumClick()" style="display: flex;align-items: center;">
-							<i class="layui-icon" style="font-size: 20px;color: red;margin-right: 10px;">&#xe6c6;</i>
+							<i class="layui-icon layui-icon-heart" style="font-size: 20px;color: red;margin-right: 10px;"></i>
 							赞一下({{detail.thumbsupnum==null?0:detail.thumbsupnum}})
 						</div>
 						<div v-if='thumbsupFlag' @click="thumbsupnumClick()" style="display: flex;align-items: center;">
-							<i class="layui-icon" style="font-size: 20px;color: red;margin-right: 10px;">&#xe6c6;</i>
+							<i class="layui-icon layui-icon-heart-fill" style="font-size: 20px;color: red;margin-right: 10px;"></i>
 							取消赞({{detail.thumbsupnum==null?0:detail.thumbsupnum}})
 						</div>
 						<a v-if='userInteractionsFlag' @click="userInteractionsUp()" href="javascript:void(0)" style="display: flex;align-items: center;margin-left: 15px;">
@@ -363,12 +363,15 @@ color: #999 !important;
 					return isFrontAuth(tablename, button)
 				},
 				currentUserDisplayName() {
-					return (localStorage.getItem('yonghuxingming') || localStorage.getItem('adminName') || '').trim();
+					return (localStorage.getItem('yonghuxingming') || localStorage.getItem('nickname') || localStorage.getItem('adminName') || '').trim();
 				},
 				replyRowUserId(o) {
 					if (!o || typeof o !== 'object') return '';
-					if (o.userId != null && o.userId !== '') return String(o.userId);
-					return '';
+					var v = o.userid != null && o.userid !== '' ? o.userid
+						: (o.userId != null && o.userId !== '' ? o.userId
+						: (o.user_id != null && o.user_id !== '' ? o.user_id
+						: (o.uid != null && o.uid !== '' ? o.uid : '')));
+					return v !== '' && v != null ? String(v) : '';
 				},
 				isOwnReply(row) {
 					var uid = (localStorage.getItem('userid') || this.currentUserId || '').trim();
@@ -711,7 +714,10 @@ color: #999 !important;
 					}
 					var pick = function(o) {
 						if (!o || typeof o !== 'object') return { nickname: '', avatar: '', content: '', userId: '' };
-						var u = o.userId != null && o.userId !== '' ? o.userId : '';
+						var u = o.userId != null && o.userId !== '' ? o.userId
+							: (o.userid != null && o.userid !== '' ? o.userid
+							: (o.user_id != null && o.user_id !== '' ? o.user_id
+							: (o.uid != null && o.uid !== '' ? o.uid : '')));
 						return {
 							nickname: o.nickname || o.yonghuxingming || o.username || '',
 							avatar: o.touxiang || o.avatar || o.headimg || '',
@@ -823,34 +829,31 @@ color: #999 !important;
 					vue.userInteractionsCount = rc.data && typeof rc.data.total === 'number' ? rc.data.total : 0;
 				});
 
-			});
-			if(localStorage.getItem('userid')){
-				http.request(`user-interactions/list`, 'get', {
-					page: 1,
-					limit: 1,
-					type:1,
-					resourceId : vue.detail.id,
-					tablename : vue.detailTable,
-					userId: localStorage.getItem('userid'),
-				}, function(res) {
-					vue.userInteractionsFlag = res.data.list.length;
-				})
-			}
+				var rid = vue.detail.id;
+				if (localStorage.getItem('userid') && rid != null && rid !== '') {
+					http.request(`user-interactions/list`, 'get', {
+						page: 1,
+						limit: 1,
+						type: 1,
+						resourceId: rid,
+						tablename: vue.detailTable,
+						userId: localStorage.getItem('userid'),
+					}, function(res) {
+						vue.userInteractionsFlag = res.data.list && res.data.list.length > 0 ? 1 : 0;
+					});
+					http.request(`user-interactions/list`, 'get', {
+						page: 1,
+						limit: 1,
+						type: '21',
+						resourceId: rid,
+						tablename: vue.detailTable,
+						userId: localStorage.getItem('userid'),
+					}, function(res) {
+						vue.thumbsupFlag = res.data.list && res.data.list.length > 0 ? 1 : 0;
+					});
+				}
 
-			if(localStorage.getItem('userid')){
-				http.request(`user-interactions/list`, 'get', {
-					page: 1,
-					limit: 1,
-					type:'21',
-					resourceId : vue.detail.id,
-					tablename : vue.detailTable,
-					userId: localStorage.getItem('userid'),
-				}, function(res) {
-					if(res.data.list.length>0) {
-						vue.thumbsupFlag = 1;
-					}
-				})
-			}
+			});
 
 			// 获取评论
 			http.request(`discuss${vue.detailTable}/list`, 'get', {

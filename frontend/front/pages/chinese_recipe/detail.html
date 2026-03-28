@@ -121,11 +121,11 @@ color: #999 !important;
 					
 				<div class="tool-container">
 						<div v-if='!thumbsupFlag' @click="thumbsupnumClick()" style="display: flex;align-items: center;">
-							<i class="layui-icon" style="font-size: 20px;color: red;margin-right: 10px;">&#xe6c6;</i>
+							<i class="layui-icon layui-icon-heart" style="font-size: 20px;color: red;margin-right: 10px;"></i>
 							赞一下({{detail.thumbsupnum==null?0:detail.thumbsupnum}})
 						</div>
 						<div v-if='thumbsupFlag' @click="thumbsupnumClick()" style="display: flex;align-items: center;">
-							<i class="layui-icon" style="font-size: 20px;color: red;margin-right: 10px;">&#xe6c6;</i>
+							<i class="layui-icon layui-icon-heart-fill" style="font-size: 20px;color: red;margin-right: 10px;"></i>
 							取消赞({{detail.thumbsupnum==null?0:detail.thumbsupnum}})
 						</div>
 						<a v-if='userInteractionsFlag' @click="userInteractionsUp()" href="javascript:void(0)" style="display: flex;align-items: center;margin-left: 15px;">
@@ -400,7 +400,7 @@ color: #999 !important;
 					return isFrontAuth(tablename, button)
 				},
 				currentUserDisplayName() {
-					return (localStorage.getItem('yonghuxingming') || localStorage.getItem('adminName') || '').trim();
+					return (localStorage.getItem('yonghuxingming') || localStorage.getItem('nickname') || localStorage.getItem('adminName') || '').trim();
 				},
 				replyRowUserId(o) {
 					if (!o || typeof o !== 'object') return '';
@@ -463,12 +463,11 @@ color: #999 !important;
 						vue.dataList = res.data.list
 						if(res.data.list.length==1) {
 							layui.http.requestJson(`user-interactions/delete`, 'post', [res.data.list[0].id], function(res) {
+								_this.thumbsupFlag = 0;
 								_this.detail.thumbsupnum = Math.max(0, parseInt(_this.detail.thumbsupnum==null?0:_this.detail.thumbsupnum) - 1)
 								layer.msg('取消成功', {
 									time: 1000,
 									icon: 5
-								}, function() {
-									window.location.reload();
 								});
 							});
 							return;
@@ -481,12 +480,11 @@ color: #999 !important;
 							resourceId: this.detail.id,
 							tablename: this.detailTable
 						}, function(res) {
+							_this.thumbsupFlag = 1;
 							_this.detail.thumbsupnum = parseInt(_this.detail.thumbsupnum==null?0:_this.detail.thumbsupnum) + 1
 							layer.msg('点赞成功', {
 								time: 1000,
 								icon: 6
-							}, function() {
-								window.location.reload();
 							});
 						});
 					});
@@ -535,6 +533,7 @@ color: #999 !important;
 
 	    // 收藏商品
 				userInteractionsUp() {
+					var _this = this;
 					layui.http.request('user-interactions/list', 'get', {
 						page: 1,
 						limit: 1,
@@ -546,11 +545,11 @@ color: #999 !important;
 						vue.dataList = res.data.list
 						if(res.data.list.length==1) {
 							layui.http.requestJson(`user-interactions/delete`, 'post', [res.data.list[0].id], function(res) {
+								_this.userInteractionsFlag = 0;
+								_this.userInteractionsCount = Math.max(0, parseInt(_this.userInteractionsCount == null ? 0 : _this.userInteractionsCount, 10) - 1);
 								layer.msg('取消成功', {
 									time: 1000,
 									icon: 5
-								}, function() {
-									window.location.reload();
 								});
 							});
 							return;
@@ -563,11 +562,11 @@ color: #999 !important;
 							resourceId: this.detail.id,
 							tablename: this.detailTable
 						}, function(res) {
+							_this.userInteractionsFlag = 1;
+							_this.userInteractionsCount = parseInt(_this.userInteractionsCount == null ? 0 : _this.userInteractionsCount, 10) + 1;
 							layer.msg('收藏成功', {
 								time: 1000,
 								icon: 6
-							}, function() {
-								window.location.reload();
 							});
 						});
 					});
@@ -888,34 +887,32 @@ color: #999 !important;
 				// 	indicator: swiper.indicator
 				// });
 
-			});
-			if(localStorage.getItem('userid')){
-				http.request(`user-interactions/list`, 'get', {
-					page: 1,
-					limit: 1,
-					type:1,
-					resourceId : vue.detail.id,
-					tablename : vue.detailTable,
-					userId: localStorage.getItem('userid'),
-				}, function(res) {
-					vue.userInteractionsFlag = res.data.list.length;
-				})
-			}
+				// 必须在详情返回后再查当前用户是否已赞/已藏，避免 id 未就绪或与接口不一致导致误判
+				var rid = vue.detail.id;
+				if (localStorage.getItem('userid') && rid != null && rid !== '') {
+					http.request(`user-interactions/list`, 'get', {
+						page: 1,
+						limit: 1,
+						type: 1,
+						resourceId: rid,
+						tablename: vue.detailTable,
+						userId: localStorage.getItem('userid'),
+					}, function(res) {
+						vue.userInteractionsFlag = res.data.list && res.data.list.length > 0 ? 1 : 0;
+					});
+					http.request(`user-interactions/list`, 'get', {
+						page: 1,
+						limit: 1,
+						type: '21',
+						resourceId: rid,
+						tablename: vue.detailTable,
+						userId: localStorage.getItem('userid'),
+					}, function(res) {
+						vue.thumbsupFlag = res.data.list && res.data.list.length > 0 ? 1 : 0;
+					});
+				}
 
-			if(localStorage.getItem('userid')){
-				http.request(`user-interactions/list`, 'get', {
-					page: 1,
-					limit: 1,
-					type:'21',
-					resourceId : vue.detail.id,
-					tablename : vue.detailTable,
-					userId: localStorage.getItem('userid'),
-				}, function(res) {
-					if(res.data.list.length>0) {
-						vue.thumbsupFlag = 1;
-					}
-				})
-			}
+			});
 
 			// 获取评论
 			http.request(`${vue.detailTable}_comment/list`, 'get', {
