@@ -30,3 +30,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# 前端源码在 frontend/，勿再将整站拷贝进 backend/static（避免与 frontend 重复）
+backend/src/main/resources/static/admin/
+backend/src/main/resources/static/front/
