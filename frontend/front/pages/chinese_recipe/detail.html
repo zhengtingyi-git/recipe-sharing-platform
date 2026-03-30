@@ -499,7 +499,7 @@ color: #999 !important;
 				},
 				// 跨表
 				onAcrossTap(acrossTable,crossOptAudit,statusColumnName,tips,statusColumnValue){
-					if(crossOptAudit=='是'&&this.detail.auditStatus!='是') {
+					if(crossOptAudit=='是'&&this.detail.auditStatus!='是'&&this.detail.auditStatus!='1') {
 						layer.msg('请审核通过后再操作', {
 							time: 2000,
 							icon: 3 

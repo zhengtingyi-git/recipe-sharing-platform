@@ -31,6 +31,8 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Arrays;
 
+import com.utils.RecipeAuditStatus;
+
 /**
  * 姣忔棩鎺ㄨ崘锛氬睍绀哄叏閮ㄤ腑寮忕編椋?澶栧浗缇庨锛堝鏍搁€氳繃锛夛紝鏀寔鎸夋渶鏂?鏈€澶氱偣璧?鏈€澶氭敹钘?鎺ㄨ崘鎺掑簭
  */
@@ -55,7 +57,7 @@ public class DailyRecommendationController {
     private ForeignRecipeService foreign_recipeService;
 
     /**
-     * 前端列表：展示全部中式与外国美食（仅 audit_status=是），支持排序：addtime、thumbsupnum、userInteractionsNum。
+     * 前端列表：展示全部中式与外国美食（仅 audit_status=1 或历史「是」），支持排序：addtime、thumbsupnum、userInteractionsNum。
      */
     @IgnoreAuth
     @RequestMapping("/list")
@@ -92,7 +94,7 @@ public class DailyRecommendationController {
         final boolean searchAllFields = "all".equalsIgnoreCase(searchTypeParam);
 
         EntityWrapper<ChineseRecipeEntity> zhongshiEw = new EntityWrapper<>();
-        zhongshiEw.eq("audit_status", "是");
+        zhongshiEw.in("audit_status", Arrays.asList(RecipeAuditStatus.APPROVED, "是"));
         zhongshiEw.eq("source_type", "chinese_recipe");
         List<ChineseRecipeEntity> zhongshiList = chinese_recipeService.selectList(zhongshiEw);
         Map<Long, Integer> zhongshiUserInteractionsMap = new HashMap<>();
@@ -142,7 +144,7 @@ public class DailyRecommendationController {
         }
 
         EntityWrapper<ForeignRecipeEntity> waiguoEw = new EntityWrapper<>();
-        waiguoEw.eq("audit_status", "是");
+        waiguoEw.in("audit_status", Arrays.asList(RecipeAuditStatus.APPROVED, "是"));
         waiguoEw.eq("source_type", "foreign_recipe");
         List<ForeignRecipeEntity> waiguoList = foreign_recipeService.selectList(waiguoEw);
         Map<Long, Integer> waiguoUserInteractionsMap = new HashMap<>();

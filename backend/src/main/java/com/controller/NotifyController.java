@@ -42,6 +42,7 @@ import com.service.ForumPostCommentService;
 import com.service.ChineseRecipeCommentService;
 import com.service.ForeignRecipeCommentService;
 import com.utils.R;
+import com.utils.RecipeAuditStatus;
 
 /**
  * ?????????????????????
@@ -111,7 +112,7 @@ public class NotifyController {
         return R.ok().put("data", unreadPayload(n));
     }
 
-    private static final String[] NOTIFY_TAB_KEYS = { "reply", "thumbsup", "userInteractions", "followMe" };
+    private static final String[] NOTIFY_TAB_KEYS = { "reply", "thumbsup", "userInteractions", "followMe", "audit" };
 
     /** 解析 lastReadByTab JSON；无效或空串返回 null（走单值 lastReadAt 或全未读） */
     private static Map<String, Long> parseLastReadByTab(HttpServletRequest request) {
@@ -147,6 +148,7 @@ public class NotifyController {
         n += countListUnread(data.get("thumbsupList"), tabCutoff(byTab, "thumbsup"));
         n += countListUnread(data.get("userInteractionsList"), tabCutoff(byTab, "userInteractions"));
         n += countListUnread(data.get("followMeList"), tabCutoff(byTab, "followMe"));
+        n += countListUnread(data.get("auditList"), tabCutoff(byTab, "audit"));
         return n;
     }
 
@@ -196,6 +198,7 @@ public class NotifyController {
         n += countListUnread(data.get("thumbsupList"), cutoff);
         n += countListUnread(data.get("userInteractionsList"), cutoff);
         n += countListUnread(data.get("followMeList"), cutoff);
+        n += countListUnread(data.get("auditList"), cutoff);
         return n;
     }
 
@@ -545,7 +548,51 @@ public class NotifyController {
         followMeList.sort(this::compareNotifyTimeDesc);
         result.put("followMeList", followMeList);
 
+        // 5. 菜品审核结果（中式 / 外国）：仅「已通过 / 未通过」，待审核(0)不出现在消息中心
+        List<Map<String, Object>> auditList = new ArrayList<>();
+        EntityWrapper<ChineseRecipeEntity> auditZh = new EntityWrapper<>();
+        auditZh.eq("user_id", userId);
+        auditZh.and("(source_type = 'chinese_recipe' OR source_type IS NULL OR source_type = '')");
+        auditZh.in("audit_status", Arrays.asList(
+                RecipeAuditStatus.APPROVED,
+                RecipeAuditStatus.REJECTED,
+                "是",
+                "否"));
+        auditZh.orderBy("id", false);
+        for (ChineseRecipeEntity r : chinese_recipeService.selectList(auditZh)) {
+            auditList.add(buildAuditNotifyItem(r.getId(), "chinese_recipe", r.getCaipinmingcheng(), r.getTupian(),
+                    r.getAuditStatus(), r.getAuditReply(), r.getCreatedAt()));
+        }
+        EntityWrapper<ForeignRecipeEntity> auditWai = new EntityWrapper<>();
+        auditWai.eq("user_id", userId);
+        auditWai.eq("source_type", "foreign_recipe");
+        auditWai.in("audit_status", Arrays.asList(
+                RecipeAuditStatus.APPROVED,
+                RecipeAuditStatus.REJECTED,
+                "是",
+                "否"));
+        auditWai.orderBy("id", false);
+        for (ForeignRecipeEntity r : foreign_recipeService.selectList(auditWai)) {
+            auditList.add(buildAuditNotifyItem(r.getId(), "foreign_recipe", r.getCaipinmingcheng(), r.getTupian(),
+                    r.getAuditStatus(), r.getAuditReply(), r.getCreatedAt()));
+        }
+        auditList.sort(this::compareNotifyTimeDesc);
+        result.put("auditList", auditList);
+
         return result;
+    }
+
+    private Map<String, Object> buildAuditNotifyItem(Long resourceId, String tablename, String name, String picture,
+            String auditStatus, String auditReply, Date createdAt) {
+        Map<String, Object> item = new HashMap<>();
+        item.put("resourceId", resourceId);
+        item.put("tablename", tablename);
+        item.put("name", name != null ? name : "");
+        item.put("picture", picture);
+        item.put("auditStatus", auditStatus);
+        item.put("auditReply", auditReply != null ? auditReply : "");
+        item.put("createdAt", createdAt);
+        return item;
     }
 
     /** 消息时间倒序：最新的在前（不能使用 Date#toString 做字符串比较，否则顺序错乱） */

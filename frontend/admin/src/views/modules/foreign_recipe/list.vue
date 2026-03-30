@@ -9,13 +9,13 @@
                   <el-input v-if="contents.inputIcon == 1 && contents.inputIconPosition == 2" suffix-icon="el-icon-search" v-model="searchForm.caipinmingcheng" placeholder="菜品名称" clearable></el-input>
                   <el-input v-if="contents.inputIcon == 0" v-model="searchForm.caipinmingcheng" placeholder="菜品名称" clearable></el-input>
                 </el-form-item>
-		<el-form-item class="select" label="是否通过" prop="auditStatus">
-		  <el-select  @change="auditStatusChange" clearable v-model="searchForm.auditStatus" placeholder="是否通过">
+		<el-form-item class="select" label="审核状态" prop="auditStatus">
+		  <el-select  @change="auditStatusChange" clearable v-model="searchForm.auditStatus" placeholder="审核状态">
 		    <el-option
 			v-for="(item,index) in auditStatusOptions"
 			v-bind:key="index"
-			:label="item"
-			:value="item">
+			:label="item.label"
+			:value="item.value">
 		    </el-option>
 		  </el-select>
 		</el-form-item>
@@ -153,11 +153,11 @@
                      </template>
                 </el-table-column>
                 <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign" 
-                    prop="addtime"
+                    prop="createdAt"
                    :header-align="contents.tableAlign"
 		    label="时间">
 		     <template slot-scope="scope">
-                       {{scope.row.addtime}}
+                       {{ scope.row.createdAt || scope.row.addtime }}
                      </template>
                 </el-table-column>
               <el-table-column :sortable="contents.tableSortable" :align="contents.tableAlign" 
@@ -170,7 +170,7 @@
                  :header-align="contents.tableAlign"
                   label="审核状态">
                   <template slot-scope="scope">
-                    <span style="margin-right:10px">{{scope.row.auditStatus=='是'?'通过':'未通过'}}</span>
+                    <span style="margin-right:10px">{{ formatAuditStatus(scope.row.auditStatus) }}</span>
                   </template>
               </el-table-column>
               <el-table-column :sortable="contents.tableSortable" :align="contents.tableAlign" 
@@ -232,8 +232,8 @@
       <el-form ref="form" :model="form" label-width="80px">
         <el-form-item label="审核状态">
           <el-select v-model="shForm.auditStatus" placeholder="审核状态">
-            <el-option label="通过" value="是"></el-option>
-            <el-option label="不通过" value="否"></el-option>
+            <el-option label="通过" value="1"></el-option>
+            <el-option label="不通过" value="2"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="内容">
@@ -472,7 +472,22 @@ export default {
     },
 
     init () {
-        this.auditStatusOptions = "是,否".split(',');
+        this.auditStatusOptions = [
+          { label: '待审核', value: '0' },
+          { label: '审核通过', value: '1' },
+          { label: '审核不通过', value: '2' }
+        ];
+    },
+    formatAuditStatus (s) {
+      if (s === '0' || s === 0) return '待审核';
+      if (s === '1' || s === '是') return '通过';
+      if (s === '2' || s === '否') return '不通过';
+      return s === undefined || s === null || s === '' ? '-' : s;
+    },
+    auditSelectValue (s) {
+      if (s === '是' || s === '1') return '1';
+      if (s === '否' || s === '2') return '2';
+      return s;
     },
     auditStatusChange () {
       this.search();
@@ -553,8 +568,8 @@ export default {
           caipinleixing: row.caipinleixing,
           cailiao: row.cailiao,
           pengrenfangfa: row.pengrenfangfa,
-          addtime: row.addtime,
-          auditStatus: row.auditStatus,
+          addtime: row.createdAt || row.addtime,
+          auditStatus: this.auditSelectValue(row.auditStatus),
           auditReply: row.auditReply,
           thumbsupnum: row.thumbsupnum,
           id: row.id

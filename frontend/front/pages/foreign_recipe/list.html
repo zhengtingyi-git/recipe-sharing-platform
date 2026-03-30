@@ -473,7 +473,7 @@ width: 100%;
         var keyword = jquery('#searchKeyword').val() ? jquery('#searchKeyword').val().trim() : '';
         var searchType = jquery('#searchType').val() || 'caipinmingcheng';
         if (keyword) param[searchType] = keyword;
-        param['auditStatus'] = '是';
+        param['auditStatus'] = '1';
         http.request('foreign_recipe/list', 'get', param, function(res) {
           vue.dataList = res.data.list || [];
           laypage.render({

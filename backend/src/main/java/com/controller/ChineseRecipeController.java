@@ -33,6 +33,7 @@ import com.entity.TokenEntity;
 import com.utils.PageUtils;
 import com.utils.R;
 import com.utils.MPUtil;
+import com.utils.RecipeAuditStatus;
 import com.service.UserInteractionsService;
 import com.entity.UserInteractionsEntity;
 
@@ -169,7 +170,7 @@ public class ChineseRecipeController {
 		chinese_recipe.setSourceType("chinese_recipe");
 		// 语义化查询参数：authorId / approved
 		// - authorId: 发布者用户ID（等价于 userId/userid）
-		// - approved: true 表示仅返回审核通过（等价于 auditStatus='是'）
+		// - approved: true 表示仅返回审核通过（audit_status=1）
 		Object authorId = params.get("authorId");
 		if (authorId != null && chinese_recipe.getUserId() == null) {
 			try {
@@ -180,14 +181,14 @@ public class ChineseRecipeController {
 		if (approved != null && chinese_recipe.getAuditStatus() == null) {
 			String v = approved.toString().trim().toLowerCase();
 			if ("true".equals(v) || "1".equals(v) || "yes".equals(v) || "y".equals(v)) {
-				chinese_recipe.setAuditStatus("是");
+				chinese_recipe.setAuditStatus(RecipeAuditStatus.APPROVED);
 			}
 		}
 		// 防止 MPUtil 将语义化参数误当作列名参与构造
 		params.remove("authorId");
 		params.remove("approved");
 		// 公开列表仅展示审核通过：不依赖前端是否传 auditStatus（旧版传 sfsh 无法绑定到实体导致未审核数据全部露出）
-		chinese_recipe.setAuditStatus("是");
+		chinese_recipe.setAuditStatus(RecipeAuditStatus.APPROVED);
         String sort = params.get("sort") != null ? params.get("sort").toString() : "";
         // 排序列名映射（兼容旧前端键）
         if ("addtime".equals(sort)) {
@@ -365,7 +366,7 @@ public class ChineseRecipeController {
         if (!"chinese_recipe".equals(chinese_recipe.getSourceType())) {
         	return R.error("记录不存在");
         }
-        if (!"是".equals(chinese_recipe.getAuditStatus())) {
+        if (!RecipeAuditStatus.isApproved(chinese_recipe.getAuditStatus())) {
         	Object uid = request.getSession().getAttribute("userId");
         	Long ownerId = chinese_recipe.getUserId();
         	boolean owner = uid != null && ownerId != null && uid.toString().equals(String.valueOf(ownerId));
@@ -410,6 +411,9 @@ public class ChineseRecipeController {
         if (chinese_recipe.getCreatedAt() == null) {
             chinese_recipe.setCreatedAt(new Date());
         }
+        if (chinese_recipe.getAuditStatus() == null || chinese_recipe.getAuditStatus().trim().isEmpty()) {
+            chinese_recipe.setAuditStatus(RecipeAuditStatus.PENDING);
+        }
     	//ValidatorUtils.validateEntity(chinese_recipe);
         chinese_recipeService.insert(chinese_recipe);
         return R.ok();
@@ -432,6 +436,7 @@ public class ChineseRecipeController {
         if (chinese_recipe.getCreatedAt() == null) {
             chinese_recipe.setCreatedAt(new Date());
         }
+        chinese_recipe.setAuditStatus(RecipeAuditStatus.PENDING);
     	//ValidatorUtils.validateEntity(chinese_recipe);
         chinese_recipeService.insert(chinese_recipe);
         return R.ok();

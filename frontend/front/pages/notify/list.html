@@ -1,4 +1,4 @@
-<!-- 消息中心：被点赞、被收藏、被回复 -->
+<!-- 消息中心：被点赞、被收藏、被回复、菜品审核结果 -->
 <!DOCTYPE html>
 <html>
 	<head>
@@ -109,6 +109,7 @@
 					<div class="tab" :class="{ current: currentTab === 'thumbsup' }" @click="switchNotifyTab('thumbsup')">点赞我的<span v-if="tabUnread.thumbsup > 0" class="tab-badge">{{ tabUnread.thumbsup > 99 ? '99+' : tabUnread.thumbsup }}</span></div>
 					<div class="tab" :class="{ current: currentTab === 'user-interactions' }" @click="switchNotifyTab('user-interactions')">收藏我的<span v-if="tabUnread.userInteractions > 0" class="tab-badge">{{ tabUnread.userInteractions > 99 ? '99+' : tabUnread.userInteractions }}</span></div>
 					<div class="tab" :class="{ current: currentTab === 'followMe' }" @click="switchNotifyTab('followMe')">关注我的<span v-if="tabUnread.followMe > 0" class="tab-badge">{{ tabUnread.followMe > 99 ? '99+' : tabUnread.followMe }}</span></div>
+					<div class="tab" :class="{ current: currentTab === 'audit' }" @click="switchNotifyTab('audit')">审核结果<span v-if="tabUnread.audit > 0" class="tab-badge">{{ tabUnread.audit > 99 ? '99+' : tabUnread.audit }}</span></div>
 				</div>
 
 				<!-- 回复我的 -->
@@ -175,6 +176,21 @@
 					</template>
 					<div v-else class="notify-empty">暂无关注消息</div>
 				</template>
+
+				<!-- 审核结果（中式/外国美食） -->
+				<template v-if="currentTab === 'audit'">
+					<template v-if="auditList.length">
+						<div v-for="(item,index) in auditList" :key="'a'+index" class="notify-item" @click="jumpToDetail(item)">
+							<img class="notify-avatar" :src="item.picture ? (baseurl + (item.picture.split(',')[0] || '').trim()) : defaultAvatar" @error="$event.target.src=defaultAvatar" />
+							<div class="notify-body">
+								<div class="notify-title">您的作品《{{ item.name }}》{{ auditStatusLabel(item.auditStatus) }}</div>
+								<div class="notify-desc" v-if="item.auditReply && String(item.auditReply).trim()">审核说明：{{ item.auditReply }}</div>
+								<div class="notify-time">发布时间 {{ item.createdAt | formatNotifyTime }}</div>
+							</div>
+						</div>
+					</template>
+					<div v-else class="notify-empty">暂无审核消息</div>
+				</template>
 			</div>
 		</div>
 
@@ -185,7 +201,7 @@
 		<script src="../../js/utils.js"></script>
 		<script>
 			function loadPerTabLastRead(uid) {
-				var empty = { reply: null, thumbsup: null, userInteractions: null, followMe: null };
+				var empty = { reply: null, audit: null, thumbsup: null, userInteractions: null, followMe: null };
 				if (!uid) {
 					return empty;
 				}
@@ -196,6 +212,7 @@
 						var o = JSON.parse(raw);
 						return {
 							reply: o.reply != null ? o.reply : null,
+							audit: o.audit != null ? o.audit : null,
 							thumbsup: o.thumbsup != null ? o.thumbsup : null,
 							userInteractions: o.userInteractions != null ? o.userInteractions : null,
 							followMe: o.followMe != null ? o.followMe : null
@@ -208,7 +225,7 @@
 				if (legacy != null && legacy !== '') {
 					var m = parseInt(legacy, 10);
 					if (!isNaN(m)) {
-						return { reply: m, thumbsup: m, userInteractions: m, followMe: m };
+						return { reply: m, audit: m, thumbsup: m, userInteractions: m, followMe: m };
 					}
 				}
 				return empty;
@@ -221,8 +238,9 @@
 					baseurl: '',
 					defaultAvatar: '',
 					currentTab: 'reply',
-					perTabLastRead: { reply: null, thumbsup: null, userInteractions: null, followMe: null },
+					perTabLastRead: { reply: null, audit: null, thumbsup: null, userInteractions: null, followMe: null },
 					replyList: [],
+					auditList: [],
 					thumbsupList: [],
 					userInteractionsList: [],
 					followMeList: []
@@ -232,6 +250,7 @@
 						var p = this.perTabLastRead || {};
 						return {
 							reply: this.countUnreadInList(this.replyList, p.reply),
+							audit: this.countUnreadInList(this.auditList, p.audit),
 							thumbsup: this.countUnreadInList(this.thumbsupList, p.thumbsup),
 							userInteractions: this.countUnreadInList(this.userInteractionsList, p.userInteractions),
 							followMe: this.countUnreadInList(this.followMeList, p.followMe)
@@ -308,6 +327,30 @@
 							jump('../' + item.tablename + '/detail.html?id=' + item.resourceId);
 						}
 					},
+					auditStatusLabel: function(st) {
+						if (st === null || st === undefined || st === '') {
+							return '';
+						}
+						var s = String(st).trim();
+						if (s === '1' || s === '是') {
+							return '审核通过';
+						}
+						if (s === '2' || s === '否') {
+							return '审核不通过';
+						}
+						var n = parseInt(s, 10);
+						if (n === 1) {
+							return '审核通过';
+						}
+						if (n === 2) {
+							return '审核不通过';
+						}
+						// 待审核(0)不应出现在本列表；若异常数据出现则不展示文案
+						if (s === '0' || n === 0) {
+							return '';
+						}
+						return '';
+					},
 					createdAtToMs: function(val) {
 						if (val == null || val === '') {
 							return 0;
@@ -352,7 +395,7 @@
 					},
 					/** UI 分签 id -> localStorage / 接口字段名 */
 					tabKeyForUi: function(uiTab) {
-						var map = { 'reply': 'reply', 'thumbsup': 'thumbsup', 'user-interactions': 'userInteractions', 'followMe': 'followMe' };
+						var map = { 'reply': 'reply', 'audit': 'audit', 'thumbsup': 'thumbsup', 'user-interactions': 'userInteractions', 'followMe': 'followMe' };
 						return map[uiTab] || null;
 					},
 					switchNotifyTab: function(uiTab) {
@@ -390,6 +433,8 @@
 							this.currentTab = 'user-interactions';
 						} else if (u.followMe > 0) {
 							this.currentTab = 'followMe';
+						} else if (u.audit > 0) {
+							this.currentTab = 'audit';
 						}
 					}
 				}
@@ -455,6 +500,7 @@
 				http.request('notify/center', 'get', {}, function(res) {
 					if (res.code === 0 && res.data) {
 						vue.replyList = res.data.replyList || [];
+						vue.auditList = res.data.auditList || [];
 						vue.thumbsupList = res.data.thumbsupList || [];
 						vue.userInteractionsList = res.data.userInteractionsList || [];
 						vue.followMeList = res.data.followMeList || [];

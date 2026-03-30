@@ -135,7 +135,7 @@ CREATE TABLE `recipe`  (
   `dish_type` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL DEFAULT NULL COMMENT '菜品类型',
   `ingredients` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL DEFAULT NULL COMMENT '材料',
   `cooking_method` longtext CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL COMMENT '烹饪方法',
-  `audit_status` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL DEFAULT '否' COMMENT '是否审核',
+  `audit_status` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL DEFAULT '0' COMMENT '审核：0待审 1通过 2不通过',
   `audit_reply` longtext CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL COMMENT '审核回复',
   `view_count` int NULL DEFAULT 0 COMMENT '点击次数',
   `user_id` bigint NOT NULL,

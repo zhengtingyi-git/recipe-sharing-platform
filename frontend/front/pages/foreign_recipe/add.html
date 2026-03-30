@@ -451,6 +451,7 @@
                         // 跨表计算
 
 
+						data.auditStatus = '0';
 						// 提交数据
 						http.requestJson('foreign_recipe' + '/add', 'post', data, function(res) {
 							layer.msg('提交成功', {
@@ -464,6 +465,7 @@
 				});
 			} else {
                 // 跨表计算
+				data.auditStatus = '0';
 				// 提交数据
 				http.requestJson('foreign_recipe' + '/add', 'post', data, function(res) {
 					layer.msg('提交成功', {

@@ -33,6 +33,7 @@ import com.entity.TokenEntity;
 import com.utils.PageUtils;
 import com.utils.R;
 import com.utils.MPUtil;
+import com.utils.RecipeAuditStatus;
 import com.service.UserInteractionsService;
 import com.entity.UserInteractionsEntity;
 
@@ -173,13 +174,13 @@ public class ForeignRecipeController {
 		if (approved != null && foreign_recipe.getAuditStatus() == null) {
 			String v = approved.toString().trim().toLowerCase();
 			if ("true".equals(v) || "1".equals(v) || "yes".equals(v) || "y".equals(v)) {
-				foreign_recipe.setAuditStatus("是");
+				foreign_recipe.setAuditStatus(RecipeAuditStatus.APPROVED);
 			}
 		}
 		params.remove("authorId");
 		params.remove("approved");
 		// 公开列表仅展示审核通过：不依赖前端是否传 auditStatus（旧版传 sfsh 无法绑定到实体导致未审核数据全部露出）
-		foreign_recipe.setAuditStatus("是");
+		foreign_recipe.setAuditStatus(RecipeAuditStatus.APPROVED);
         String sort = params.get("sort") != null ? params.get("sort").toString() : "";
         // 排序列名映射（兼容旧前端键）
         if ("addtime".equals(sort)) {
@@ -357,7 +358,7 @@ public class ForeignRecipeController {
         if (!"foreign_recipe".equals(foreign_recipe.getSourceType())) {
         	return R.error("记录不存在");
         }
-        if (!"是".equals(foreign_recipe.getAuditStatus())) {
+        if (!RecipeAuditStatus.isApproved(foreign_recipe.getAuditStatus())) {
         	Object uid = request.getSession().getAttribute("userId");
         	Long ownerId = foreign_recipe.getUserId();
         	boolean owner = uid != null && ownerId != null && uid.toString().equals(String.valueOf(ownerId));
@@ -401,6 +402,9 @@ public class ForeignRecipeController {
         if (foreign_recipe.getCreatedAt() == null) {
             foreign_recipe.setCreatedAt(new Date());
         }
+        if (foreign_recipe.getAuditStatus() == null || foreign_recipe.getAuditStatus().trim().isEmpty()) {
+            foreign_recipe.setAuditStatus(RecipeAuditStatus.PENDING);
+        }
     	//ValidatorUtils.validateEntity(foreign_recipe);
         foreign_recipeService.insert(foreign_recipe);
         return R.ok();
@@ -423,6 +427,7 @@ public class ForeignRecipeController {
         if (foreign_recipe.getCreatedAt() == null) {
             foreign_recipe.setCreatedAt(new Date());
         }
+        foreign_recipe.setAuditStatus(RecipeAuditStatus.PENDING);
     	//ValidatorUtils.validateEntity(foreign_recipe);
         foreign_recipeService.insert(foreign_recipe);
         return R.ok();
