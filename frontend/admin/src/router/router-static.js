@@ -1,4 +1,4 @@
-﻿import Vue from 'vue';
+import Vue from 'vue';
 //配置路由
 import VueRouter from 'vue-router'
 Vue.use(VueRouter);
@@ -14,7 +14,7 @@ import center from '@/views/center'
     import forumPost from '@/views/modules/forum-post/list'
     import chinese_recipe from '@/views/modules/chinese_recipe/list'
     import foreign_recipe from '@/views/modules/foreign_recipe/list'
-    import yonghu from '@/views/modules/user/list'
+    import user from '@/views/modules/user/list'
     import chinese_recipe_comment from '@/views/modules/chinese_recipe_comment/list'
     import foreign_recipe_comment from '@/views/modules/foreign_recipe_comment/list'
     import config from '@/views/modules/config/list'
@@ -70,7 +70,7 @@ const routes = [{
       ,{
 	path: '/user',
         name: '用户',
-        component: yonghu
+        component: user
       }
       ,{
 	path: '/chinese_recipe_comment',

@@ -288,7 +288,7 @@ export default {
     // 多级联动参数
     info(id) {
       this.$http({
-        url: `yonghu/info/${id}`,
+        url: `user/info/${id}`,
         method: "get"
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -363,7 +363,7 @@ var objcross = this.$storage.getObj('crossObj');
 				crossrefid:this.ruleForm.crossrefid,
 			} 
 			this.$http({ 
-				url: "yonghu/page", 
+				url: "user/page", 
 				method: "get", 
 				params: params 
 			}).then(({ 
@@ -375,7 +375,7 @@ var objcross = this.$storage.getObj('crossObj');
 					       return false;
 				       } else {
 					 this.$http({
-					   url: `yonghu/${!this.ruleForm.id ? "save" : "update"}`,
+					   url: `user/${!this.ruleForm.id ? "save" : "update"}`,
 					   method: "post",
 					   data: this.ruleForm
 					 }).then(({ data }) => {
@@ -387,7 +387,7 @@ var objcross = this.$storage.getObj('crossObj');
 					       onClose: () => {
 						 this.parent.showFlag = true;
 						 this.parent.addOrUpdateFlag = false;
-						 this.parent.yonghuCrossAddOrUpdateFlag = false;
+						 this.parent.crossAddOrUpdateFlag = false;
 						 this.parent.search();
 						 this.parent.contentStyleChange();
 					       }
@@ -403,7 +403,7 @@ var objcross = this.$storage.getObj('crossObj');
 			});
 		 } else {
 			 this.$http({
-			   url: `yonghu/${!this.ruleForm.id ? "save" : "update"}`,
+			   url: `user/${!this.ruleForm.id ? "save" : "update"}`,
 			   method: "post",
 			   data: this.ruleForm
 			 }).then(({ data }) => {
@@ -415,7 +415,7 @@ var objcross = this.$storage.getObj('crossObj');
 			       onClose: () => {
 				 this.parent.showFlag = true;
 				 this.parent.addOrUpdateFlag = false;
-				 this.parent.yonghuCrossAddOrUpdateFlag = false;
+				 this.parent.crossAddOrUpdateFlag = false;
 				 this.parent.search();
 				 this.parent.contentStyleChange();
 			       }
@@ -436,7 +436,7 @@ var objcross = this.$storage.getObj('crossObj');
     back() {
       this.parent.showFlag = true;
       this.parent.addOrUpdateFlag = false;
-      this.parent.yonghuCrossAddOrUpdateFlag = false;
+      this.parent.crossAddOrUpdateFlag = false;
       this.parent.contentStyleChange();
     },
     avatarUploadChange(fileUrls) {

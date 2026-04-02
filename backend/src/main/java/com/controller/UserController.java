@@ -64,18 +64,19 @@ public class UserController {
      */
 	@IgnoreAuth
     @RequestMapping("/register")
-    public R register(@RequestBody UserEntity yonghu){
+    public R register(@RequestBody UserEntity user){
     	//ValidatorUtils.validateEntity(user);
-    	if(yonghu.getPhone() == null || yonghu.getPhone().trim().isEmpty()) {
+    	if(user.getPhone() == null || user.getPhone().trim().isEmpty()) {
 			return R.error("手机号不能为空");
 		}
-    	UserEntity user = userService.selectOne(new EntityWrapper<UserEntity>().eq("username", yonghu.getUsername()));
-		if(user!=null) {
+    	// 防止重复注册：用户名已存在则拒绝
+    	UserEntity existingUser = userService.selectOne(new EntityWrapper<UserEntity>().eq("username", user.getUsername()));
+		if(existingUser!=null) {
 			return R.error("注册用户已存在");
 		}
 		Long uId = new Date().getTime();
-		yonghu.setId(uId);
-        userService.insert(yonghu);
+		user.setId(uId);
+        userService.insert(user);
         return R.ok();
     }
 
@@ -119,10 +120,10 @@ public class UserController {
      * 后端列表
      */
     @RequestMapping("/page")
-    public R page(@RequestParam Map<String, Object> params, UserEntity yonghu,
+    public R page(@RequestParam Map<String, Object> params, UserEntity user,
 				  HttpServletRequest request){
         EntityWrapper<UserEntity> ew = new EntityWrapper<UserEntity>();
-		PageUtils page = userService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, yonghu), params), params));
+		PageUtils page = userService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, user), params), params));
 
         return R.ok().put("data", page);
     }
@@ -132,10 +133,10 @@ public class UserController {
      */
 	@IgnoreAuth
     @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params, UserEntity yonghu,
+    public R list(@RequestParam Map<String, Object> params, UserEntity user,
 				  HttpServletRequest request){
         EntityWrapper<UserEntity> ew = new EntityWrapper<UserEntity>();
-		PageUtils page = userService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, yonghu), params), params));
+		PageUtils page = userService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, user), params), params));
         return R.ok().put("data", page);
     }
 
@@ -143,9 +144,9 @@ public class UserController {
      * 列表
      */
     @RequestMapping("/lists")
-    public R list( UserEntity yonghu){
+    public R list( UserEntity user){
        	EntityWrapper<UserEntity> ew = new EntityWrapper<UserEntity>();
-      	ew.allEq(MPUtil.allEQMapPre( yonghu, "user")); 
+      	ew.allEq(MPUtil.allEQMapPre( user, "user")); 
         return R.ok().put("data", userService.selectListView(ew));
     }
 
@@ -153,11 +154,11 @@ public class UserController {
      * 查询
      */
     @RequestMapping("/query")
-    public R query(UserEntity yonghu){
+    public R query(UserEntity user){
         EntityWrapper<UserEntity> ew = new EntityWrapper<UserEntity>();
- 		ew.allEq(MPUtil.allEQMapPre( yonghu, "user")); 
-		UserView yonghuView =  userService.selectView(ew);
-		return R.ok("查询用户成功").put("data", yonghuView);
+ 		ew.allEq(MPUtil.allEQMapPre( user, "user")); 
+		UserView userView =  userService.selectView(ew);
+		return R.ok("查询用户成功").put("data", userView);
     }
 	
     /**
@@ -165,8 +166,8 @@ public class UserController {
      */
     @RequestMapping("/info/{id}")
     public R info(@PathVariable("id") Long id){
-        UserEntity yonghu = userService.selectById(id);
-        return R.ok().put("data", yonghu);
+        UserEntity user = userService.selectById(id);
+        return R.ok().put("data", user);
     }
 
     /**
@@ -175,8 +176,8 @@ public class UserController {
 	@IgnoreAuth
     @RequestMapping("/detail/{id}")
     public R detail(@PathVariable("id") Long id){
-        UserEntity yonghu = userService.selectById(id);
-        return R.ok().put("data", yonghu);
+        UserEntity user = userService.selectById(id);
+        return R.ok().put("data", user);
     }
     
 
@@ -186,15 +187,15 @@ public class UserController {
      * 后端保存
      */
     @RequestMapping("/save")
-    public R save(@RequestBody UserEntity yonghu, HttpServletRequest request){
-    	yonghu.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
+    public R save(@RequestBody UserEntity user, HttpServletRequest request){
+    	user.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
     	//ValidatorUtils.validateEntity(user);
-    	UserEntity user = userService.selectOne(new EntityWrapper<UserEntity>().eq("username", yonghu.getUsername()));
-		if(user!=null) {
+    	UserEntity existingUser = userService.selectOne(new EntityWrapper<UserEntity>().eq("username", user.getUsername()));
+		if(existingUser!=null) {
 			return R.error("用户已存在");
 		}
-		yonghu.setId(new Date().getTime());
-        userService.insert(yonghu);
+		user.setId(new Date().getTime());
+        userService.insert(user);
         return R.ok();
     }
     
@@ -202,15 +203,15 @@ public class UserController {
      * 前端保存
      */
     @RequestMapping("/add")
-    public R add(@RequestBody UserEntity yonghu, HttpServletRequest request){
-    	yonghu.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
+    public R add(@RequestBody UserEntity user, HttpServletRequest request){
+    	user.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
     	//ValidatorUtils.validateEntity(user);
-    	UserEntity user = userService.selectOne(new EntityWrapper<UserEntity>().eq("username", yonghu.getUsername()));
-		if(user!=null) {
+    	UserEntity existingUser = userService.selectOne(new EntityWrapper<UserEntity>().eq("username", user.getUsername()));
+		if(existingUser!=null) {
 			return R.error("用户已存在");
 		}
-		yonghu.setId(new Date().getTime());
-        userService.insert(yonghu);
+		user.setId(new Date().getTime());
+        userService.insert(user);
         return R.ok();
     }
 
@@ -218,9 +219,9 @@ public class UserController {
      * 修改
      */
     @RequestMapping("/update")
-    public R update(@RequestBody UserEntity yonghu, HttpServletRequest request){
+    public R update(@RequestBody UserEntity user, HttpServletRequest request){
         //ValidatorUtils.validateEntity(user);
-        userService.updateById(yonghu);//全部更新
+        userService.updateById(user);//全部更新
         return R.ok();
     }
     

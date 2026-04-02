@@ -4,7 +4,7 @@
 <mapper namespace="com.dao.UserDao">
 
 	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="com.entity.UserEntity" id="yonghuMap">
+    <resultMap type="com.entity.UserEntity" id="userMap">
         <result property="username" column="username"/>
         <result property="nickname" column="nickname"/>
         <result property="password" column="password"/>
@@ -16,26 +16,26 @@
 
 	<select id="selectListVO"
 		resultType="com.entity.vo.UserVO" >
-		SELECT * FROM user  yonghu         
+		SELECT * FROM user  u         
         <where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 	
 	<select id="selectVO"
 		resultType="com.entity.vo.UserVO" >
-		SELECT  yonghu.* FROM user  yonghu 	
+		SELECT  u.* FROM user  u	
  		<where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 
     <select id="selectListView"
 		resultType="com.entity.view.UserView" >
 
-		SELECT  yonghu.* FROM user  yonghu 	        
+		SELECT  u.* FROM user  u	        
         <where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 	
 	<select id="selectView"
 		resultType="com.entity.view.UserView" >
-		SELECT * FROM user  yonghu <where> 1=1 ${ew.sqlSegment}</where>
+		SELECT * FROM user  u <where> 1=1 ${ew.sqlSegment}</where>
 	</select>
 	
 

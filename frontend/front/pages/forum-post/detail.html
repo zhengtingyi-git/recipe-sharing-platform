@@ -750,16 +750,17 @@
 						vue.followFlag = (r.data && r.data.followed) ? 1 : 0;
 					});
 				}
-				http.request('user-interactions/list', 'get', {
-					page: 1,
-					limit: 1,
-					type: 1,
-						resourceId: vue.detail.id,
-					tablename: vue.detailTable
-				}, function(rc) {
-					vue.userInteractionsCount = rc.data && typeof rc.data.total === 'number' ? rc.data.total : 0;
-				});
+				// 游客访问详情时不要请求 user-interactions/list（该接口需登录，会触发 401 跳转登录页）
 				if (localStorage.getItem('userid')) {
+					http.request('user-interactions/list', 'get', {
+						page: 1,
+						limit: 1,
+						type: 1,
+						resourceId: vue.detail.id,
+						tablename: vue.detailTable
+					}, function(rc) {
+						vue.userInteractionsCount = rc.data && typeof rc.data.total === 'number' ? rc.data.total : 0;
+					});
 					http.request('user-interactions/list', 'get', {
 						page: 1,
 						limit: 1,
@@ -780,6 +781,8 @@
 					}, function(r2) {
 						vue.thumbsupFlag = r2.data.list && r2.data.list.length > 0 ? 1 : 0;
 					});
+				} else {
+					vue.userInteractionsCount = 0;
 				}
 			});
 

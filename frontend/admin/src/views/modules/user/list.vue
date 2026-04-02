@@ -474,7 +474,7 @@ export default {
         type: "warning"
       }).then(() => {
         this.$http({
-          url: "yonghu/delete",
+          url: "user/delete",
           method: "post",
           data: ids
         }).then(({ data }) => {
